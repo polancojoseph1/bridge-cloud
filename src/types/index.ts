@@ -50,6 +50,57 @@ export interface ChatStore {
   setSidebarOpen: (open: boolean) => void;
 }
 
+export interface Instance {
+  instanceId: string;
+  agentId: string;
+  conversationId: string | null;
+  label: string;
+  createdAt: number;
+  isPinned: boolean;
+}
+
+export interface InstanceStore {
+  instances: Instance[];
+  activeInstanceId: string | null;
+  activeInstance: () => Instance | null;
+  createInstance: (agentId: string) => string;
+  closeInstance: (instanceId: string) => void;
+  setActiveInstance: (instanceId: string) => void;
+  setInstanceConversation: (instanceId: string, conversationId: string) => void;
+}
+
+export interface AgentWithHealth extends Agent {
+  health?: HealthStatus;
+  latencyMs?: number;
+  isOnline: boolean;
+  healthStatus?: HealthStatus;
+}
+
+export type OrchestrationMode = 'single' | 'broadcast' | 'parallel' | 'pipeline' | 'gather';
+
+export interface SubtaskResult {
+  nodeId: string;
+  nodeName: string;
+  status: 'pending' | 'running' | 'done' | 'error' | 'failed' | 'timeout' | 'streaming' | 'sent';
+  nodeColor?: string;
+  elapsedMs?: number;
+  result?: string;
+  subtaskId?: string;
+  output: string;
+}
+
+export interface OrchestrationJob {
+  jobId: string;
+  mode: OrchestrationMode;
+  prompt: string;
+  nodeIds: string[];
+  status: 'running' | 'done' | 'error' | 'reducing';
+  results: Record<string, string>;
+  subtasks: SubtaskResult[];
+  finalResult?: string;
+  createdAt: number;
+}
+
 export type ServerTier = 'local' | 'cloud';
 export type HealthStatus = 'unknown' | 'checking' | 'online' | 'offline' | 'auth_error';
 
@@ -65,6 +116,7 @@ export interface ServerProfile {
   lastCheckedAt: number | null;
   createdAt: number;
   cloudProvisionStatus?: 'pending' | 'provisioned';
+  pricingTier?: 'free' | 'pro';
 }
 
 export interface ServerStore {
@@ -81,4 +133,10 @@ export interface ServerStore {
   setDefault: (id: string) => void;
   setActiveProfile: (id: string | null) => void;
   connectProfile: (id: string) => Promise<HealthStatus>;
+  isManageModalOpen: boolean;
+  isManageOpen: boolean;
+  manageModalView: 'list' | 'add';
+  manageTab: 'list' | 'add';
+  openManage: (view?: 'list' | 'add') => void;
+  closeManage: () => void;
 }

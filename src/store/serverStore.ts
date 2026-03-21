@@ -14,6 +14,12 @@ export const useServerStore = create<ServerStore>()(
       profiles: [],
       activeProfileId: null,
       connectionStatus: 'unknown' as HealthStatus,
+      isManageModalOpen: false,
+      isManageOpen: false,
+      manageModalView: 'list' as 'list' | 'add',
+      manageTab: 'list' as 'list' | 'add',
+      openManage: (view = 'list') => set({ isManageModalOpen: true, isManageOpen: true, manageModalView: view, manageTab: view }),
+      closeManage: () => set({ isManageModalOpen: false, isManageOpen: false }),
 
       activeProfile: () =>
         get().profiles.find(p => p.id === get().activeProfileId) ?? null,
