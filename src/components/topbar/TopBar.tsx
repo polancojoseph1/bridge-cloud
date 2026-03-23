@@ -1,6 +1,7 @@
 'use client';
 
 import AgentSelector from './AgentSelector';
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 interface TopBarProps {
   activeAgentId: string;
