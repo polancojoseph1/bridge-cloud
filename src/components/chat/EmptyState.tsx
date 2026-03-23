@@ -1,6 +1,5 @@
 'use client';
 import { useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 
@@ -12,7 +11,6 @@ const SUGGESTIONS = [
 ];
 
 export default function EmptyState() {
-  const router = useRouter();
   const newConversation = useChatStore(s => s.newConversation);
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
@@ -29,11 +27,10 @@ export default function EmptyState() {
     if (activeConv && activeConv.messages.length === 0) {
       sendMessage(text);
     } else {
-      const id = newConversation();
-      router.push('/chat/' + id);
-      setTimeout(() => sendMessage(text), 100);
+      newConversation();
+      sendMessage(text);
     }
-  }, [newConversation, router, sendMessage]);
+  }, [newConversation, sendMessage]);
 
   const handleSubmit = () => {
     const trimmed = value.trim();

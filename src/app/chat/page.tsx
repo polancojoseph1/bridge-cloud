@@ -1,6 +1,6 @@
 'use client';
-import EmptyState from '@/components/chat/EmptyState';
+import ChatView from '@/components/chat/ChatView';
 
 export default function ChatPage() {
-  return <EmptyState />;
+  return <ChatView />;
 }
