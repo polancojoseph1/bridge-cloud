@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { checkHealth } from './healthCheck';
 
 describe('checkHealth', () => {
-  const mockUrl = 'http://localhost:3000';
+  // Use a public non-internal IP so SSRF guard doesn't block it
+  const mockUrl = 'http://203.0.113.1:3000';
   const mockApiKey = 'test-api-key';
 
   beforeEach(() => {
     vi.useFakeTimers();
-    // Clear mock fetch before each test
     global.fetch = vi.fn();
   });
 
@@ -26,9 +26,10 @@ describe('checkHealth', () => {
 
     const result = await checkHealth(mockUrl, mockApiKey);
 
-    expect(global.fetch).toHaveBeenCalledWith(`${mockUrl}/v1/health`, expect.objectContaining({
-      method: 'GET',
-      headers: { 'X-API-Key': mockApiKey },
+    expect(global.fetch).toHaveBeenCalledWith('/api/proxy/verify', expect.objectContaining({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: mockUrl, apiKey: mockApiKey }),
     }));
 
     expect(result).toEqual({
@@ -70,6 +71,7 @@ describe('checkHealth', () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: false,
       status: 500,
+      text: async () => 'Server returned 500',
     });
 
     const result = await checkHealth(mockUrl, mockApiKey);
@@ -81,12 +83,10 @@ describe('checkHealth', () => {
   });
 
   it('should handle offline status on timeout (AbortError)', async () => {
-    // Mock fetch to simulate it taking too long and being aborted by the controller
     const abortError = new Error('The operation was aborted');
     abortError.name = 'AbortError';
 
-    (global.fetch as ReturnType<typeof vi.fn>).mockImplementationOnce(async (url, options) => {
-      // Simulate fetch being aborted when the signal is triggered
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementationOnce(async (_url, options) => {
       return new Promise((resolve, reject) => {
         if (options?.signal) {
           options.signal.addEventListener('abort', () => reject(abortError));
@@ -94,12 +94,8 @@ describe('checkHealth', () => {
       });
     });
 
-    // Start checkHealth but do not await it yet
     const healthPromise = checkHealth(mockUrl, mockApiKey);
-
-    // Fast-forward time to trigger the timeout which will call controller.abort()
     vi.advanceTimersByTime(8000);
-
     const result = await healthPromise;
 
     expect(result).toEqual({
@@ -120,7 +116,6 @@ describe('checkHealth', () => {
   });
 
   it('should handle unknown errors gracefully', async () => {
-    // Reject with a non-Error object
     (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce('string error');
 
     const result = await checkHealth(mockUrl, mockApiKey);
@@ -141,9 +136,18 @@ describe('checkHealth', () => {
 
     await checkHealth(mockUrl, '');
 
-    expect(global.fetch).toHaveBeenCalledWith(`${mockUrl}/v1/health`, expect.objectContaining({
-      method: 'GET',
-      headers: {},
+    expect(global.fetch).toHaveBeenCalledWith('/api/proxy/verify', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ url: mockUrl, apiKey: '' }),
     }));
+  });
+
+  it('should reject internal/localhost URLs with SSRF guard', async () => {
+    const result = await checkHealth('http://localhost:3000', mockApiKey);
+    expect(result).toEqual({
+      status: 'offline',
+      error: 'Forbidden internal hostname or IP',
+    });
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });
