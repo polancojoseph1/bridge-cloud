@@ -37,7 +37,7 @@ export const useChatStore = create<ChatStore>()(
         return id;
       },
 
-      setActiveConversation: (id: string) => set({ activeConversationId: id }),
+      setActiveConversation: (id: string | null) => set({ activeConversationId: id }),
 
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 

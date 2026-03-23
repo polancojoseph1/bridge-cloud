@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { Check, Plus, Settings } from 'lucide-react';
+import { Check, Plus, Settings, UserCircle, LogIn, UserPlus } from 'lucide-react';
 import { useServerStore } from '@/store/serverStore';
 import { cn } from '@/lib/cn';
 import type { HealthStatus } from '@/types';
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 interface Props {
   onClose: () => void;
@@ -80,6 +81,30 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
           <Settings size={13} />
           Manage servers
         </button>
+      </div>
+
+      {/* Account / Auth section */}
+      <div className="border-t border-[#2d4035] mt-1 pt-1 pb-1">
+        <Show when="signed-in">
+          <div className="w-full flex items-center gap-2.5 px-3 py-1.5 transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+            <UserButton />
+            <span className="flex-1">Account settings</span>
+          </div>
+        </Show>
+        <Show when="signed-out">
+          <SignInButton mode="modal">
+            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+              <LogIn size={13} />
+              Log in
+            </button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+              <UserPlus size={13} />
+              Sign up
+            </button>
+          </SignUpButton>
+        </Show>
       </div>
     </div>
   );

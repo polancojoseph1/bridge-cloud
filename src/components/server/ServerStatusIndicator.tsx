@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useServerStore } from '@/store/serverStore';
 import { cn } from '@/lib/cn';
 import ServerSwitcherPopover from './ServerSwitcherPopover';
@@ -47,7 +47,11 @@ export default function ServerStatusIndicator() {
           <div className="text-[13px] text-[#ececec] truncate leading-tight">{activeProfile.name}</div>
           <div className="text-[11px] text-[#8e8e8e] leading-tight">{statusLabel}</div>
         </div>
-        <ChevronUp size={12} className="text-[#565656] flex-shrink-0" />
+        {showPopover ? (
+          <ChevronDown size={12} className="text-[#565656] flex-shrink-0" />
+        ) : (
+          <ChevronUp size={12} className="text-[#565656] flex-shrink-0" />
+        )}
       </button>
     </div>
   );

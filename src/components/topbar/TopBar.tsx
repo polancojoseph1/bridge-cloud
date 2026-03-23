@@ -1,7 +1,6 @@
 'use client';
 
 import AgentSelector from './AgentSelector';
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 interface TopBarProps {
   activeAgentId: string;
@@ -20,23 +19,6 @@ export default function TopBar({ activeAgentId, onAgentSelect }: TopBarProps) {
         <div className="flex items-center">
           <AgentSelector activeAgentId={activeAgentId} onSelect={onAgentSelect} />
         </div>
-
-        {/* Authentication */}
-        <Show when="signed-out">
-          <SignInButton mode="modal">
-            <button className="text-sm font-medium text-[#8e8e8e] hover:text-[#ececec] transition-colors">
-              Log in
-            </button>
-          </SignInButton>
-          <SignUpButton mode="modal">
-            <button className="text-sm font-medium bg-[#1e3025] hover:bg-[#2a4334] text-[#ececec] px-3 py-1.5 rounded-md transition-colors">
-              Sign up
-            </button>
-          </SignUpButton>
-        </Show>
-        <Show when="signed-in">
-          <UserButton />
-        </Show>
       </div>
     </header>
   );
