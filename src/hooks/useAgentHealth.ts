@@ -9,9 +9,14 @@ type StatusBroadcast = HealthStatus;
 let cachedStatus: StatusBroadcast = 'checking';
 const listeners = new Set<(s: StatusBroadcast) => void>();
 
+let serverStoreModule: typeof import('@/store/serverStore') | null = null;
+
 async function pollActive() {
   try {
-    const { useServerStore } = await import('@/store/serverStore');
+    if (!serverStoreModule) {
+      serverStoreModule = await import('@/store/serverStore');
+    }
+    const { useServerStore } = serverStoreModule;
     const profile = useServerStore.getState().activeProfile();
     if (!profile?.url) {
       cachedStatus = 'offline';
