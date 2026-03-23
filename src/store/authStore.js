@@ -9,19 +9,10 @@ export const useAuthStore = create((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      // Demo login - always succeeds for demo credentials
-      const user = {
-        id: `user-${Date.now()}`,
-        name: email.split('@')[0],
-        email,
-      };
-      
-      set({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-      return true;
+      // AUTHENTICATION NOT IMPLEMENTED:
+      // Hardcoded demo logic has been removed for security.
+      // Connect this to your real authentication service (e.g., Auth0, Firebase, or your own backend).
+      throw new Error('Authentication is currently disabled for security. Please configure a real auth provider.');
     } catch (error) {
       set({
         error: error.message,
@@ -34,18 +25,10 @@ export const useAuthStore = create((set) => ({
   signup: async (name, email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const user = {
-        id: `user-${Date.now()}`,
-        name,
-        email,
-      };
-      
-      set({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-      return true;
+      // AUTHENTICATION NOT IMPLEMENTED:
+      // Hardcoded demo logic has been removed for security.
+      // Connect this to your real authentication service.
+      throw new Error('Sign-up is currently disabled for security. Please configure a real auth provider.');
     } catch (error) {
       set({
         error: error.message,
