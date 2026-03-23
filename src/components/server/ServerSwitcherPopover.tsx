@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, Settings } from 'lucide-react';
 import { useServerStore } from '@/store/serverStore';
 import { cn } from '@/lib/cn';
 import type { HealthStatus } from '@/types';
@@ -19,7 +19,7 @@ const dotColor = (s: HealthStatus) => ({
 
 export default function ServerSwitcherPopover({ onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const { profiles, activeProfileId, connectProfile } = useServerStore();
+  const { profiles, activeProfileId, connectProfile, openManage } = useServerStore();
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -66,9 +66,19 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
         </button>
       ))}
       <div className="border-t border-[#2d4035] mt-1 pt-1">
-        <button className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+        <button
+          onClick={() => { openManage('add'); onClose(); }}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]"
+        >
           <Plus size={13} />
           Add server
+        </button>
+        <button
+          onClick={() => { openManage('list'); onClose(); }}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]"
+        >
+          <Settings size={13} />
+          Manage servers
         </button>
       </div>
     </div>
