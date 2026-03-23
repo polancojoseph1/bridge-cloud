@@ -9,6 +9,15 @@ interface MarkdownRendererProps {
   className?: string;
 }
 
+interface CodeComponentProps extends React.ComponentPropsWithoutRef<'code'> {
+  node?: {
+    position?: {
+      start: { line: number };
+      end: { line: number };
+    };
+  };
+}
+
 export default function MarkdownRenderer({ content, isStreaming, className }: MarkdownRendererProps) {
   return (
     <div className={cn('text-[15px] leading-[1.75] text-[#ececec]', isStreaming && 'stream-cursor', className)}>
@@ -64,7 +73,7 @@ export default function MarkdownRenderer({ content, isStreaming, className }: Ma
           // Handles both inline and block code.
           // Block code: multiline OR has a language className.
           // Inline code: single line, no language class.
-          code: ({ node, children, className: langClass, ...props }: any) => {
+          code: ({ node, children, className: langClass, ...props }: CodeComponentProps) => {
             const isBlock = langClass?.startsWith('language-') ||
               (node?.position?.start?.line !== node?.position?.end?.line);
             if (isBlock) {
