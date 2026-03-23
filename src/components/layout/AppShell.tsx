@@ -6,6 +6,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ServerGate from '@/components/server/ServerGate';
 import ConnectForm from '@/components/server/ConnectForm';
+import ServerManageModal from '@/components/server/ServerManageModal';
 import { cn } from '@/lib/cn';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -69,6 +70,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      {/* Server Manager Modal */}
+      <ServerManageModal />
     </div>
   );
 }

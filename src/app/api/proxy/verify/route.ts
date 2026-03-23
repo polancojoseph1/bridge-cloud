@@ -11,6 +11,19 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Validate URL protocol to prevent SSRF
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      throw new Error('Invalid protocol');
+    }
+  } catch (err) {
+    return new Response(JSON.stringify({ error: 'Invalid server URL' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const result = await checkHealth(url, apiKey ?? '');
   return new Response(JSON.stringify(result), {
     status: result.status === 'online' ? 200 : 503,
