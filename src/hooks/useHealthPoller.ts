@@ -10,7 +10,7 @@ export function useHealthPoller() {
   useEffect(() => {
     if (profiles.length === 0) return;
     async function checkAll() {
-      for (const p of profiles) await connectProfile(p.id);
+      await Promise.all(profiles.map(p => connectProfile(p.id)));
     }
     if (!didInitialPoll.current) {
       didInitialPoll.current = true;
