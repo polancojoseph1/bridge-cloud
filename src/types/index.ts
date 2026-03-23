@@ -8,6 +8,7 @@ export interface Message {
   agentId: string | null;
   createdAt: number;
   isStreaming: boolean;
+  errorType?: 'connection';
 }
 
 export interface Conversation {

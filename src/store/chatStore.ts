@@ -101,7 +101,18 @@ export const useChatStore = create<ChatStore>()(
           try {
             await streamFromProxy(agentId, content, convId, onChunk);
           } catch (error) {
-            onChunk('*No connection detected. Please connect to your model.*');
+            set(s => ({
+              conversations: s.conversations.map(c =>
+                c.id === convId
+                  ? {
+                      ...c,
+                      messages: c.messages.map(m =>
+                        m.id === assistantMsgId ? { ...m, content: 'No connection detected.', errorType: 'connection' as const } : m
+                      ),
+                    }
+                  : c
+              ),
+            }));
           }
         } else {
           const { streamMockResponse } = await import('@/lib/mockApi');
