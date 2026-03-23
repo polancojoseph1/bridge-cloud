@@ -57,5 +57,13 @@ describe('utils', () => {
     it('handles empty strings', () => {
       expect(truncate('', 5)).toBe('');
     });
+
+    it('handles n = 0', () => {
+      expect(truncate('hello', 0)).toBe('…');
+    });
+
+    it('handles very large n', () => {
+      expect(truncate('hello', 1000)).toBe('hello');
+    });
   });
 });
