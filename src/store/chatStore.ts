@@ -98,7 +98,11 @@ export const useChatStore = create<ChatStore>()(
         const hasServer = useServerStore.getState().activeProfile() !== null;
         if (hasServer) {
           const { streamFromProxy } = await import('@/lib/streaming');
-          await streamFromProxy(agentId, content, convId, onChunk);
+          try {
+            await streamFromProxy(agentId, content, convId, onChunk);
+          } catch (error) {
+            onChunk('*No connection detected. Please connect to your model.*');
+          }
         } else {
           const { streamMockResponse } = await import('@/lib/mockApi');
           await streamMockResponse(content, agentId, onChunk);
