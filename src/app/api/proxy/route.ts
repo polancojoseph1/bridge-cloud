@@ -25,6 +25,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Validate URL protocol to prevent SSRF
+  try {
+    const parsedUrl = new URL(targetUrl);
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      throw new Error('Invalid protocol');
+    }
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid server URL' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   let upstream: Response;
   try {
     upstream = await fetch(`${targetUrl}/v1/chat`, {

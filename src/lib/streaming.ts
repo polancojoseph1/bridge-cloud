@@ -54,6 +54,9 @@ export async function streamFromProxy(
           return;
         }
       } catch (parseErr) {
+        if (!(parseErr instanceof SyntaxError)) {
+          throw parseErr;
+        }
         // Non-JSON line — ignore (could be SSE comment or empty)
       }
     }
