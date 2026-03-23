@@ -1,5 +1,6 @@
 'use client';
 import { Server, Cloud } from 'lucide-react';
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 interface ServerGateProps {
   onLocalSelect: () => void;
@@ -8,7 +9,26 @@ interface ServerGateProps {
 
 export default function ServerGate({ onLocalSelect, onCloudSelect }: ServerGateProps) {
   return (
-    <div className="min-h-screen bg-[#0a1410] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#0a1410] flex flex-col items-center justify-center px-4 py-12 relative">
+      {/* Top Right Auth */}
+      <div className="absolute top-4 right-4 flex items-center gap-3">
+        <Show when="signed-out">
+          <SignInButton mode="modal">
+            <button className="text-sm font-medium text-[#8e8e8e] hover:text-[#ececec] transition-colors">
+              Log in
+            </button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <button className="text-sm font-medium bg-[#1e3025] hover:bg-[#2a4334] text-[#ececec] px-3 py-1.5 rounded-md transition-colors">
+              Sign up
+            </button>
+          </SignUpButton>
+        </Show>
+        <Show when="signed-in">
+          <UserButton />
+        </Show>
+      </div>
+
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3">
         <div className="w-16 h-16 rounded-2xl bg-[#10a37f] flex items-center justify-center">
