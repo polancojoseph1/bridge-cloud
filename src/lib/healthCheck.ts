@@ -12,10 +12,11 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
 
-    const res = await fetch(`${url}/v1/health`, {
-      method: 'GET',
+    const res = await fetch('/api/proxy/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, apiKey }),
       signal: controller.signal,
-      headers: apiKey ? { 'X-API-Key': apiKey } : {},
     });
     clearTimeout(timeout);
 
@@ -23,10 +24,16 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
       return { status: 'auth_error', error: 'API key rejected by server' };
     }
     if (!res.ok) {
-      return { status: 'offline', error: `Server returned ${res.status}` };
+      const errorMsg = await res.text().catch(() => '');
+      return { status: 'offline', error: errorMsg || `Server returned ${res.status}` };
     }
 
     const data = await res.json();
+    // In case the proxy returns its own wrapped result
+    if (data.status) {
+       return data;
+    }
+
     return {
       status: 'online',
       agentId: data.agent_id,
