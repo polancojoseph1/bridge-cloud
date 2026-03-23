@@ -44,17 +44,21 @@ export const useOrchestrationStore = create<OrchestrationStore>((set, get) => ({
   // Called when server profiles change — syncs nodes, preserves user selections
   syncNodes: (nodes) => {
     set(s => {
+      const nodeIdsSet = new Set(nodes.map(n => n.nodeId));
       const prevIds = new Set(s.nodes.map(n => n.nodeId));
       const isFirstSync = s.nodes.length === 0;
+
       const selectedNodeIds = isFirstSync
         ? nodes.filter(n => n.online).map(n => n.nodeId)
         : [
-            ...s.selectedNodeIds.filter(id => nodes.some(n => n.nodeId === id)),
+            ...s.selectedNodeIds.filter(id => nodeIdsSet.has(id)),
             ...nodes.filter(n => n.online && !prevIds.has(n.nodeId)).map(n => n.nodeId),
           ];
+
+      const pipelineOrderSet = new Set(s.pipelineOrder);
       const pipelineOrder = [
-        ...s.pipelineOrder.filter(id => nodes.some(n => n.nodeId === id)),
-        ...nodes.filter(n => !s.pipelineOrder.includes(n.nodeId)).map(n => n.nodeId),
+        ...s.pipelineOrder.filter(id => nodeIdsSet.has(id)),
+        ...nodes.filter(n => !pipelineOrderSet.has(n.nodeId)).map(n => n.nodeId),
       ];
       return { nodes, selectedNodeIds, pipelineOrder };
     });
