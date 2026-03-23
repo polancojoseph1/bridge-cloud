@@ -9,6 +9,34 @@ export interface HealthCheckResult {
 
 export async function checkHealth(url: string, apiKey: string): Promise<HealthCheckResult> {
   try {
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return { status: 'offline', error: 'Invalid URL format' };
+    }
+
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      return { status: 'offline', error: 'Invalid URL protocol' };
+    }
+
+    const hn = parsedUrl.hostname.toLowerCase();
+
+    // Check for loopback, current network, AWS metadata, etc.
+    if (
+      hn === 'localhost' ||
+      hn.includes('127.') ||
+      hn === '0.0.0.0' ||
+      hn.includes('169.254.') ||
+      hn.match(/^10\./) ||
+      hn.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
+      hn.match(/^192\.168\./) ||
+      hn === '[::1]' ||
+      hn === '::1'
+    ) {
+      return { status: 'offline', error: 'Forbidden internal hostname or IP' };
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
 
