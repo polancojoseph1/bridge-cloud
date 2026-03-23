@@ -20,8 +20,9 @@ import EmptyState from './EmptyState';
  */
 export default function ChatView() {
   const activeConversationId = useChatStore((s) => s.activeConversationId);
+  const activeConversation = useChatStore((s) => s.activeConversation());
 
-  if (!activeConversationId) {
+  if (!activeConversationId || (activeConversation && activeConversation.messages.length === 0)) {
     return (
       <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0">
         <EmptyState />

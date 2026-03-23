@@ -22,9 +22,17 @@ export default function EmptyState() {
 
   const startChat = useCallback((text: string) => {
     if (!text.trim()) return;
-    const id = newConversation();
-    router.push('/chat/' + id);
-    setTimeout(() => sendMessage(text), 100);
+
+    const store = useChatStore.getState();
+    const activeConv = store.activeConversation();
+
+    if (activeConv && activeConv.messages.length === 0) {
+      sendMessage(text);
+    } else {
+      const id = newConversation();
+      router.push('/chat/' + id);
+      setTimeout(() => sendMessage(text), 100);
+    }
   }, [newConversation, router, sendMessage]);
 
   const handleSubmit = () => {
