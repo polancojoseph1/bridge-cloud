@@ -119,16 +119,20 @@ export default function MarkdownRenderer({ content, isStreaming, className }: Ma
           hr: () => <hr className="my-4 border-[#1e3025]" />,
 
           // ── Links ────────────────────────────────────────────────────────────
-          a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#6c8cff] underline underline-offset-2 hover:text-[#5a7aee] transition-colors"
-            >
-              {children}
-            </a>
-          ),
+          a: ({ href, children }) => {
+            const isSafe = href && /^(https?|mailto):/i.test(href);
+            const safeHref = isSafe ? href : '#';
+            return (
+              <a
+                href={safeHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#6c8cff] underline underline-offset-2 hover:text-[#5a7aee] transition-colors"
+              >
+                {children}
+              </a>
+            );
+          },
         }}
       >
         {content}
