@@ -2,6 +2,7 @@
 import { cn } from '@/lib/cn';
 import type { Message } from '@/types';
 import AgentBadge from '@/components/agent/AgentBadge';
+import { useServerStore } from '@/store/serverStore';
 
 interface MessageBubbleProps {
   message: Message;
@@ -33,7 +34,19 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
             </div>
           )}
           <div className="w-full">
-            {message.content ? (
+            {message.errorType === 'connection' ? (
+              <div className="mt-1 flex flex-col items-start gap-3 bg-[#1e1e1e] border border-[#2d2d2d] rounded-lg p-4">
+                <p className="text-[14px] text-[#e0e0e0]">
+                  No connection detected. Please connect to a model either locally or via our cloud service.
+                </p>
+                <button
+                  onClick={() => useServerStore.getState().openManage()}
+                  className="px-4 py-2 bg-[#2d4035] hover:bg-[#3d5548] text-[#ececec] text-[13px] font-medium rounded transition-colors"
+                >
+                  Connect Model
+                </button>
+              </div>
+            ) : message.content ? (
               <p className={cn(
                 'text-[15px] leading-[1.75] text-[#ececec] whitespace-pre-wrap break-words',
                 message.isStreaming && 'stream-cursor'

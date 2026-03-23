@@ -98,7 +98,22 @@ export const useChatStore = create<ChatStore>()(
         const hasServer = useServerStore.getState().activeProfile() !== null;
         if (hasServer) {
           const { streamFromProxy } = await import('@/lib/streaming');
-          await streamFromProxy(agentId, content, convId, onChunk);
+          try {
+            await streamFromProxy(agentId, content, convId, onChunk);
+          } catch (error) {
+            set(s => ({
+              conversations: s.conversations.map(c =>
+                c.id === convId
+                  ? {
+                      ...c,
+                      messages: c.messages.map(m =>
+                        m.id === assistantMsgId ? { ...m, content: 'No connection detected.', errorType: 'connection' as const } : m
+                      ),
+                    }
+                  : c
+              ),
+            }));
+          }
         } else {
           const { streamMockResponse } = await import('@/lib/mockApi');
           await streamMockResponse(content, agentId, onChunk);
