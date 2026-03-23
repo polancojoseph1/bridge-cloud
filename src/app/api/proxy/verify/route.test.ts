@@ -57,7 +57,7 @@ describe('POST /api/proxy/verify', () => {
       error: 'Connection timed out',
     });
 
-    const req = createMockRequest({ url: 'http://test.com' }); // no apiKey provided
+    const req = createMockRequest({ url: 'http://test.com', apiKey: 'test-key' }); // apiKey provided
     const res = await POST(req);
 
     expect(res.status).toBe(503);
@@ -65,6 +65,6 @@ describe('POST /api/proxy/verify', () => {
     expect(data.status).toBe('offline');
     expect(data.error).toBe('Connection timed out');
 
-    expect(checkHealth).toHaveBeenCalledWith('http://test.com', '');
+    expect(checkHealth).toHaveBeenCalledWith('http://test.com', 'test-key');
   });
 });

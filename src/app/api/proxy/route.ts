@@ -25,6 +25,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (!targetKey || typeof targetKey !== 'string' || targetKey.trim() === '') {
+    return new Response(
+      JSON.stringify({ error: 'API key is required for secure connection' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   // Validate URL protocol to prevent SSRF
   try {
     const parsedUrl = new URL(targetUrl);

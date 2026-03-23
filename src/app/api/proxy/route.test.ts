@@ -62,7 +62,7 @@ describe('POST /api/proxy', () => {
   });
 
   it('forwards the error response when upstream is not ok', async () => {
-    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com' });
+    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key' });
 
     // Mock response with ok = false
     const mockUpstreamResponse = new Response(JSON.stringify({ detail: 'Bad request' }), {
@@ -79,7 +79,7 @@ describe('POST /api/proxy', () => {
   });
 
   it('returns a streamed response with correct headers on success', async () => {
-    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com' });
+    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key' });
 
     // Mock successful stream response
     const mockStream = new ReadableStream({

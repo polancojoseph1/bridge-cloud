@@ -1,5 +1,6 @@
 'use client';
 import { Server, Cloud } from 'lucide-react';
+import { Show, SignInButton, SignUpButton } from '@clerk/nextjs';
 
 interface ServerGateProps {
   onLocalSelect: () => void;
@@ -38,9 +39,8 @@ export default function ServerGate({ onLocalSelect, onCloudSelect }: ServerGateP
         </button>
 
         {/* Cloud card */}
-        <button
-          onClick={onCloudSelect}
-          className="flex-1 text-left p-6 rounded-xl bg-[#0e1c14] border border-[#2d4035] hover:border-[#10a37f] hover:bg-[#152219] transition-all duration-150 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
+        <div
+          className="flex-1 flex flex-col p-6 rounded-xl bg-[#0e1c14] border border-[#2d4035] relative"
           style={{ boxShadow: '0 0 0 1px rgba(16,163,127,0.10)' }}
         >
           <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-[rgba(16,163,127,0.12)] text-[11px] font-medium text-[#10a37f]">
@@ -48,13 +48,34 @@ export default function ServerGate({ onLocalSelect, onCloudSelect }: ServerGateP
           </div>
           <Cloud size={28} className="text-[#10a37f] mb-3" />
           <div className="text-[16px] font-semibold text-[#ececec] mb-1">Bridge Cloud</div>
-          <div className="text-[13px] text-[#8e8e8e] leading-relaxed">
+          <div className="text-[13px] text-[#8e8e8e] leading-relaxed mb-4 flex-1">
             Zero setup. Everything is provisioned for you. Paid service.
           </div>
-          <div className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#8e8e8e]">
-            Request access →
-          </div>
-        </button>
+
+          <Show when="signed-out">
+            <div className="flex items-center gap-3">
+              <SignInButton mode="modal">
+                <button className="flex-1 py-2 text-[13px] font-medium text-[#8e8e8e] bg-[#152219] border border-[#2d4035] hover:text-[#ececec] hover:border-[#3d5548] rounded-lg transition-colors">
+                  Log in
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="flex-1 py-2 text-[13px] font-medium text-[#0a1410] bg-[#10a37f] hover:bg-[#0d8f6f] rounded-lg transition-colors">
+                  Sign up
+                </button>
+              </SignUpButton>
+            </div>
+          </Show>
+
+          <Show when="signed-in">
+            <button
+              onClick={onCloudSelect}
+              className="w-full py-2 text-[13px] font-medium text-[#0a1410] bg-[#10a37f] hover:bg-[#0d8f6f] rounded-lg transition-colors"
+            >
+              Connect to Cloud →
+            </button>
+          </Show>
+        </div>
       </div>
     </div>
   );
