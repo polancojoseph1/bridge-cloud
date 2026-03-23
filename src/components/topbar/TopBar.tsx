@@ -13,9 +13,12 @@ export default function TopBar({ activeAgentId, onAgentSelect }: TopBarProps) {
       className="h-12 flex items-center px-4 flex-shrink-0 border-b border-[#1e3025] bg-[#0a1410]"
       style={{ minHeight: '48px' }}
     >
-      {/* Left: Agent selector */}
-      <div className="flex items-center">
-        <AgentSelector activeAgentId={activeAgentId} onSelect={onAgentSelect} />
+      {/* Right side contents container aligned to end */}
+      <div className="ml-auto flex items-center gap-3">
+        {/* Agent selector moved to the right */}
+        <div className="flex items-center">
+          <AgentSelector activeAgentId={activeAgentId} onSelect={onAgentSelect} />
+        </div>
       </div>
     </header>
   );
