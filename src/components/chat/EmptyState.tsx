@@ -83,7 +83,7 @@ export default function EmptyState() {
       </div>
 
       {/* Chat input pinned to bottom */}
-      <div className="sticky bottom-0 bg-gradient-to-t from-[#0a1410] via-[#0a1410] to-transparent pt-6 pb-4 px-4">
+      <div className="sticky bottom-0 bg-gradient-to-t from-[#0a1410] via-[#0a1410] to-transparent pt-6 pb-2 px-4">
         <div className="w-full max-w-[720px] mx-auto">
           <div className={[
             'flex items-end gap-2 px-4 py-3',

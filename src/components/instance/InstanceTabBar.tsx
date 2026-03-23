@@ -148,7 +148,7 @@ export default function InstanceTabBar() {
   return (
     <>
       {/* ── Desktop tab bar ─────────────────────────────────────────────── */}
-      <div className="hidden lg:flex items-center h-9 flex-shrink-0 border-b border-[#1e3025] bg-[#0a1410] relative">
+      <div className="hidden lg:flex items-center h-9 flex-shrink-0 border-t border-[#1e3025] bg-[#0a1410] relative">
         {canScrollLeft && (
           <button
             type="button"
