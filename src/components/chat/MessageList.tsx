@@ -10,21 +10,29 @@ interface MessageListProps {
 
 export default function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isUserScrolledRef = useRef(false);
   const conversations = useChatStore(s => s.conversations);
   const isStreaming = useChatStore(s => s.isStreaming);
 
   const conversation = conversations.find(c => c.id === conversationId);
   const messages = conversation?.messages ?? [];
 
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    // User is considered at bottom if they are within 30px of the bottom
+    isUserScrolledRef.current = scrollHeight - scrollTop - clientHeight > 30;
+  };
+
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && !isUserScrolledRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages.length, isStreaming]);
 
   // Also scroll when streaming content updates
   useEffect(() => {
-    if (isStreaming && scrollRef.current) {
+    if (isStreaming && scrollRef.current && !isUserScrolledRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   });
@@ -33,7 +41,11 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const showTypingIndicator = isStreaming && lastMsg?.role === 'assistant' && lastMsg?.content === '';
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 scroll-smooth">
+    <div
+      ref={scrollRef}
+      onScroll={handleScroll}
+      className="flex-1 overflow-y-auto py-6 scroll-smooth"
+    >
       <div className="flex flex-col">
         {messages.map(message => (
           <MessageBubble key={message.id} message={message} />

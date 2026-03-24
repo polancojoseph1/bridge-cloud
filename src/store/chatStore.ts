@@ -9,6 +9,9 @@ function generateId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+// AbortController state is kept out of persist
+let activeAbortController: AbortController | null = null;
+
 export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
@@ -40,6 +43,13 @@ export const useChatStore = create<ChatStore>()(
       setActiveConversation: (id: string | null) => set({ activeConversationId: id }),
 
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
+
+      stopGeneration: () => {
+        if (activeAbortController) {
+          activeAbortController.abort();
+          activeAbortController = null;
+        }
+      },
 
       sendMessage: async (content: string) => {
         if (get().isStreaming) return;
@@ -94,13 +104,22 @@ export const useChatStore = create<ChatStore>()(
             ),
           }));
         };
+        activeAbortController = new AbortController();
+
         const { useServerStore } = await import('@/store/serverStore');
         const hasServer = useServerStore.getState().activeProfile() !== null;
-        if (hasServer) {
-          const { streamFromProxy } = await import('@/lib/streaming');
-          try {
-            await streamFromProxy(agentId, content, convId, onChunk);
-          } catch (error) {
+        try {
+          if (hasServer) {
+            const { streamFromProxy } = await import('@/lib/streaming');
+            await streamFromProxy(agentId, content, convId, onChunk, undefined, activeAbortController.signal);
+          } else {
+            const { streamMockResponse } = await import('@/lib/mockApi');
+            await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
+          }
+        } catch (error: any) {
+          if (error.name === 'AbortError') {
+            // User stopped generation, we just end here gracefully
+          } else {
             set(s => ({
               conversations: s.conversations.map(c =>
                 c.id === convId
@@ -114,10 +133,10 @@ export const useChatStore = create<ChatStore>()(
               ),
             }));
           }
-        } else {
-          const { streamMockResponse } = await import('@/lib/mockApi');
-          await streamMockResponse(content, agentId, onChunk);
+        } finally {
+          activeAbortController = null;
         }
+
         set(s => ({
           isStreaming: false,
           conversations: s.conversations.map(c =>

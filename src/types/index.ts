@@ -45,6 +45,7 @@ export interface ChatStore {
   setActiveConversation: (id: string | null) => void;
   setActiveAgent: (agentId: string) => void;
   sendMessage: (content: string) => Promise<void>;
+  stopGeneration: () => void;
   deleteConversation: (id: string) => void;
   clearAll: () => void;
   toggleSidebar: () => void;
