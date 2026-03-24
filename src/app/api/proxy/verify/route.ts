@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const result = await checkHealth(url, apiKey ?? '');
+  const endpoint = url.includes('openrouter.ai') ? `${url}/v1/chat/completions` : url;
+  const result = await checkHealth(endpoint, apiKey ?? '');
   return new Response(JSON.stringify(result), {
     status: result.status === 'online' ? 200 : 503,
     headers: { 'Content-Type': 'application/json' },
