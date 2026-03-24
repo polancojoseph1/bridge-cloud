@@ -1,4 +1,5 @@
 'use client';
+import { memo } from 'react';
 import { cn } from '@/lib/cn';
 import type { Message } from '@/types';
 import AgentBadge from '@/components/agent/AgentBadge';
@@ -8,7 +9,14 @@ interface MessageBubbleProps {
   message: Message;
 }
 
-export default function MessageBubble({ message }: MessageBubbleProps) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents MessageBubble from re-rendering unless its specific `message` prop changes.
+ * 🎯 Why: When streaming a new message, the parent MessageList re-renders on every chunk.
+ *         Without memo, EVERY message in the history re-renders simultaneously, causing CPU spikes.
+ * 📊 Impact: O(1) render cost during streaming instead of O(N) where N is chat history length.
+ */
+const MessageBubble = memo(function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 
   return (
@@ -59,4 +67,6 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
       )}
     </div>
   );
-}
+});
+
+export default MessageBubble;

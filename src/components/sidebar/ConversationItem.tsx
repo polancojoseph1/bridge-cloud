@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -23,7 +24,14 @@ function formatRelativeTime(timestamp: number): string {
   return `${days}d ago`;
 }
 
-export function ConversationItem({ conversation, isActive }: ConversationItemProps) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents ConversationItem from re-rendering unless its props (conversation or isActive) change.
+ * 🎯 Why: When a new chat is created or the active chat changes, the entire Sidebar re-renders.
+ *         Without memo, every single historical chat item re-renders, slowing down navigation.
+ * 📊 Impact: O(1) render cost for sidebar items on route changes instead of O(N) where N is total chats.
+ */
+export const ConversationItem = memo(function ConversationItem({ conversation, isActive }: ConversationItemProps) {
   const router = useRouter();
   const deleteConversation = useChatStore((s) => s.deleteConversation);
 
@@ -86,4 +94,4 @@ export function ConversationItem({ conversation, isActive }: ConversationItemPro
       </button>
     </div>
   );
-}
+});
