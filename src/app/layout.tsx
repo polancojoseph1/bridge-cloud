@@ -26,8 +26,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Provide a dummy test key as fallback so testing environments don't crash
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_ZHVtbXkua2V5LmNsZXJrLmFjY291bnRzLmRldiQ";
+
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={clerkKey}>
       <html lang="en" className={inter.variable}>
         <body className="bg-[#0a1410] text-[#ececec] antialiased h-screen overflow-hidden">
           {children}

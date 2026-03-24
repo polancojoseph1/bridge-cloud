@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-BASE = "http://localhost:3000"
+BASE = "http://localhost:3005"
 SHOTS = Path(__file__).parent / "screenshots"
 SHOTS.mkdir(exist_ok=True)
 
@@ -24,10 +24,10 @@ async def shot(page, name: str):
 
 
 async def verify_desktop(browser):
-    ctx = await browser.new_context(viewport={"width": 1440, "height": 900})
+    ctx = await browser.new_context(viewport={"width": 1440, "height": 900}, ignore_https_errors=True)
     page = await ctx.new_page()
     try:
-        await page.goto(BASE, wait_until="networkidle", timeout=15000)
+        await page.goto(BASE, wait_until="domcontentloaded", timeout=15000)
         await page.wait_for_timeout(1000)
         await shot(page, "desktop_01_loaded")
 
@@ -66,10 +66,10 @@ async def verify_desktop(browser):
 
 
 async def verify_mobile(browser):
-    ctx = await browser.new_context(viewport={"width": 390, "height": 844})
+    ctx = await browser.new_context(viewport={"width": 390, "height": 844}, ignore_https_errors=True)
     page = await ctx.new_page()
     try:
-        await page.goto(BASE, wait_until="networkidle", timeout=15000)
+        await page.goto(BASE, wait_until="domcontentloaded", timeout=15000)
         await page.wait_for_timeout(1000)
         await shot(page, "mobile_01_loaded")
 
