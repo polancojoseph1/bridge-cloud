@@ -142,11 +142,6 @@ export default function InputBar() {
             </button>
           )}
         </div>
-
-        {/* Hint text */}
-        <p className="text-center text-[11px] text-[#5c5c5c] mt-2 select-none">
-          Bridge Cloud can make mistakes. Verify important information.
-        </p>
       </div>
     </div>
   );
