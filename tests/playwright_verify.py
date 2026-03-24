@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-BASE = "http://localhost:3005"
+BASE = "http://localhost:3000"
 SHOTS = Path(__file__).parent / "screenshots"
 SHOTS.mkdir(exist_ok=True)
 
