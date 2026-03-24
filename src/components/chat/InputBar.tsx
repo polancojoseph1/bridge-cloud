@@ -23,6 +23,7 @@ const MAX_HEIGHT = LINE_HEIGHT_PX * MAX_LINES; // 120px
 export default function InputBar() {
   const isStreaming = useChatStore((s) => s.isStreaming);
   const sendMessage = useChatStore((s) => s.sendMessage);
+  const stopGeneration = useChatStore((s) => s.stopGeneration);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -108,6 +109,7 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
+              onClick={stopGeneration}
               aria-label="Stop generation"
               title="Stop generation"
               className={[

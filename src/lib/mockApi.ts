@@ -1,7 +1,8 @@
 export async function streamMockResponse(
   message: string,
   agentId: string,
-  onChunk: (chunk: string) => void
+  onChunk: (chunk: string) => void,
+  signal?: AbortSignal
 ): Promise<void> {
   const agentName = agentId === 'claude' ? 'Claude' : agentId === 'gemini' ? 'Gemini' : agentId === 'codex' ? 'Codex' : agentId === 'qwen' ? 'Qwen' : 'Free Bot';
   const responses = [
@@ -11,8 +12,14 @@ export async function streamMockResponse(
   ];
   const text = responses[Math.floor(Math.random() * responses.length)];
   for (let i = 0; i < text.length; ) {
+    if (signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
     const chunkSize = Math.ceil(Math.random() * 3 + 1);
     await new Promise(r => setTimeout(r, 20 + Math.random() * 30));
+    if (signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
     onChunk(text.slice(i, i + chunkSize));
     i += chunkSize;
   }

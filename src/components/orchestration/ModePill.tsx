@@ -23,20 +23,23 @@ export default function ModePill() {
     >
       {MODES.map(m => {
         const isActive = mode === m.id;
+        const isDisabled = !isActive && m.id !== 'single';
         return (
           <button
             key={m.id}
             type="button"
             role="radio"
             aria-checked={isActive}
-            title={m.title}
+            title={isDisabled ? "Coming soon" : m.title}
             onClick={() => setMode(m.id)}
+            disabled={isDisabled}
             className={cn(
               'px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-150',
               'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
               isActive
                 ? 'bg-[#1e3025] text-[#ececec] shadow-sm'
-                : 'text-[#5c5c5c] hover:text-[#9b9b9b] hover:bg-[#111f15]'
+                : 'text-[#5c5c5c] hover:text-[#9b9b9b] hover:bg-[#111f15]',
+              isDisabled && 'opacity-50 cursor-not-allowed hover:text-[#5c5c5c] hover:bg-transparent'
             )}
           >
             {m.label}
