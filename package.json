@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "vitest run",
+    "test": "vitest run --exclude '**/**.integration.test.*'",
+    "test:integration": "vitest run integration",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {

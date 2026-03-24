@@ -1,0 +1,89 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:  # manual trigger only
+  push:
+    branches: [main, master]
+    paths:
+      - 'src/app/api/**'  # only run when the proxy/API layer changes
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout bridge-cloud
+        uses: actions/checkout@v4
+
+      - name: Checkout bridgebot
+        uses: actions/checkout@v4
+        with:
+          repository: polancojoseph1/bridgebot
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: bridgebot
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install bridgebot dependencies
+        run: |
+          cd bridgebot
+          pip install -r requirements.txt
+
+      - name: Start bridgebot (Claude runner via OpenRouter)
+        run: |
+          cd bridgebot
+          uvicorn server:app --host 0.0.0.0 --port 8585 &
+          echo "Waiting for bridgebot to be ready..."
+          for i in $(seq 1 15); do
+            curl -sf http://localhost:8585/v1/health && echo "bridgebot ready" && break
+            sleep 2
+          done
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          INTERNAL_API_KEY: integration-test-key
+          CLI_RUNNER: claude
+          PORT: 8585
+          ALLOWED_USER_IDS: "0"
+          MEMORY_ENABLED: "false"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install bridge-cloud dependencies
+        run: npm ci
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          BRIDGEBOT_CLAUDE_URL: http://localhost:8585
+          BRIDGEBOT_CLAUDE_KEY: integration-test-key
+          BRIDGEBOT_GEMINI_URL: http://localhost:8585
+          BRIDGEBOT_GEMINI_KEY: integration-test-key
+          BRIDGEBOT_CODEX_URL: http://localhost:8585
+          BRIDGEBOT_CODEX_KEY: integration-test-key
+          BRIDGEBOT_QWEN_URL: http://localhost:8585
+          BRIDGEBOT_QWEN_KEY: integration-test-key
+          BRIDGEBOT_FREE_URL: http://localhost:8585
+          BRIDGEBOT_FREE_KEY: integration-test-key
+          NEXT_PUBLIC_SERVER_PRECONFIGURED: "true"
+
+      - name: Build
+        run: npm run build
+        env:
+          BRIDGEBOT_CLAUDE_URL: http://localhost:8585
+          BRIDGEBOT_CLAUDE_KEY: integration-test-key
+          BRIDGEBOT_GEMINI_URL: http://localhost:8585
+          BRIDGEBOT_GEMINI_KEY: integration-test-key
+          BRIDGEBOT_CODEX_URL: http://localhost:8585
+          BRIDGEBOT_CODEX_KEY: integration-test-key
+          BRIDGEBOT_QWEN_URL: http://localhost:8585
+          BRIDGEBOT_QWEN_KEY: integration-test-key
+          BRIDGEBOT_FREE_URL: http://localhost:8585
+          BRIDGEBOT_FREE_KEY: integration-test-key
+          NEXT_PUBLIC_SERVER_PRECONFIGURED: "true"

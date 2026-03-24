@@ -9,13 +9,40 @@ import ConnectForm from '@/components/server/ConnectForm';
 import ServerManageModal from '@/components/server/ServerManageModal';
 import { cn } from '@/lib/cn';
 
+// If the deployment pre-configures a server via env vars, auto-seed the profile
+// so the user never sees the ServerGate on first load.
+const PRECONFIGURED_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? '';
+const PRECONFIGURED_KEY = process.env.NEXT_PUBLIC_SERVER_KEY ?? '';
+const PRECONFIGURED_AGENT = process.env.NEXT_PUBLIC_SERVER_AGENT_ID ?? 'claude';
+const IS_PRECONFIGURED = process.env.NEXT_PUBLIC_SERVER_PRECONFIGURED === 'true';
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const isSidebarOpen = useChatStore(s => s.isSidebarOpen);
   const setSidebarOpen = useChatStore(s => s.setSidebarOpen);
 
   const profiles = useServerStore(s => s.profiles);
+  const addProfile = useServerStore(s => s.addProfile);
+
+  // Seed the pre-configured server profile on first render if the store is empty.
+  // This runs once — afterwards the persisted store keeps the profile across reloads.
+  useEffect(() => {
+    if (IS_PRECONFIGURED && PRECONFIGURED_URL && PRECONFIGURED_KEY && profiles.length === 0) {
+      addProfile({
+        name: 'Bridge Cloud',
+        tier: 'cloud',
+        agentId: PRECONFIGURED_AGENT,
+        url: PRECONFIGURED_URL,
+        apiKey: PRECONFIGURED_KEY,
+        isDefault: true,
+        cloudProvisionStatus: 'provisioned',
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally run once on mount
+
   const [gateStep, setGateStep] = useState<'gate' | 'local' | 'cloud' | null>(
-    profiles.length === 0 ? 'gate' : null
+    // If pre-configured and a URL is present, start with no gate (profile seeds async via useEffect above)
+    IS_PRECONFIGURED && PRECONFIGURED_URL ? null : profiles.length === 0 ? 'gate' : null
   );
 
   // Watch for profiles being added (auto-dismiss gate)
