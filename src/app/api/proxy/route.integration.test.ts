@@ -10,7 +10,8 @@ import { describe, it, expect } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 
-const SKIP = !process.env.BRIDGEBOT_CLAUDE_URL?.includes('localhost');
+const url = process.env.BRIDGEBOT_CLAUDE_URL ?? '';
+const SKIP = !url || (!url.includes('localhost') && !url.includes('tail') && !url.includes('ts.net'));
 
 function createRequest(body: object) {
   return { json: async () => body } as unknown as NextRequest;

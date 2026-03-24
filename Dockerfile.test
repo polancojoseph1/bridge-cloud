@@ -1,0 +1,26 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Copy dependency manifests first for layer caching
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+# Copy the full project
+COPY . .
+
+# Dummy env vars — all BRIDGEBOT_* and NEXT_PUBLIC_* vars
+ENV BRIDGEBOT_CLAUDE_URL=http://localhost:8585 \
+    BRIDGEBOT_CLAUDE_KEY=dummy-claude-key \
+    BRIDGEBOT_GEMINI_URL=http://localhost:8586 \
+    BRIDGEBOT_GEMINI_KEY=dummy-gemini-key \
+    BRIDGEBOT_CODEX_URL=http://localhost:8587 \
+    BRIDGEBOT_CODEX_KEY=dummy-codex-key \
+    BRIDGEBOT_QWEN_URL=http://localhost:8588 \
+    BRIDGEBOT_QWEN_KEY=dummy-qwen-key \
+    BRIDGEBOT_FREE_URL=http://localhost:8590 \
+    BRIDGEBOT_FREE_KEY=dummy-free-key \
+    NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+CMD ["npm", "test"]
