@@ -71,7 +71,7 @@ export default function InputBar() {
      * Sticky bottom wrapper with a gradient fade so the message feed
      * smoothly fades into the input area rather than hard-cutting.
      */
-    <div className="sticky bottom-0 bg-gradient-to-t from-[#0a1410] via-[#0a1410] to-transparent pt-6 pb-2 px-4">
+    <div className="sticky bottom-0 bg-gradient-to-t from-[#0a1410] via-[#0a1410] to-transparent pt-6 pb-2 px-4 mb-14 lg:mb-0">
       {/* Centered input pill */}
       <div className="w-full max-w-[720px] mx-auto">
         <div
