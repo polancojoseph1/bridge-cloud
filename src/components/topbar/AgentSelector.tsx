@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { AGENTS } from '@/lib/agents';
 import { cn } from '@/lib/cn';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface AgentSelectorProps {
   activeAgentId: string;
@@ -20,33 +21,11 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
 
   const dotColor = activeAgent.dotColor;
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [open]);
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
 
-  // Close on Escape
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    if (open) {
-      document.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open]);
+  useClickOutside(containerRef, handleClose, open);
 
   function handleSelect(agentId: string) {
     onSelect(agentId);
