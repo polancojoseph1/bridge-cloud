@@ -1,10 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useServerStore } from './serverStore';
+
+vi.mock('zustand/middleware', () => ({
+  persist: (config: any) => config
+}));
 
 describe('ServerStore - removeProfile', () => {
   beforeEach(() => {
     // Re-initialize the entire store state, preserving functions
-    const initialState = useServerStore.getInitialState();
+    const initialState = useServerStore.getInitialState ? useServerStore.getInitialState() : useServerStore.getState();
     useServerStore.setState({ ...initialState, profiles: [], activeProfileId: null }, true);
   });
 
