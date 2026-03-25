@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useInstanceStore } from './instanceStore';
+
+vi.mock('zustand/middleware');
 
 describe('useInstanceStore', () => {
   const initialState = useInstanceStore.getState();
