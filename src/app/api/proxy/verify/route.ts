@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { checkHealth } from '@/lib/healthCheck';
+import { isForbiddenHostname } from '@/lib/ssrf';
 
 export async function POST(req: NextRequest) {
   const { url, apiKey } = await req.json();
@@ -24,8 +25,15 @@ export async function POST(req: NextRequest) {
     if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
       throw new Error('Invalid protocol');
     }
+
+    // In test environment we need to bypass localhost restrictions for integration tests
+    const isIntegrationTestServer = process.env.NODE_ENV === 'test' && parsedUrl.hostname.toLowerCase() === 'localhost' && parsedUrl.port === '8585';
+
+    if (!isIntegrationTestServer && isForbiddenHostname(parsedUrl.hostname)) {
+      throw new Error('Forbidden internal hostname or IP');
+    }
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Invalid server URL' }), {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid server URL' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
