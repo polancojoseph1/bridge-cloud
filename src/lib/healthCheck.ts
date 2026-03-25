@@ -1,4 +1,5 @@
 import type { HealthStatus } from '@/types';
+import { isForbiddenHostname } from './ssrf';
 
 export interface HealthCheckResult {
   status: HealthStatus;
@@ -31,17 +32,7 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
     const hn = parsedUrl.hostname.toLowerCase();
 
     // Check for loopback, current network, AWS metadata, etc.
-    if (
-      hn === 'localhost' ||
-      hn.includes('127.') ||
-      hn === '0.0.0.0' ||
-      hn.includes('169.254.') ||
-      hn.match(/^10\./) ||
-      hn.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
-      hn.match(/^192\.168\./) ||
-      hn === '[::1]' ||
-      hn === '::1'
-    ) {
+    if (isForbiddenHostname(hn)) {
       return { status: 'offline', error: 'Forbidden internal hostname or IP' };
     }
 

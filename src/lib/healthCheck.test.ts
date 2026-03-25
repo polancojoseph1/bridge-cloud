@@ -137,12 +137,42 @@ describe('checkHealth', () => {
   });
 
   it('should reject internal/localhost URLs with SSRF guard', async () => {
-    const result = await checkHealth('http://localhost:3000', mockApiKey);
-    expect(result).toEqual({
-      status: 'offline',
-      error: 'Forbidden internal hostname or IP',
-    });
+    const testUrls = [
+      'http://localhost:3000',
+      'http://127.0.0.1:8080',
+      'http://169.254.169.254',
+      'http://2130706433', // 127.0.0.1 dec
+      'http://0x7f.0.0.1', // hex
+      'http://0177.0.0.1', // octal
+      'http://[::1]',
+      'http://[::ffff:127.0.0.1]', // IPv4 mapped
+      'http://10.0.0.1',
+      'http://0.0.0.0'
+    ];
+
+    for (const url of testUrls) {
+      const result = await checkHealth(url, mockApiKey);
+      expect(result).toEqual({
+        status: 'offline',
+        error: 'Forbidden internal hostname or IP',
+      });
+    }
+
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should allow valid external IPs with SSRF guard', async () => {
+    const testUrls = [
+      'http://example.com',
+      'http://203.0.113.1', // test net
+      'http://127.com', // false positive evasion check
+      'http://8.8.8.8'
+    ];
+
+    for (const url of testUrls) {
+      const result = await checkHealth(url, mockApiKey);
+      expect(result.error).not.toBe('Forbidden internal hostname or IP');
+    }
   });
 
   it('should return offline if url is empty', async () => {
