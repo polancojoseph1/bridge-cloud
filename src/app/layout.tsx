@@ -30,7 +30,7 @@ export default function RootLayout({
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_ZHVtbXkua2V5LmNsZXJrLmFjY291bnRzLmRldiQ";
 
   return (
-    <ClerkProvider publishableKey={clerkKey}>
+    <ClerkProvider publishableKey={clerkKey} telemetry={{ disabled: true }}>
       <html lang="en" className={inter.variable}>
         <body className="bg-[#0a1410] text-[#ececec] antialiased h-screen overflow-hidden">
           {children}
