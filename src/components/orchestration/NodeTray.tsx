@@ -102,10 +102,12 @@ export default function NodeTray() {
     gather:    'Gather from:',
   };
 
-  const onlineCount = nodes.filter(n => n.online).length;
-  const selectedCount = selectedNodeIds.filter(id =>
-    nodes.find(n => n.nodeId === id)?.online
-  ).length;
+  // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
+  // to prevent O(N) memory allocations and reduce React GC pauses
+  const onlineCount = nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0);
+  const selectedCount = selectedNodeIds.reduce((count, id) =>
+    count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
+  );
 
   const orderedNodes =
     mode === 'pipeline'

@@ -3,11 +3,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ChatStore, Conversation, Message } from '@/types';
 import { AGENTS } from '@/lib/agents';
+import { generateId } from '@/lib/utils';
 // streamMockResponse imported dynamically below as fallback
-
-function generateId(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
 
 // AbortController state is kept out of persist
 let activeAbortController: AbortController | null = null;
@@ -116,8 +113,8 @@ export const useChatStore = create<ChatStore>()(
             const { streamMockResponse } = await import('@/lib/mockApi');
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
-        } catch (error: any) {
-          if (error.name === 'AbortError') {
+        } catch (error: unknown) {
+          if (error instanceof Error && error.name === 'AbortError') {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => ({

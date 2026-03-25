@@ -2,10 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Instance, InstanceStore } from '@/types';
-
-function generateId(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
+import { generateId } from '@/lib/utils';
 
 function generateLabel(_agentId: string, instances: Instance[]): string {
   const nums = instances
