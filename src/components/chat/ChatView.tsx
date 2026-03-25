@@ -3,7 +3,7 @@
 import { useChatStore } from '@/store/chatStore';
 import MessageList from './MessageList';
 import InputBar from './InputBar';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, use } from 'react';
 import EmptyState from './EmptyState';
 import InstanceTabBar from '@/components/instance/InstanceTabBar';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -21,7 +21,10 @@ import { useInstanceStore } from '@/store/instanceStore';
  * It's intentionally thin so that MessageList and InputBar remain independently
  * testable and reusable.
  */
-export default function ChatView() {
+export default function ChatView({ params }: { params?: Promise<{ id: string }> }) {
+  const resolvedParams = params ? use(params) : null;
+  const conversationIdFromUrl = resolvedParams?.id;
+
   const activeConversationId = useChatStore((s) => s.activeConversationId);
   const activeConversation = useChatStore((s) => s.activeConversation());
   const setActiveConversation = useChatStore((s) => s.setActiveConversation);
@@ -34,6 +37,13 @@ export default function ChatView() {
 
   // Keep track of previous active instance ID to know when a tab switch occurred
   const prevInstanceIdRef = useRef<string | null>(null);
+
+  // Sync URL conversation ID to store
+  useEffect(() => {
+    if (conversationIdFromUrl && conversationIdFromUrl !== activeConversationId) {
+      setActiveConversation(conversationIdFromUrl);
+    }
+  }, [conversationIdFromUrl, activeConversationId, setActiveConversation]);
 
   useEffect(() => {
     if (!activeInstance || !activeInstanceId) return;
