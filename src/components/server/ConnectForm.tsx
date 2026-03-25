@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ArrowLeft, CheckCircle, XCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useServerStore } from '@/store/serverStore';
 import { cn } from '@/lib/cn';
+import { cleanUrl, hostnameFrom } from '@/lib/utils';
 
 interface ConnectFormProps {
   tier: 'local' | 'cloud';
@@ -21,8 +22,6 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
 
   const addProfile = useServerStore(s => s.addProfile);
   const connectProfile = useServerStore(s => s.connectProfile);
-
-  const cleanUrl = (raw: string) => raw.trim().replace(/\/+$/, '');
 
   const handleTest = async () => {
     setError(null);
@@ -51,7 +50,7 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
       }
 
       // Save and connect
-      const hostname = (() => { try { return new URL(cleanedUrl).hostname; } catch { return 'Server'; } })();
+      const hostname = hostnameFrom(cleanedUrl);
       const id = addProfile({
         name: name.trim() || hostname,
         tier,
