@@ -21,7 +21,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
     if (!scrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     // User is considered at bottom if they are within 30px of the bottom
-    isUserScrolledRef.current = scrollHeight - scrollTop - clientHeight > 30;
+    isUserScrolledRef.current = Math.ceil(scrollTop + clientHeight) < scrollHeight - 30;
   };
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
     if (isStreaming && scrollRef.current && !isUserScrolledRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  });
+  }, [messages, isStreaming]);
 
   const lastMsg = messages[messages.length - 1];
   const showTypingIndicator = isStreaming && lastMsg?.role === 'assistant' && lastMsg?.content === '';
