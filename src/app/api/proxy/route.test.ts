@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 
-function createMockRequest(body: any) {
+function createMockRequest(body: Record<string, unknown>) {
   return {
     json: async () => body,
   } as unknown as NextRequest;
