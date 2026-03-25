@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useOrchestrationStore, type BridgeNode } from '@/store/orchestrationStore';
 import { useServerStore } from '@/store/serverStore';
 import type { ServerProfile } from '@/types';
@@ -116,6 +116,8 @@ export default function NodeTray() {
           .filter(Boolean) as BridgeNode[]
       : nodes;
 
+  const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
+
   return (
     <div className="w-full max-w-[720px] mx-auto mb-2 animate-fade-in">
       <div className="bg-[#0d1a11] border border-[#1e3025] rounded-xl px-4 py-3">
@@ -157,7 +159,7 @@ export default function NodeTray() {
             <NodeChip
               key={node.nodeId}
               node={node}
-              selected={selectedNodeIds.includes(node.nodeId)}
+              selected={selectedNodeSet.has(node.nodeId)}
               onClick={() => toggleNode(node.nodeId)}
               showArrow={mode === 'pipeline' && idx < orderedNodes.length - 1}
             />
