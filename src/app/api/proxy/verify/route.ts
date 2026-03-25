@@ -4,7 +4,7 @@ import { checkHealth } from '@/lib/healthCheck';
 export async function POST(req: NextRequest) {
   const { url, apiKey } = await req.json();
 
-  if (!url || typeof url !== 'string') {
+  if (!url || typeof url !== 'string' || url.trim() === '') {
     return new Response(JSON.stringify({ error: 'url is required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },

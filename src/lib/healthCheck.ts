@@ -8,6 +8,14 @@ export interface HealthCheckResult {
 }
 
 export async function checkHealth(url: string, apiKey: string): Promise<HealthCheckResult> {
+  if (!url || typeof url !== 'string' || url.trim() === '') {
+    return { status: 'offline', error: 'Server URL is required' };
+  }
+
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
+    return { status: 'auth_error', error: 'API key is required' };
+  }
+
   try {
     let parsedUrl: URL;
     try {

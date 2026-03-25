@@ -126,20 +126,14 @@ describe('checkHealth', () => {
     });
   });
 
-  it('should not send X-API-Key header if apiKey is empty', async () => {
-    const mockData = { agent_id: 'agent-123', bot_name: 'TestBot' };
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => mockData,
+  it('should return auth_error if apiKey is empty', async () => {
+    const result = await checkHealth(mockUrl, '');
+
+    expect(result).toEqual({
+      status: 'auth_error',
+      error: 'API key is required',
     });
-
-    await checkHealth(mockUrl, '');
-
-    expect(global.fetch).toHaveBeenCalledWith('/api/proxy/verify', expect.objectContaining({
-      method: 'POST',
-      body: JSON.stringify({ url: mockUrl, apiKey: '' }),
-    }));
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('should reject internal/localhost URLs with SSRF guard', async () => {
@@ -147,6 +141,15 @@ describe('checkHealth', () => {
     expect(result).toEqual({
       status: 'offline',
       error: 'Forbidden internal hostname or IP',
+    });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should return offline if url is empty', async () => {
+    const result = await checkHealth('', mockApiKey);
+    expect(result).toEqual({
+      status: 'offline',
+      error: 'Server URL is required',
     });
     expect(global.fetch).not.toHaveBeenCalled();
   });
