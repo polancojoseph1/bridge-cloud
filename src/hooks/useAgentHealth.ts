@@ -18,7 +18,7 @@ async function pollActive() {
     }
     const { useServerStore } = serverStoreModule;
     const profile = useServerStore.getState().activeProfile();
-    if (!profile?.url) {
+    if (!profile?.url || profile.url.trim() === '') {
       cachedStatus = 'offline';
       listeners.forEach(fn => fn('offline'));
       return;

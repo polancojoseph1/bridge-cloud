@@ -76,7 +76,7 @@ export const useServerStore = create<ServerStore>()(
 
       connectProfile: async (id) => {
         const profile = get().profiles.find(p => p.id === id);
-        if (!profile) return 'offline';
+        if (!profile || !profile.url || profile.url.trim() === '') return 'offline';
 
         set({ connectionStatus: 'checking' });
         const result = await checkHealth(profile.url, profile.apiKey);
