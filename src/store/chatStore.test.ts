@@ -8,6 +8,10 @@ import { useChatStore } from './chatStore';
 // 4. streamFromProxy AbortError
 // 5. Successful streaming update functionality
 
+vi.mock('zustand/middleware', () => ({
+  persist: (config: any) => config
+}));
+
 const mockGetState = vi.fn();
 vi.mock('@/store/serverStore', () => ({
   useServerStore: {
