@@ -78,6 +78,15 @@ describe('POST /api/proxy', () => {
     expect(data).toEqual({ detail: 'Bad request' });
   });
 
+  it('returns 400 when attempting to fetch an internal IP', async () => {
+    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://127.0.0.1:3000', serverKey: 'test-key' });
+    const response = await POST(req);
+
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data).toEqual({ error: 'Forbidden internal hostname or IP' });
+  });
+
   it('returns a streamed response with correct headers on success', async () => {
     const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key' });
 
