@@ -116,8 +116,8 @@ export const useChatStore = create<ChatStore>()(
             const { streamMockResponse } = await import('@/lib/mockApi');
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
-        } catch (error: any) {
-          if (error.name === 'AbortError') {
+        } catch (error: unknown) {
+          if (error instanceof Error && error.name === 'AbortError') {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => ({
