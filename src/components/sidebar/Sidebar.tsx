@@ -1,9 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 import { useChatStore } from '@/store/chatStore';
 import { NewChatButton } from './NewChatButton';
 import { ConversationItem } from './ConversationItem';
+import type { Conversation } from '@/types';
 
 /** Returns midnight (local) of the date `daysAgo` days before today. */
 function startOfDayOffset(daysAgo: number): number {
@@ -19,8 +21,29 @@ interface GroupedConversations {
   older: ReturnType<typeof useChatStore.getState>['conversations'];
 }
 
+/**
+ * ⚡ Bolt Optimization: Custom equality function for conversations
+ * 💡 What: Compares only the metadata fields (id, title, updatedAt) of the conversations.
+ * 🎯 Why: When streaming a new message, the conversations array updates on every chunk because `messages` changes.
+ *         This caused the entire Sidebar component to re-render constantly.
+ *         By comparing only metadata, the Sidebar completely ignores message content updates.
+ * 📊 Impact: Prevents Sidebar re-renders during message streaming. O(1) instead of O(chunks) re-renders.
+ */
+function compareConversationsMetadata(oldVal: Conversation[], newVal: Conversation[]) {
+  if (oldVal.length !== newVal.length) return false;
+  for (let i = 0; i < oldVal.length; i++) {
+    const o = oldVal[i];
+    const n = newVal[i];
+    if (o.id !== n.id || o.title !== n.title || o.updatedAt !== n.updatedAt) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function Sidebar() {
-  const conversations = useChatStore((s) => s.conversations);
+  // Use the custom equality function to ignore `messages` changes
+  const conversations = useStoreWithEqualityFn(useChatStore, (s) => s.conversations, compareConversationsMetadata);
   const activeConversationId = useChatStore((s) => s.activeConversationId);
 
   const groups: GroupedConversations = useMemo(() => {
