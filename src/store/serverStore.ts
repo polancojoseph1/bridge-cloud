@@ -3,10 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ServerStore, ServerProfile, HealthStatus } from '@/types';
 import { checkHealth } from '@/lib/healthCheck';
-
-function generateId(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
+import { generateId } from '@/lib/utils';
 
 export const useServerStore = create<ServerStore>()(
   persist(

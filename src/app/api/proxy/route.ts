@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { isForbiddenHostname } from '@/lib/ssrf';
 
 // Env var config (Jefe's cloud bots — Option A)
 const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
@@ -68,19 +69,7 @@ export async function POST(req: NextRequest) {
     // is the specific integration test bridgebot port (8585)
     const isIntegrationTestServer = process.env.NODE_ENV === 'test' && hn === 'localhost' && parsedUrl.port === '8585';
 
-    if (
-      !isIntegrationTestServer && (
-        hn === 'localhost' ||
-        hn.includes('127.') ||
-        hn === '0.0.0.0' ||
-        hn.includes('169.254.') ||
-        hn.match(/^10\./) ||
-        hn.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
-        hn.match(/^192\.168\./) ||
-        hn === '[::1]' ||
-        hn === '::1'
-      )
-    ) {
+    if (!isIntegrationTestServer && isForbiddenHostname(hn)) {
       throw new Error('Forbidden internal hostname or IP');
     }
   } catch (err) {

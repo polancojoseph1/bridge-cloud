@@ -3,11 +3,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ChatStore, Conversation, Message } from '@/types';
 import { AGENTS } from '@/lib/agents';
+import { generateId } from '@/lib/utils';
 // streamMockResponse imported dynamically below as fallback
-
-function generateId(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
 
 // AbortController state is kept out of persist
 let activeAbortController: AbortController | null = null;
@@ -90,19 +87,37 @@ export const useChatStore = create<ChatStore>()(
           ),
         }));
         const agentId = get().activeAgentId;
-        const onChunk = (chunk: string) => {
+
+        let pendingChunk = '';
+        let flushTimeout: NodeJS.Timeout | null = null;
+
+        const flushChunk = () => {
+          if (!pendingChunk) return;
+          const chunkToApply = pendingChunk;
+          pendingChunk = '';
+
           set(s => ({
             conversations: s.conversations.map(c =>
               c.id === convId
                 ? {
                     ...c,
                     messages: c.messages.map(m =>
-                      m.id === assistantMsgId ? { ...m, content: m.content + chunk } : m
+                      m.id === assistantMsgId ? { ...m, content: m.content + chunkToApply } : m
                     ),
                   }
                 : c
             ),
           }));
+        };
+
+        const onChunk = (chunk: string) => {
+          pendingChunk += chunk;
+          if (!flushTimeout) {
+            flushTimeout = setTimeout(() => {
+              flushTimeout = null;
+              flushChunk();
+            }, 16);
+          }
         };
         activeAbortController = new AbortController();
 
@@ -116,8 +131,8 @@ export const useChatStore = create<ChatStore>()(
             const { streamMockResponse } = await import('@/lib/mockApi');
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
-        } catch (error: any) {
-          if (error.name === 'AbortError') {
+        } catch (error: unknown) {
+          if (error instanceof Error && error.name === 'AbortError') {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => ({
@@ -134,6 +149,8 @@ export const useChatStore = create<ChatStore>()(
             }));
           }
         } finally {
+          if (flushTimeout) clearTimeout(flushTimeout);
+          flushChunk();
           activeAbortController = null;
         }
 
