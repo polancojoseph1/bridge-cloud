@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -77,9 +77,12 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
   const openManage = useServerStore(s => s.openManage);
   const isOrchestrating = orchMode !== 'single';
 
-  const activeAgent = agents.find(a => a.id === activeAgentId) ?? agents[0];
-  const onlineAgents  = agents.filter(a => a.isOnline);
-  const offlineAgents = agents.filter(a => !a.isOnline);
+  const activeAgent = useMemo(() => {
+    return agents.find(a => a.id === activeAgentId) ?? agents[0];
+  }, [agents, activeAgentId]);
+
+  const onlineAgents = useMemo(() => agents.filter(a => a.isOnline), [agents]);
+  const offlineAgents = useMemo(() => agents.filter(a => !a.isOnline), [agents]);
 
   useEffect(() => {
     if (!open) return;
