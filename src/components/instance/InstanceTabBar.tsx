@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -11,17 +11,18 @@ import { NewInstanceButton } from './NewInstancePicker';
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
 function InstanceTab({ instanceId }: { instanceId: string }) {
-  const instances       = useInstanceStore(s => s.instances);
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
 
-  const instance = instances.find((i: Instance) => i.instanceId === instanceId);
+  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
+  const instancesLength = useInstanceStore(s => s.instances.length);
+
   if (!instance) return null;
 
   const isActive  = activeInstanceId === instanceId;
   const dotColor  = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
-  const canClose  = instances.length > 1 && !instance.isPinned;
+  const canClose  = instancesLength > 1 && !instance.isPinned;
 
   return (
     <button
@@ -76,17 +77,18 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
 function MobileInstancePill({ instanceId }: { instanceId: string }) {
-  const instances        = useInstanceStore(s => s.instances);
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
 
-  const instance = instances.find((i: Instance) => i.instanceId === instanceId);
+  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
+  const instancesLength = useInstanceStore(s => s.instances.length);
+
   if (!instance) return null;
 
   const isActive = activeInstanceId === instanceId;
   const dotColor = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
-  const canClose = instances.length > 1;
+  const canClose = instancesLength > 1;
 
   return (
     <div

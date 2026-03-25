@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useOrchestrationStore, type BridgeNode } from '@/store/orchestrationStore';
 import { useServerStore } from '@/store/serverStore';
 import type { ServerProfile } from '@/types';
@@ -102,10 +102,12 @@ export default function NodeTray() {
     gather:    'Gather from:',
   };
 
-  const onlineCount = nodes.filter(n => n.online).length;
-  const selectedCount = selectedNodeIds.filter(id =>
-    nodes.find(n => n.nodeId === id)?.online
-  ).length;
+  // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
+  // to prevent O(N) memory allocations and reduce React GC pauses
+  const onlineCount = nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0);
+  const selectedCount = selectedNodeIds.reduce((count, id) =>
+    count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
+  );
 
   const orderedNodes =
     mode === 'pipeline'
@@ -113,6 +115,8 @@ export default function NodeTray() {
           .map(id => nodes.find(n => n.nodeId === id))
           .filter(Boolean) as BridgeNode[]
       : nodes;
+
+  const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
 
   return (
     <div className="w-full max-w-[720px] mx-auto mb-2 animate-fade-in">
@@ -155,7 +159,7 @@ export default function NodeTray() {
             <NodeChip
               key={node.nodeId}
               node={node}
-              selected={selectedNodeIds.includes(node.nodeId)}
+              selected={selectedNodeSet.has(node.nodeId)}
               onClick={() => toggleNode(node.nodeId)}
               showArrow={mode === 'pipeline' && idx < orderedNodes.length - 1}
             />
