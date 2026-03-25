@@ -120,6 +120,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers,
       body: JSON.stringify(upstreamBody),
+      signal: req.signal,
     });
   };
 
