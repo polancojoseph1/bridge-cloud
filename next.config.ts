@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SERVER_PRECONFIGURED: "true",
     NEXT_PUBLIC_SERVER_URL: "http://localhost:8585",
     NEXT_PUBLIC_SERVER_KEY: "test",
+    NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED: "true",
   },
 };
 
