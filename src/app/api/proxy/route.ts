@@ -60,9 +60,32 @@ export async function POST(req: NextRequest) {
     if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
       throw new Error('Invalid protocol');
     }
+
+    const hn = parsedUrl.hostname.toLowerCase();
+
+    // In test environment we need to bypass localhost restrictions for integration tests,
+    // but we also want to test this very logic. We'll allow localhost ONLY if the port
+    // is the specific integration test bridgebot port (8585)
+    const isIntegrationTestServer = process.env.NODE_ENV === 'test' && hn === 'localhost' && parsedUrl.port === '8585';
+
+    if (
+      !isIntegrationTestServer && (
+        hn === 'localhost' ||
+        hn.includes('127.') ||
+        hn === '0.0.0.0' ||
+        hn.includes('169.254.') ||
+        hn.match(/^10\./) ||
+        hn.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) ||
+        hn.match(/^192\.168\./) ||
+        hn === '[::1]' ||
+        hn === '::1'
+      )
+    ) {
+      throw new Error('Forbidden internal hostname or IP');
+    }
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: 'Invalid server URL' }),
+      JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid server URL' }),
       { status: 400, headers: { 'Content-Type': 'application/json' } }
     );
   }
