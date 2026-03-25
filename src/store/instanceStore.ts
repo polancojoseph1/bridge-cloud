@@ -13,6 +13,36 @@ function generateLabel(_agentId: string, instances: Instance[]): string {
 
 const DEFAULT_INSTANCE_ID = 'default-inst';
 
+export const instanceStoreOptions = {
+  name: 'bridge-cloud-instances',
+  version: 1,
+  skipHydration: true,
+  partialize: (state: InstanceStore) => ({ instances: state.instances, activeInstanceId: state.activeInstanceId }),
+  migrate: (persistedState: unknown, version: number) => {
+    const state = persistedState as { instances: Instance[]; activeInstanceId: string | null };
+    if (version < 1 && state.instances) {
+      // Rename old agentId-prefixed labels (e.g. "claude-1", "gemini-2") → "chat-N"
+      state.instances = state.instances.map(i => ({
+        ...i,
+        label: i.label.replace(/^(claude|gemini|codex|qwen|free)-(\d+)$/, 'chat-$2'),
+      }));
+    }
+    return state;
+  },
+  onRehydrateStorage: () => (state?: InstanceStore) => {
+    // Belt-and-suspenders: rename old labels even if migrate didn't fire
+    if (state?.instances) {
+      const renamed = state.instances.map(i => ({
+        ...i,
+        label: i.label.replace(/^(claude|gemini|codex|qwen|free)-(\d+)$/, 'chat-$2'),
+      }));
+      if (renamed.some((i, idx) => i.label !== state.instances[idx].label)) {
+        state.instances = renamed;
+      }
+    }
+  },
+};
+
 export const useInstanceStore = create<InstanceStore>()(
   persist(
     (set, get) => ({
@@ -80,34 +110,6 @@ export const useInstanceStore = create<InstanceStore>()(
         });
       },
     }),
-    {
-      name: 'bridge-cloud-instances',
-      version: 1,
-      skipHydration: true,
-      partialize: (state) => ({ instances: state.instances, activeInstanceId: state.activeInstanceId }),
-      migrate: (persistedState: unknown, version: number) => {
-        const state = persistedState as { instances: Instance[]; activeInstanceId: string | null };
-        if (version < 1 && state.instances) {
-          // Rename old agentId-prefixed labels (e.g. "claude-1", "gemini-2") → "chat-N"
-          state.instances = state.instances.map(i => ({
-            ...i,
-            label: i.label.replace(/^(claude|gemini|codex|qwen|free)-(\d+)$/, 'chat-$2'),
-          }));
-        }
-        return state;
-      },
-      onRehydrateStorage: () => (state) => {
-        // Belt-and-suspenders: rename old labels even if migrate didn't fire
-        if (state?.instances) {
-          const renamed = state.instances.map(i => ({
-            ...i,
-            label: i.label.replace(/^(claude|gemini|codex|qwen|free)-(\d+)$/, 'chat-$2'),
-          }));
-          if (renamed.some((i, idx) => i.label !== state.instances[idx].label)) {
-            state.instances = renamed;
-          }
-        }
-      },
-    }
+    instanceStoreOptions
   )
 );
