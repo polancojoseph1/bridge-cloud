@@ -90,19 +90,37 @@ export const useChatStore = create<ChatStore>()(
           ),
         }));
         const agentId = get().activeAgentId;
-        const onChunk = (chunk: string) => {
+
+        let pendingChunk = '';
+        let flushTimeout: NodeJS.Timeout | null = null;
+
+        const flushChunk = () => {
+          if (!pendingChunk) return;
+          const chunkToApply = pendingChunk;
+          pendingChunk = '';
+
           set(s => ({
             conversations: s.conversations.map(c =>
               c.id === convId
                 ? {
                     ...c,
                     messages: c.messages.map(m =>
-                      m.id === assistantMsgId ? { ...m, content: m.content + chunk } : m
+                      m.id === assistantMsgId ? { ...m, content: m.content + chunkToApply } : m
                     ),
                   }
                 : c
             ),
           }));
+        };
+
+        const onChunk = (chunk: string) => {
+          pendingChunk += chunk;
+          if (!flushTimeout) {
+            flushTimeout = setTimeout(() => {
+              flushTimeout = null;
+              flushChunk();
+            }, 16);
+          }
         };
         activeAbortController = new AbortController();
 
@@ -134,6 +152,8 @@ export const useChatStore = create<ChatStore>()(
             }));
           }
         } finally {
+          if (flushTimeout) clearTimeout(flushTimeout);
+          flushChunk();
           activeAbortController = null;
         }
 
