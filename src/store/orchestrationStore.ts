@@ -66,11 +66,13 @@ export const useOrchestrationStore = create<OrchestrationStore>((set, get) => ({
 
   toggleNode: (nodeId) => {
     set(s => {
-      const has = s.selectedNodeIds.includes(nodeId);
-      const selectedNodeIds = has
-        ? s.selectedNodeIds.filter(id => id !== nodeId)
-        : [...s.selectedNodeIds, nodeId];
-      return { selectedNodeIds };
+      const index = s.selectedNodeIds.indexOf(nodeId);
+      if (index !== -1) {
+        const copy = [...s.selectedNodeIds];
+        copy.splice(index, 1);
+        return { selectedNodeIds: copy };
+      }
+      return { selectedNodeIds: [...s.selectedNodeIds, nodeId] };
     });
   },
 
