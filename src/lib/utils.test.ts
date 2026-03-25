@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatRelativeTime, truncate } from './utils';
+import { formatRelativeTime, truncate, generateId } from './utils';
 
 describe('utils', () => {
   describe('formatRelativeTime', () => {
@@ -64,6 +64,49 @@ describe('utils', () => {
 
     it('handles very large n', () => {
       expect(truncate('hello', 1000)).toBe('hello');
+    });
+  });
+
+  describe('generateId', () => {
+    it('generates a string', () => {
+      const id = generateId();
+      expect(typeof id).toBe('string');
+      expect(id.length).toBeGreaterThan(0);
+    });
+
+    it('generates unique IDs', () => {
+      const ids = new Set();
+      for (let i = 0; i < 100; i++) {
+        ids.add(generateId());
+      }
+      expect(ids.size).toBe(100);
+    });
+
+    it('uses crypto.randomUUID when available', () => {
+      const mockUUID = '12345678-1234-1234-1234-123456789012';
+      const originalCrypto = globalThis.crypto;
+
+      globalThis.crypto = {
+        randomUUID: vi.fn().mockReturnValue(mockUUID),
+      } as any;
+
+      const id = generateId();
+      expect(globalThis.crypto.randomUUID).toHaveBeenCalled();
+      expect(id).toBe(mockUUID);
+
+      globalThis.crypto = originalCrypto;
+    });
+
+    it('falls back to Math.random when crypto.randomUUID is not available', () => {
+      const originalCrypto = globalThis.crypto;
+      // @ts-ignore
+      delete globalThis.crypto;
+
+      const id = generateId();
+      expect(typeof id).toBe('string');
+      expect(id.length).toBeGreaterThan(10); // Check it's not empty and has some length
+
+      globalThis.crypto = originalCrypto;
     });
   });
 });
