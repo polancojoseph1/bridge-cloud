@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { AGENTS } from '@/lib/agents';
 import { cn } from '@/lib/cn';
@@ -14,7 +14,10 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const activeAgent = AGENTS.find((a) => a.id === activeAgentId) ?? AGENTS[0];
+  const activeAgent = useMemo(() => {
+    return AGENTS.find((a) => a.id === activeAgentId) ?? AGENTS[0];
+  }, [activeAgentId]);
+
   const dotColor = activeAgent.dotColor;
 
   // Close dropdown when clicking outside
