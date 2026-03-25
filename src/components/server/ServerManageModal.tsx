@@ -17,6 +17,7 @@ import {
 import { useServerStore } from '@/store/serverStore';
 import { checkHealth } from '@/lib/healthCheck';
 import { cn } from '@/lib/cn';
+import { cleanUrl, hostnameFrom } from '@/lib/utils';
 import type { HealthStatus, ServerProfile } from '@/types';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -36,18 +37,6 @@ const healthLabel: Record<HealthStatus, string> = {
   auth_error: 'Auth error',
   unknown: 'Unknown',
 };
-
-function cleanUrl(raw: string) {
-  return raw.trim().replace(/\/+$/, '');
-}
-
-function hostnameFrom(url: string) {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return 'Server';
-  }
-}
 
 // ─── Inline confirm state per card ──────────────────────────────────────────
 

@@ -9,3 +9,15 @@ export function formatRelativeTime(timestamp: number): string {
 export function truncate(str: string, n: number): string {
   return str.length > n ? str.slice(0, n) + '…' : str;
 }
+
+export function cleanUrl(raw: string) {
+  return raw.trim().replace(/\/+$/, '');
+}
+
+export function hostnameFrom(url: string) {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'Server';
+  }
+}
