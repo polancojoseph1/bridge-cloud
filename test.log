@@ -1,0 +1,31 @@
+
+> bridge-cloud@0.1.0 test
+> vitest run --exclude '**/**.integration.test.*'
+
+
+[1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/app[39m
+
+ [32m✓[39m src/lib/streaming.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/store/orchestrationStore.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/store/instanceStore.test.ts [2m([22m[2m26 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/lib/healthCheck.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m src/store/chatStore.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/hooks/useHealthPoller.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m src/app/api/proxy/route.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/lib/mockApi.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m src/store/serverStore.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/lib/utils.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/app/api/proxy/verify/route.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+[90mstderr[2m | src/components/chat/ChatView.test.tsx[2m > [22m[2mChatView Component[2m > [22m[2mrenders chat and gives an output when a message is sent
+[22m[39mEach child in a list should have a unique "key" prop.
+
+Check the render method of `InstanceTabBar`. See https://react.dev/link/warning-keys for more information.
+
+ [32m✓[39m src/components/chat/ChatView.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 137[2mms[22m[39m
+ [32m✓[39m src/lib/cn.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/lib/agents.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+[2m      Tests [22m [1m[32m105 passed[39m[22m[90m (105)[39m
+[2m   Start at [22m 14:01:50
+[2m   Duration [22m 8.34s[2m (transform 950ms, setup 0ms, import 2.03s, tests 391ms, environment 18.55s)[22m

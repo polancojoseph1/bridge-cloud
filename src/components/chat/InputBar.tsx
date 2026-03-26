@@ -16,8 +16,7 @@ const MAX_HEIGHT = LINE_HEIGHT_PX * MAX_LINES; // 120px
  *
  * - Auto-resizing textarea: starts at 1 row, grows up to 5 lines, then scrolls.
  * - Enter submits; Shift+Enter inserts a newline.
- * - While streaming, send button is replaced by a Stop button (visual only for
- *   now — stop logic can hook into an AbortController in a future iteration).
+ * - While streaming, send button is replaced by a Stop button.
  * - Subtle gradient fade above the bar blends the message feed into the input.
  */
 export default function InputBar() {
