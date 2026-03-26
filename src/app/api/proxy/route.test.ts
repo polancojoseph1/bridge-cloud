@@ -61,11 +61,11 @@ describe('POST /api/proxy', () => {
     });
   });
 
-  it('forwards the error response when upstream is not ok', async () => {
+  it('sanitizes the error response when upstream is not ok', async () => {
     const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key' });
 
-    // Mock response with ok = false
-    const mockUpstreamResponse = new Response(JSON.stringify({ detail: 'Bad request' }), {
+    // Mock response with ok = false, simulating upstream leaking internal data
+    const mockUpstreamResponse = new Response(JSON.stringify({ detail: 'Internal DB Error: stacktrace...' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -73,9 +73,9 @@ describe('POST /api/proxy', () => {
 
     const response = await POST(req);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(502);
     const data = await response.json();
-    expect(data).toEqual({ detail: 'Bad request' });
+    expect(data).toEqual({ error: 'Upstream service returned an error' });
   });
 
   it('returns 400 when attempting to fetch an internal IP', async () => {
