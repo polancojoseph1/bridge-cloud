@@ -91,7 +91,9 @@ interface OrchestrationPanelProps {
 }
 
 export default function OrchestrationPanel({ job }: OrchestrationPanelProps) {
-  const doneCount  = job.subtasks.filter(t => t.status === 'done').length;
+  // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
+  // to prevent O(N) memory allocations and reduce React GC pauses
+  const doneCount  = job.subtasks.reduce((count, t) => count + (t.status === 'done' ? 1 : 0), 0);
   const totalCount = job.subtasks.length;
   const isRunning  = job.status === 'running' || job.status === 'reducing';
 
