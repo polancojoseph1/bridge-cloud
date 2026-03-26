@@ -150,10 +150,14 @@ export async function POST(req: NextRequest) {
   }
 
   if (!upstream || !upstream.ok) {
-    return new Response(upstream?.body, {
-      status: upstream?.status || 503,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // 🛡️ Sentinel: Prevent information disclosure by sanitizing upstream errors
+    return new Response(
+      JSON.stringify({ error: 'Upstream service returned an error' }),
+      {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   if (isOpenRouter) {
