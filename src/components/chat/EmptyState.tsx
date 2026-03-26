@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
   'Explain a concept',
@@ -14,6 +15,7 @@ export default function EmptyState() {
   const newConversation = useChatStore(s => s.newConversation);
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
+  const router = useRouter();
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -27,10 +29,11 @@ export default function EmptyState() {
     if (activeConv && activeConv.messages.length === 0) {
       sendMessage(text);
     } else {
-      newConversation();
+      const id = newConversation();
+      router.push(`/chat/${id}`);
       sendMessage(text);
     }
-  }, [newConversation, sendMessage]);
+  }, [newConversation, sendMessage, router]);
 
   const handleSubmit = () => {
     const trimmed = value.trim();

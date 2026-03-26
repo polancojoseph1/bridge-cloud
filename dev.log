@@ -1,0 +1,23 @@
+
+> bridge-cloud@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.7 (Turbopack)
+- Local:        ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.0.2:3001
+- Environments: .env.local
+✓ Ready in 1016ms
+⨯ Another next dev server is already running in this directory.
+Stop the other server before starting a new one.
+[?25h
+ogram, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 2.1s
+○ Compiling / ...
+ GET / 307 in 5.0s (compile: 4.3s, proxy.ts: 287ms, render: 406ms)
+○ Compiling /chat ...
+ GET /chat 200 in 4.1s (compile: 3.6s, proxy.ts: 55ms, render: 419ms)
+ GET /chat/0286ccf9-2726-403b-8ad5-96567e3d5bb8 200 in 2.5s (compile: 2.5s, proxy.ts: 14ms, render: 40ms)

@@ -11,6 +11,7 @@ interface MessageListProps {
 export default function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
+  const isProgrammaticScrollRef = useRef(false);
   const conversations = useChatStore(s => s.conversations);
   const isStreaming = useChatStore(s => s.isStreaming);
 
@@ -19,6 +20,12 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
+
+    if (isProgrammaticScrollRef.current) {
+      isProgrammaticScrollRef.current = false;
+      return;
+    }
+
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     // User is considered at bottom if they are within 30px of the bottom
     isUserScrolledRef.current = Math.ceil(scrollTop + clientHeight) < scrollHeight - 30;
@@ -26,6 +33,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
   useEffect(() => {
     if (scrollRef.current && !isUserScrolledRef.current) {
+      isProgrammaticScrollRef.current = true;
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages.length, isStreaming]);
@@ -33,6 +41,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
   // Also scroll when streaming content updates
   useEffect(() => {
     if (isStreaming && scrollRef.current && !isUserScrolledRef.current) {
+      isProgrammaticScrollRef.current = true;
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isStreaming]);
