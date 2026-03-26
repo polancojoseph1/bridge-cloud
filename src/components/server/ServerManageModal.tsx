@@ -328,6 +328,7 @@ function ProfileCard({
             onClick={handleRecheck}
             disabled={isChecking}
             title="Re-check connection"
+            aria-label="Re-check connection"
             className="p-1.5 rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isChecking
@@ -341,6 +342,7 @@ function ProfileCard({
             <button
               onClick={() => setDefault(profile.id)}
               title="Set as default"
+              aria-label="Set as default"
               className="p-1.5 rounded-lg text-[#565656] hover:text-[#f59e0b] hover:bg-[#1e3025] transition-colors"
             >
               <Star size={13} />
@@ -355,6 +357,7 @@ function ProfileCard({
                 : setConfirmDelete({ profileId: profile.id })
             }
             title="Remove server"
+            aria-label="Remove server"
             className="p-1.5 rounded-lg text-[#565656] hover:text-[#f87171] hover:bg-[rgba(239,68,68,0.08)] transition-colors"
           >
             <Trash2 size={13} />
@@ -517,12 +520,14 @@ export default function ServerManageModal() {
                 onClick={() => setTab('add')}
                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] transition-colors"
                 title="Add server"
+                aria-label="Add server"
               >
                 <Plus size={15} />
               </button>
             )}
             <button
               onClick={closeManage}
+              aria-label="Close modal"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors"
             >
               <X size={16} />
@@ -570,6 +575,7 @@ export default function ServerManageModal() {
             )}
             <button
               onClick={closeManage}
+              aria-label="Close modal"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors"
             >
               <X size={16} />
