@@ -37,8 +37,15 @@ function NewInstancePicker({ open, onClose, anchorRef }: NewInstancePickerProps)
 
   if (!open) return null;
 
-  const onlineAgents  = agents.filter(a => a.isOnline);
-  const offlineAgents = agents.filter(a => !a.isOnline);
+  // Optimize array filtering: replace O(2N) double .filter() with O(N) single-pass .reduce()
+  // to reduce memory allocations and React GC pauses during frequent health poll updates.
+  const [onlineAgents, offlineAgents] = agents.reduce<[typeof agents, typeof agents]>(
+    (acc, a) => {
+      acc[a.isOnline ? 0 : 1].push(a);
+      return acc;
+    },
+    [[], []]
+  );
 
   return (
     <div
