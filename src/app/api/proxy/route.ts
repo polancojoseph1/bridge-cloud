@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid server URL' }),
+      JSON.stringify({ error: 'Invalid or forbidden server URL' }),
       { status: 400, headers: { 'Content-Type': 'application/json' } }
     );
   }
