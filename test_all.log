@@ -1,0 +1,45 @@
+
+> bridge-cloud@0.1.0 test
+> vitest run --exclude '**/**.integration.test.*'
+
+
+[1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/Users/openclaw/Desktop/Jefe/Projects/bridge-cloud[39m
+
+(node:62387) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [31m❯[39m src/store/chatStore.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m       [31m×[31m handles general error during streamFromProxy[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m handles AbortError during streamFromProxy gracefully[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m handles general error during streamMockResponse[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m handles AbortError during streamMockResponse gracefully[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m verifies onChunk callback updates the message content correctly[39m[32m 0[2mms[22m[39m
+(node:62388) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/store/chatStore.test.ts[2m > [22mchatStore fallback error handling[2m > [22mwhen using actual server (hasServer = true)[2m > [22mhandles general error during streamFromProxy
+[41m[1m FAIL [22m[49m src/store/chatStore.test.ts[2m > [22mchatStore fallback error handling[2m > [22mwhen using actual server (hasServer = true)[2m > [22mhandles AbortError during streamFromProxy gracefully
+[41m[1m FAIL [22m[49m src/store/chatStore.test.ts[2m > [22mchatStore fallback error handling[2m > [22mwhen using mock server (hasServer = false)[2m > [22mhandles general error during streamMockResponse
+[41m[1m FAIL [22m[49m src/store/chatStore.test.ts[2m > [22mchatStore fallback error handling[2m > [22mwhen using mock server (hasServer = false)[2m > [22mhandles AbortError during streamMockResponse gracefully
+[41m[1m FAIL [22m[49m src/store/chatStore.test.ts[2m > [22mchatStore fallback error handling[2m > [22mverifies onChunk callback updates the message content correctly
+[31m[1mTypeError[22m: storage.setItem is not a function[39m
+[90m [2m❯[22m Object.setItem node_modules/zustand/esm/middleware.mjs:[2m298:42[22m[39m
+[90m [2m❯[22m setItem node_modules/zustand/esm/middleware.mjs:[2m358:20[22m[39m
+[90m [2m❯[22m useBoundStore.api.setState node_modules/zustand/esm/middleware.mjs:[2m366:12[22m[39m
+[36m [2m❯[22m src/store/chatStore.test.ts:[2m30:18[22m[39m
+    [90m 28|[39m [34mdescribe[39m([32m'chatStore fallback error handling'[39m[33m,[39m () [33m=>[39m {
+    [90m 29|[39m   [34mbeforeEach[39m(() [33m=>[39m {
+    [90m 30|[39m     useChatStore[33m.[39m[34msetState[39m({
+    [90m   |[39m                  [31m^[39m
+    [90m 31|[39m       conversations[33m:[39m [][33m,[39m
+    [90m 32|[39m       activeConversationId[33m:[39m [35mnull[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m40 passed[39m[22m[90m (45)[39m
+[2m   Start at [22m 15:17:54
+[2m   Duration [22m 1.25s[2m (transform 340ms, setup 0ms, import 620ms, tests 62ms, environment 5.49s)[22m
+

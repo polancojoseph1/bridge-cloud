@@ -1,0 +1,15 @@
+
+> bridge-cloud@0.1.0 test
+> vitest run --exclude '**/**.integration.test.*'
+
+
+[1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/Users/openclaw/Desktop/Jefe/Projects/bridge-cloud[39m
+
+ [31m❯[39m src/lib/utils.test.ts [2m([22m[2m14 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 6[2mms[22m[39m
+[31m       [31m×[31m uses crypto.randomUUID when available[39m[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m43 passed[39m[22m[90m (44)[39m
+[2m   Start at [22m 16:03:14
+[2m   Duration [22m 1.01s[2m (transform 275ms, setup 0ms, import 490ms, tests 58ms, environment 3.37s)[22m
+

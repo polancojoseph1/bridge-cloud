@@ -1,0 +1,18 @@
+
+> bridge-cloud@0.1.0 test
+> vitest run --exclude '**/**.integration.test.*'
+
+
+[1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/Users/openclaw/Desktop/Jefe/Projects/bridge-cloud[39m
+
+ [31m❯[39m src/store/serverStore.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m     [31m×[31m removes the active profile and falls back to the default profile[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m removes the default profile and ensures another profile becomes the new default[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m removes a profile that is both active and default, transitioning both states[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m removes the only existing profile, transitioning to empty state[39m[32m 0[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m69 passed[39m[22m[90m (73)[39m
+[2m   Start at [22m 16:32:00
+[2m   Duration [22m 991ms[2m (transform 548ms, setup 0ms, import 1.05s, tests 113ms, environment 6.81s)[22m
+
