@@ -122,8 +122,9 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       <div className="space-y-3.5">
         {/* URL */}
         <div>
-          <label className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
+          <label htmlFor="server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
           <input
+            id="server-url"
             type="url"
             value={url}
             onChange={e => { setUrl(e.target.value); setError(null); }}
@@ -134,9 +135,10 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
 
         {/* API Key */}
         <div>
-          <label className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
+          <label htmlFor="api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
           <div className="relative">
             <input
+              id="api-key"
               type={showKey ? 'text' : 'password'}
               value={apiKey}
               onChange={e => { setApiKey(e.target.value); setError(null); }}
@@ -156,10 +158,11 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
 
         {/* Name */}
         <div>
-          <label className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+          <label htmlFor="server-name" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
             Name <span className="text-[#565656] font-normal">(optional)</span>
           </label>
           <input
+            id="server-name"
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}

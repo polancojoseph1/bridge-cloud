@@ -90,8 +90,9 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
         <div className="space-y-4">
           {/* URL */}
           <div>
-            <label className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
+            <label htmlFor="connect-server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
             <input
+              id="connect-server-url"
               type="url"
               value={url}
               onChange={e => { setUrl(e.target.value); setError(null); }}
@@ -102,9 +103,10 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
 
           {/* API Key */}
           <div>
-            <label className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
+            <label htmlFor="connect-api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
             <div className="relative">
               <input
+                id="connect-api-key"
                 type={showKey ? 'text' : 'password'}
                 value={apiKey}
                 onChange={e => { setApiKey(e.target.value); setError(null); }}
@@ -124,10 +126,11 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
 
           {/* Name (optional) */}
           <div>
-            <label className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+            <label htmlFor="connect-server-name" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
               Name <span className="text-[#565656] font-normal">(optional)</span>
             </label>
             <input
+              id="connect-server-name"
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
