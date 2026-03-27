@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       throw new Error('Forbidden internal hostname or IP');
     }
   } catch (err) {
-    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid server URL' }), {
+    return new Response(JSON.stringify({ error: 'Invalid or forbidden server URL' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });

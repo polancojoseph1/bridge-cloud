@@ -1,3 +1,44 @@
+
+function parseIPv4(ip: string): number[] | null {
+  let parts: string[];
+  if (ip.includes('.')) {
+    parts = ip.split('.');
+  } else {
+    parts = [ip];
+  }
+  if (parts.length === 0 || parts.length > 4) return null;
+
+  const parsedParts: number[] = [];
+  for (const p of parts) {
+    if (!/^(0x[0-9a-fA-F]+|0[0-7]*|[1-9][0-9]*)$/.test(p)) return null;
+    let n: number;
+    if (p.startsWith('0x') || p.startsWith('0X')) {
+      n = parseInt(p, 16);
+    } else if (p.startsWith('0') && p.length > 1) {
+      n = parseInt(p, 8);
+    } else {
+      n = parseInt(p, 10);
+    }
+    if (isNaN(n)) return null;
+    parsedParts.push(n);
+  }
+
+  const last = parsedParts.pop()!;
+  if (last >= Math.pow(256, 5 - parsedParts.length)) return null;
+
+  for (const p of parsedParts) {
+    if (p > 255) return null;
+  }
+
+  const result = [...parsedParts];
+  let remaining = last;
+  for (let i = 4 - parsedParts.length; i > 0; i--) {
+    result.push(Math.floor(remaining / Math.pow(256, i - 1)) % 256);
+  }
+
+  return result;
+}
+
 export function isForbiddenHostname(hn: string): boolean {
   const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
 
@@ -6,10 +47,9 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
-  // IPv4 blocking (handles formats correctly due to new URL() normalizing them to standard dotted decimal)
-  const ipv4Match = cleanHn.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-  if (ipv4Match) {
-    const parts = ipv4Match.slice(1).map(Number);
+  // IPv4 blocking (handles octal, hex, and dword formats)
+  const parts = parseIPv4(cleanHn);
+  if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
     if (parts[0] === 127) return true; // 127.0.0.0/8

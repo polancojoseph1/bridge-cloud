@@ -84,7 +84,7 @@ describe('POST /api/proxy', () => {
 
     expect(response.status).toBe(400);
     const data = await response.json();
-    expect(data).toEqual({ error: 'Forbidden internal hostname or IP' });
+    expect(data).toEqual({ error: 'Invalid or forbidden server URL' });
   });
 
   it('returns a streamed response with correct headers on success', async () => {
