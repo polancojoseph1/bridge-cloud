@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Plus, WifiOff } from 'lucide-react';
 // NewInstancePicker (dropdown) kept for potential future use
 import { cn } from '@/lib/cn';
@@ -39,13 +39,15 @@ function NewInstancePicker({ open, onClose, anchorRef }: NewInstancePickerProps)
 
   // Optimize array filtering: replace O(2N) double .filter() with O(N) single-pass .reduce()
   // to reduce memory allocations and React GC pauses during frequent health poll updates.
-  const [onlineAgents, offlineAgents] = agents.reduce<[typeof agents, typeof agents]>(
+  // ⚡ Bolt Optimization: Wrap with useMemo to prevent recalculating on every re-render
+  // when agents array hasn't changed.
+  const [onlineAgents, offlineAgents] = useMemo(() => agents.reduce<[typeof agents, typeof agents]>(
     (acc, a) => {
       acc[a.isOnline ? 0 : 1].push(a);
       return acc;
     },
     [[], []]
-  );
+  ), [agents]);
 
   return (
     <div
