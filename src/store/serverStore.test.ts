@@ -14,10 +14,10 @@ describe('ServerStore - removeProfile', () => {
 
   it('removes the active profile and falls back to the default profile', () => {
     const store = useServerStore.getState();
-    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
     store.setDefault(id1);
 
-    const id2 = store.addProfile({ name: 'Profile 2', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id2 = store.addProfile({ name: 'Profile 2', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
 
     useServerStore.getState().setActiveProfile(id2);
     expect(useServerStore.getState().activeProfileId).toBe(id2);
@@ -32,10 +32,10 @@ describe('ServerStore - removeProfile', () => {
 
   it('removes the default profile and ensures another profile becomes the new default', () => {
     const store = useServerStore.getState();
-    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
     store.setDefault(id1);
-    const id2 = store.addProfile({ name: 'Profile 2', tier: 'local', agentId: 'claude', url: 'http://localhost' });
-    const id3 = store.addProfile({ name: 'Profile 3', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id2 = store.addProfile({ name: 'Profile 2', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
+    const id3 = store.addProfile({ name: 'Profile 3', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
 
     useServerStore.getState().removeProfile(id1);
 
@@ -52,9 +52,9 @@ describe('ServerStore - removeProfile', () => {
 
   it('removes a profile that is both active and default, transitioning both states', () => {
     const store = useServerStore.getState();
-    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
     store.setDefault(id1);
-    const id2 = store.addProfile({ name: 'Profile 2', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id2 = store.addProfile({ name: 'Profile 2', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
 
     useServerStore.getState().setActiveProfile(id1);
 
@@ -69,7 +69,7 @@ describe('ServerStore - removeProfile', () => {
 
   it('removes the only existing profile, transitioning to empty state', () => {
     const store = useServerStore.getState();
-    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost' });
+    const id1 = store.addProfile({ name: 'Profile 1', tier: 'local', agentId: 'claude', url: 'http://localhost', apiKey: 'test', isDefault: false });
     store.setDefault(id1);
 
     useServerStore.getState().setActiveProfile(id1);

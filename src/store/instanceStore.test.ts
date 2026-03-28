@@ -148,7 +148,6 @@ describe('instanceStoreOptions', () => {
       setInstanceAgent: () => {},
     };
 
-    // @ts-expect-error partializing full state
     const partial = instanceStoreOptions.partialize(fullState);
     expect(partial).toEqual({
       instances: fullState.instances,
