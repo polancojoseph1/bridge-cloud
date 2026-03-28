@@ -69,6 +69,8 @@ export interface InstanceStore {
   closeInstance: (instanceId: string) => void;
   setActiveInstance: (instanceId: string) => void;
   setInstanceConversation: (instanceId: string, conversationId: string) => void;
+  renameInstance: (instanceId: string, label: string) => void;
+  setInstanceAgent: (instanceId: string, agentId: string) => void;
 }
 
 export interface AgentWithHealth extends Agent {
