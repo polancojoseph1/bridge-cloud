@@ -4,6 +4,7 @@ import { cn } from '@/lib/cn';
 import type { Message } from '@/types';
 import AgentBadge from '@/components/agent/AgentBadge';
 import { useServerStore } from '@/store/serverStore';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface MessageBubbleProps {
   message: Message;
@@ -55,12 +56,10 @@ const MessageBubble = memo(function MessageBubble({ message }: MessageBubbleProp
                 </button>
               </div>
             ) : message.content ? (
-              <p className={cn(
-                'text-[15px] leading-[1.75] text-[#ececec] whitespace-pre-wrap break-words',
-                message.isStreaming && 'stream-cursor'
-              )}>
-                {message.content}
-              </p>
+              <MarkdownRenderer
+                content={message.content}
+                isStreaming={message.isStreaming}
+              />
             ) : null}
           </div>
         </div>
