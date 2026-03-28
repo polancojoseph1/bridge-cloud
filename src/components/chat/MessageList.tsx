@@ -18,6 +18,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const conversation = conversations.find(c => c.id === conversationId);
   const messages = conversation?.messages ?? [];
 
+  const lastMsg = messages[messages.length - 1];
+
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
@@ -32,11 +34,17 @@ export default function MessageList({ conversationId }: MessageListProps) {
   };
 
   useEffect(() => {
+    // If the user just sent a message, force auto-scroll to bottom
+    // regardless of whether they were previously scrolled up
+    if (lastMsg?.role === 'user') {
+      isUserScrolledRef.current = false;
+    }
+
     if (scrollRef.current && !isUserScrolledRef.current) {
       isProgrammaticScrollRef.current = true;
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages.length, isStreaming]);
+  }, [messages.length, isStreaming, lastMsg?.role]);
 
   // Also scroll when streaming content updates
   useEffect(() => {
@@ -46,7 +54,6 @@ export default function MessageList({ conversationId }: MessageListProps) {
     }
   }, [messages, isStreaming]);
 
-  const lastMsg = messages[messages.length - 1];
   const showTypingIndicator = isStreaming && lastMsg?.role === 'assistant' && lastMsg?.content === '';
 
   return (

@@ -31,7 +31,7 @@ export default function ModePill() {
             role="radio"
             aria-checked={isActive}
             title={isDisabled ? "Coming soon" : m.title}
-            onClick={() => setMode(m.id)}
+            onClick={isDisabled ? undefined : () => setMode(m.id)}
             disabled={isDisabled}
             className={cn(
               'px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-150',

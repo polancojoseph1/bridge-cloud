@@ -32,6 +32,12 @@ export async function streamFromProxy(
   let buffer = '';
 
   while (true) {
+    if (signal?.aborted) {
+      const error = new Error('Aborted');
+      error.name = 'AbortError';
+      throw error;
+    }
+
     const { done, value } = await reader.read();
     if (done) break;
 
