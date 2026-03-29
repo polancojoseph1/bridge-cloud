@@ -29,8 +29,10 @@ export default function MessageList({ conversationId }: MessageListProps) {
     }
 
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    // User is considered at bottom if they are within 30px of the bottom
-    isUserScrolledRef.current = Math.ceil(scrollTop + clientHeight) < scrollHeight - 30;
+    // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
+    // ensuring precision within the threshold
+    const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
+    isUserScrolledRef.current = distanceToBottom > 30;
   };
 
   useEffect(() => {
@@ -41,16 +43,23 @@ export default function MessageList({ conversationId }: MessageListProps) {
     }
 
     if (scrollRef.current && !isUserScrolledRef.current) {
-      isProgrammaticScrollRef.current = true;
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // Only set programmatic true if we actually move it
+      const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
+      if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
+        isProgrammaticScrollRef.current = true;
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
     }
   }, [messages.length, isStreaming, lastMsg?.role]);
 
   // Also scroll when streaming content updates
   useEffect(() => {
     if (isStreaming && scrollRef.current && !isUserScrolledRef.current) {
-      isProgrammaticScrollRef.current = true;
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
+      if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
+        isProgrammaticScrollRef.current = true;
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
     }
   }, [messages, isStreaming]);
 
