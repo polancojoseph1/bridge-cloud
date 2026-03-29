@@ -35,6 +35,8 @@ export default function ServerStatusIndicator() {
       )}
       <button
         onClick={() => setShowPopover(v => !v)}
+        aria-haspopup="dialog"
+        aria-expanded={showPopover}
         className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-[#152219] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
       >
         {/* Status dot */}

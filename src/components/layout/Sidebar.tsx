@@ -26,6 +26,7 @@ export default function Sidebar() {
         <span className="text-[#ececec] font-semibold text-[15px] tracking-tight">Bridge Cloud</span>
         <button
           onClick={handleNewChat}
+          aria-label="New chat"
           className="w-8 h-8 flex items-center justify-center rounded-md text-[#8e8e8e] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
           title="New chat"
         >
