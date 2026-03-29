@@ -1,5 +1,9 @@
 import { NextRequest } from 'next/server';
 import { isForbiddenHostname } from '@/lib/ssrf';
+import dns from 'dns';
+import { promisify } from 'util';
+
+const lookup = promisify(dns.lookup);
 
 // Env var config (Jefe's cloud bots — Option A)
 const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
@@ -69,8 +73,18 @@ export async function POST(req: NextRequest) {
     // is the specific integration test bridgebot port (8585)
     const isIntegrationTestServer = process.env.NODE_ENV === 'test' && hn === 'localhost' && parsedUrl.port === '8585';
 
-    if (!isIntegrationTestServer && isForbiddenHostname(hn)) {
-      throw new Error('Forbidden internal hostname or IP');
+    if (!isIntegrationTestServer) {
+      if (isForbiddenHostname(hn)) {
+        throw new Error('Forbidden internal hostname or IP');
+      }
+
+      // DNS lookup to prevent DNS resolution bypass
+      const lookupResult = await lookup(hn, { all: true });
+      for (const result of lookupResult) {
+        if (isForbiddenHostname(result.address)) {
+          throw new Error('Forbidden internal hostname or IP');
+        }
+      }
     }
   } catch (err) {
     return new Response(

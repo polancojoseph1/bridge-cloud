@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // Provide a dummy test key as fallback so testing environments don't crash
-  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_live_Y2xlcmsuY2xlcmsuY29tJA==";
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_Y2xlcmsuY2xlcmsuY29tJA==";
 
   return (
     <ClerkProvider publishableKey={clerkKey} telemetry={{ disabled: true }}>
