@@ -1,0 +1,19 @@
+# Bridge Bot server connections — hardwired so chat always routes to bridgebot
+BRIDGEBOT_CLAUDE_URL=http://localhost:8585
+BRIDGEBOT_CLAUDE_KEY=Fb-JmYqQ92fKwD4pIXarX7U6QiYo51InnHRTvgjgkNg
+BRIDGEBOT_GEMINI_URL=http://localhost:8586
+BRIDGEBOT_GEMINI_KEY=MLphlf7SJhEvm45oS8kEIkhdKlBkCumLGg3F_KJ28wo
+BRIDGEBOT_CODEX_URL=http://localhost:8587
+BRIDGEBOT_CODEX_KEY=LPEsjr_J6TFfihFtWztCi-fX8f8omN-kukMx6FAv5BQ
+BRIDGEBOT_QWEN_URL=http://localhost:8588
+BRIDGEBOT_QWEN_KEY=dqlhN7ZvkXQyRzys8Oad6jxiekw4OWfZF3IO8U3KdBM
+BRIDGEBOT_FREE_URL=http://localhost:8590
+BRIDGEBOT_FREE_KEY=ICsZoOYuAfpAeW9gzm-itkGdSyay6Ch1j9GnsF1mZ4I
+
+# Skip the server-connect gate — server is pre-configured above
+NEXT_PUBLIC_SERVER_PRECONFIGURED=true
+
+# Auto-seed default server profile (used by AppShell on first load)
+NEXT_PUBLIC_SERVER_URL=
+NEXT_PUBLIC_SERVER_KEY=Fb-JmYqQ92fKwD4pIXarX7U6QiYo51InnHRTvgjgkNg
+NEXT_PUBLIC_SERVER_AGENT_ID=claude

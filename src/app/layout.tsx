@@ -28,14 +28,23 @@ export default function RootLayout({
 }>) {
   // Provide a dummy test key as fallback so testing environments don't crash
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_Y2xlcmsuY2xlcmsuY29tJA==";
+  const isTest = clerkKey.includes('mock');
+
+  const content = (
+    <html lang="en" className={inter.variable}>
+      <body className="bg-[#0a1410] text-[#ececec] antialiased h-screen overflow-hidden">
+        {children}
+      </body>
+    </html>
+  );
+
+  if (isTest) {
+    return content;
+  }
 
   return (
     <ClerkProvider publishableKey={clerkKey} telemetry={{ disabled: true }}>
-      <html lang="en" className={inter.variable}>
-        <body className="bg-[#0a1410] text-[#ececec] antialiased h-screen overflow-hidden">
-          {children}
-        </body>
-      </html>
+      {content}
     </ClerkProvider>
   );
 }
