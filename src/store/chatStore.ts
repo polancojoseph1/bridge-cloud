@@ -46,6 +46,7 @@ export const useChatStore = create<ChatStore>()(
           activeAbortController.abort();
           activeAbortController = null;
         }
+        set({ isStreaming: false });
       },
 
       sendMessage: async (content: string) => {

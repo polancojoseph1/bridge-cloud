@@ -12,6 +12,10 @@ const MODES: { id: OrchestrationMode; label: string; title: string }[] = [
 ];
 
 export default function ModePill() {
+  // Currently disabled gracefully as it's not wired to the proxy
+  return null;
+
+  /*
   const mode = useOrchestrationStore(s => s.mode);
   const setMode = useOrchestrationStore(s => s.setMode);
 
@@ -48,4 +52,5 @@ export default function ModePill() {
       })}
     </div>
   );
+  */
 }
