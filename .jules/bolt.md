@@ -6,3 +6,7 @@
 ## 2024-05-14 - [React.useMemo for Array Partitions]
 **Learning:** In frequently polling React components (like `NewInstancePicker` handling health checks), even if array partitioning is optimized to O(N) using `reduce`, doing this on every render cycle when the underlying data hasn't changed still causes unnecessary CPU churn and memory allocations.
 **Action:** Always wrap expensive or allocation-heavy array derivations (like `reduce` partitions) in `useMemo` within frequently re-rendering components, tying the dependency strictly to the source array.
+
+## 2024-05-15 - [Optimize Store Array Traversals]
+**Learning:** In Zustand stores, chaining multiple array methods (`.filter`, `.findIndex`, `.some`, `.map`, `.find`) creates unnecessary O(N) intermediate allocations, leading to memory bloat and garbage collection pauses when managing active components like UI tabs or dropdowns. Additionally, when using `.reduce` to construct an updated state array, directly mutating objects (e.g. `updated[0].isDefault = true`) breaks React's shallow equality checks causing missing re-renders.
+**Action:** Replace multiple chained array traversals with a single `for` loop or `.reduce()` pass when mutating store collections. Always preserve immutability by shallow copying specific updated objects (e.g., `updated[0] = { ...updated[0], isDefault: true }`).

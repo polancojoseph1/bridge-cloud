@@ -52,14 +52,29 @@ export const useServerStore = create<ServerStore>()(
 
       removeProfile: (id) => {
         const { profiles, activeProfileId } = get();
-        const remaining = profiles.filter(p => p.id !== id);
+        let defaultId: string | null = null;
+        let fallbackActiveId: string | null = null;
+
+        // ⚡ Bolt: Replace multiple array traversals (.filter, .find, .some, .map)
+        // with a single .reduce pass to prevent O(N) memory allocations and reduce React GC pauses.
+        const updated = profiles.reduce<ServerProfile[]>((acc, p) => {
+          if (p.id !== id) {
+            if (p.isDefault) defaultId = p.id;
+            if (!fallbackActiveId) fallbackActiveId = p.id; // Store first available as fallback
+            acc.push(p);
+          }
+          return acc;
+        }, []);
+
+        if (updated.length > 0 && !defaultId) {
+          updated[0] = { ...updated[0], isDefault: true };
+          defaultId = updated[0].id;
+        }
+
         const newActive = activeProfileId === id
-          ? (remaining.find(p => p.isDefault)?.id ?? remaining[0]?.id ?? null)
+          ? (defaultId ?? fallbackActiveId)
           : activeProfileId;
-        // Ensure at least one default
-        const updated = remaining.length > 0 && !remaining.some(p => p.isDefault)
-          ? remaining.map((p, i) => ({ ...p, isDefault: i === 0 }))
-          : remaining;
+
         set({ profiles: updated, activeProfileId: newActive });
       },
 
