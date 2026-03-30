@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback, KeyboardEvent } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 import { useChatStore } from '@/store/chatStore';
 
 // One line-height in px — used to cap auto-resize at 5 lines
@@ -52,9 +53,20 @@ export default function InputBar() {
     }
   };
 
+  const { user } = useUser();
+  const allowedEmails = ['josephpolanco909@gmail.com', 'diony.monday@gmail.com', 'dionymonday@gmail.com', 'jhanielbonilla@gmail.com'];
+  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
+  const isAdmin = allowedEmails.includes(userEmail) || !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_');
+
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
     if (!trimmed || isStreaming) return;
+    
+    if (!isAdmin) {
+      alert("🔒 This instance is running in Prototype Mode. Please sign in with an authorized Administrator account to communicate with the swarm.");
+      return;
+    }
+
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
@@ -62,7 +74,7 @@ export default function InputBar() {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
     }
-  }, [value, isStreaming, sendMessage]);
+  }, [value, isStreaming, sendMessage, isAdmin]);
 
   const canSend = value.trim().length > 0 && !isStreaming;
 
