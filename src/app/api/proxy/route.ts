@@ -124,6 +124,7 @@ export async function POST(req: NextRequest) {
       headers,
       body: JSON.stringify(upstreamBody),
       signal: req.signal,
+      redirect: 'error',
     });
   };
 

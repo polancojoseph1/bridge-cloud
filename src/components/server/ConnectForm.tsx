@@ -36,6 +36,7 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: cleanedUrl, apiKey: apiKey.trim() }),
+        redirect: 'error',
       });
       const data = await res.json();
 

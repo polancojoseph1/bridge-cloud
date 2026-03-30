@@ -21,6 +21,7 @@ export async function streamFromProxy(
       serverKey: profile?.apiKey ?? '',
     }),
     signal,
+    redirect: 'error',
   });
 
   if (!res.ok || !res.body) {
