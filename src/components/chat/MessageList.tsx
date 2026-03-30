@@ -17,6 +17,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
   const conversation = conversations.find(c => c.id === conversationId);
   const messages = conversation?.messages ?? [];
+  const prevCountRef = useRef(messages.length);
 
   const lastMsg = messages[messages.length - 1];
 
@@ -38,9 +39,10 @@ export default function MessageList({ conversationId }: MessageListProps) {
   useEffect(() => {
     // If the user just sent a message, force auto-scroll to bottom
     // regardless of whether they were previously scrolled up
-    if (lastMsg?.role === 'user') {
+    if (messages.length > prevCountRef.current) {
       isUserScrolledRef.current = false;
     }
+    prevCountRef.current = messages.length;
 
     if (scrollRef.current && !isUserScrolledRef.current) {
       // Only set programmatic true if we actually move it

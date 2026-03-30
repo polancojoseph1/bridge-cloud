@@ -31,7 +31,7 @@ export default function EmptyState() {
     } else {
       const id = newConversation();
       router.push(`/chat/${id}`);
-      sendMessage(text);
+      setTimeout(() => sendMessage(text), 0);
     }
   }, [newConversation, sendMessage, router]);
 

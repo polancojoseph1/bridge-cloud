@@ -91,9 +91,6 @@ interface OrchestrationPanelProps {
 }
 
 export default function OrchestrationPanel({ job }: OrchestrationPanelProps) {
-  // Currently disabled gracefully as it's not wired to the proxy
-  return null;
-
   // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
   // to prevent O(N) memory allocations and reduce React GC pauses
   const doneCount  = job.subtasks.reduce((count, t) => count + (t.status === 'done' ? 1 : 0), 0);

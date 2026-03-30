@@ -40,6 +40,12 @@ export async function streamFromProxy(
     }
 
     const { done, value } = await reader.read();
+
+    if (signal?.aborted) {
+      const error = new Error('Aborted');
+      error.name = 'AbortError';
+      throw error;
+    }
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
