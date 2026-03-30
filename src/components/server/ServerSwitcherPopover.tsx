@@ -39,6 +39,7 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
 
   return (
     <div
+      id="server-switcher-popover"
       ref={ref}
       className="absolute bottom-full left-2 right-2 mb-1 rounded-xl bg-[#1a2e22] border border-[#2d4035] shadow-xl shadow-black/40 py-1 z-50 animate-badge-in"
     >

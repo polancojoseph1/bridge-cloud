@@ -40,6 +40,7 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={open ? "agent-listbox" : undefined}
         className={cn(
           'flex items-center gap-2 px-3 py-1.5 rounded-md',
           'text-[13px] font-medium text-[#ececec]',
@@ -67,6 +68,7 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
       {/* Dropdown panel */}
       {open && (
         <div
+          id="agent-listbox"
           role="listbox"
           aria-label="Select agent"
           className={cn(

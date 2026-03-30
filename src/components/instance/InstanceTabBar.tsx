@@ -155,6 +155,7 @@ export default function InstanceTabBar() {
           <button
             type="button"
             onClick={() => nudge('left')}
+            aria-label="Scroll left"
             className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-r from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
@@ -174,6 +175,7 @@ export default function InstanceTabBar() {
           <button
             type="button"
             onClick={() => nudge('right')}
+            aria-label="Scroll right"
             className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-l from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10"
           >
             <ChevronRight className="w-3.5 h-3.5" />

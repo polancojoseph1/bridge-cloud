@@ -104,6 +104,7 @@ export function NewInstanceButton() {
       onClick={() => { if (!atMax) createInstance(activeAgent); }}
       disabled={atMax}
       title={atMax ? 'Maximum 8 instances open' : 'New instance'}
+      aria-label="New instance"
       className={cn(
         'w-6 h-6 flex items-center justify-center rounded-md',
         'border border-[#1e3025] transition-colors duration-150',
