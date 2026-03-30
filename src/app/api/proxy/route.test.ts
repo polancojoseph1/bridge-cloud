@@ -58,6 +58,8 @@ describe('POST /api/proxy', () => {
         instance_id: 0,
         system_prompt: '',
       }),
+      signal: undefined,
+      redirect: 'error',
     });
   });
 
