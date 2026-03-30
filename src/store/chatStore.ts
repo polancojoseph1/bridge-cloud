@@ -42,11 +42,11 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
+        set({ isStreaming: false });
         if (activeAbortController) {
           activeAbortController.abort();
           activeAbortController = null;
         }
-        set({ isStreaming: false });
       },
 
       sendMessage: async (content: string) => {
