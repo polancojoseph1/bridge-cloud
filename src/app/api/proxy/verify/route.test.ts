@@ -9,6 +9,10 @@ vi.mock('@/lib/healthCheck', () => ({
   checkHealth: vi.fn(),
 }));
 
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
+}));
+
 vi.mock('dns', () => {
   return {
     default: {
@@ -23,6 +27,7 @@ vi.mock('dns', () => {
 function createMockRequest(body: any): NextRequest {
   return {
     json: async () => body,
+    headers: new Headers(),
   } as unknown as NextRequest;
 }
 
