@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { isForbiddenHostname } from '@/lib/ssrf';
 import dns from 'dns';
 import { promisify } from 'util';
+import { auth } from '@clerk/nextjs/server';
 
 const lookup = promisify(dns.lookup);
 
@@ -14,8 +15,34 @@ const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
 };
 
 export async function POST(req: NextRequest) {
+  // 🛡️ Sentinel: Close unauthenticated open proxy by requiring login
+  const { userId } = await auth();
+  if (!userId) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized: Authentication required to use proxy' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // 🛡️ Sentinel: Mitigate DoS by enforcing a strict total request body size limit
+  const contentLength = Number(req.headers.get('content-length') || '0');
+  if (contentLength > 50000) {
+    return new Response(
+      JSON.stringify({ error: 'Request body too large' }),
+      { status: 413, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   const body = await req.json();
   const { agentId, message, conversationId, serverUrl, serverKey } = body;
+
+  // 🛡️ Sentinel: Mitigate DoS by restricting message length and input validation
+  if (!message || typeof message !== 'string' || message.length > 20000) {
+    return new Response(
+      JSON.stringify({ error: 'Message is required and must be under 20000 characters' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
 
   let targetUrl = '';
   let targetKey = '';

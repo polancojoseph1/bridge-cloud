@@ -3,10 +3,29 @@ import { checkHealth } from '@/lib/healthCheck';
 import { isForbiddenHostname } from '@/lib/ssrf';
 import dns from 'dns';
 import { promisify } from 'util';
+import { auth } from '@clerk/nextjs/server';
 
 const lookup = promisify(dns.lookup);
 
 export async function POST(req: NextRequest) {
+  // 🛡️ Sentinel: Close unauthenticated open proxy by requiring login
+  const { userId } = await auth();
+  if (!userId) {
+    return new Response(JSON.stringify({ error: 'Unauthorized: Authentication required to use proxy' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 🛡️ Sentinel: Mitigate DoS by enforcing a strict total request body size limit
+  const contentLength = Number(req.headers.get('content-length') || '0');
+  if (contentLength > 10000) {
+    return new Response(JSON.stringify({ error: 'Request body too large' }), {
+      status: 413,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const { url, apiKey } = await req.json();
 
   if (!url || typeof url !== 'string' || url.trim() === '') {
