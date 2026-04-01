@@ -32,7 +32,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
     // ensuring precision within the threshold
-    const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
+    const distanceToBottom = scrollHeight - Math.ceil(scrollTop + clientHeight);
     isUserScrolledRef.current = distanceToBottom > 30;
   };
 
@@ -49,7 +49,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
         isProgrammaticScrollRef.current = true;
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        scrollRef.current.scrollTop = targetScrollTop;
       }
     }
   }, [messages.length, isStreaming, lastMsg?.role]);
@@ -60,7 +60,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
         isProgrammaticScrollRef.current = true;
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        scrollRef.current.scrollTop = targetScrollTop;
       }
     }
   }, [messages, isStreaming]);
