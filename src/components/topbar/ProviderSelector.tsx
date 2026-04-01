@@ -38,11 +38,19 @@ function AgentRow({
     <div
       role="option"
       aria-selected={isActive}
+      tabIndex={disabled ? -1 : 0}
       onClick={disabled ? undefined : onSelect}
+      onKeyDown={(e) => {
+        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       title={disabled ? `${agent.name} is offline` : undefined}
       className={cn(
         'flex items-center gap-3 px-3 py-2.5 mx-1 rounded-md',
         'text-[13px] transition-colors duration-100',
+        'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
         disabled
           ? 'opacity-40 cursor-not-allowed'
           : isActive

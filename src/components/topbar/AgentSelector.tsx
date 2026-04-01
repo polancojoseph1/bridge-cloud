@@ -87,10 +87,18 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
                 key={agent.id}
                 role="option"
                 aria-selected={isActive}
+                tabIndex={0}
                 onClick={() => handleSelect(agent.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelect(agent.id);
+                  }
+                }}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 cursor-pointer mx-1 rounded-md',
                   'text-[13px] transition-colors duration-100',
+                  'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
                   isActive
                     ? 'bg-[#1e2a4a] text-[#ececec]'
                     : 'text-[#ececec] hover:bg-[#222222]'
