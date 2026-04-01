@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useChatStore } from '@/store/chatStore';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
@@ -12,10 +12,20 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
   const isProgrammaticScrollRef = useRef(false);
-  const conversations = useChatStore(s => s.conversations);
+
+  /**
+   * ⚡ Bolt Optimization: Targeted Zustand Selector
+   * 💡 What: Replaced subscribing to the entire `conversations` array and finding the specific item with a memoized selector.
+   * 🎯 Why: When any conversation updates (e.g., new title, deleted conversation), it changes the `conversations` array reference.
+   *         Previously, this caused O(N) re-renders in MessageList even if its specific conversation didn't change.
+   *         By using a targeted selector, MessageList only re-renders when its specific conversation's reference changes.
+   * 📊 Impact: Prevents unnecessary MessageList re-renders. Reduces O(N) array mapping overhead to O(1) selector lookup.
+   */
+  const conversation = useChatStore(
+    useCallback(s => s.conversations.find(c => c.id === conversationId), [conversationId])
+  );
   const isStreaming = useChatStore(s => s.isStreaming);
 
-  const conversation = conversations.find(c => c.id === conversationId);
   const messages = conversation?.messages ?? [];
   const prevCountRef = useRef(messages.length);
 

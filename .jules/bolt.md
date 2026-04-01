@@ -10,3 +10,7 @@
 ## 2024-05-15 - [Optimize Store Array Traversals]
 **Learning:** In Zustand stores, chaining multiple array methods (`.filter`, `.findIndex`, `.some`, `.map`, `.find`) creates unnecessary O(N) intermediate allocations, leading to memory bloat and garbage collection pauses when managing active components like UI tabs or dropdowns. Additionally, when using `.reduce` to construct an updated state array, directly mutating objects (e.g. `updated[0].isDefault = true`) breaks React's shallow equality checks causing missing re-renders.
 **Action:** Replace multiple chained array traversals with a single `for` loop or `.reduce()` pass when mutating store collections. Always preserve immutability by shallow copying specific updated objects (e.g., `updated[0] = { ...updated[0], isDefault: true }`).
+
+## 2026-04-01 - [Zustand Targeted Selectors in Arrays]
+**Learning:** In React components (like `MessageList.tsx`) that extract a specific item from a Zustand store array via its ID, subscribing to the entire array and doing `.find(c => c.id === id)` locally causes the component to re-render for ANY mutation to that array (e.g., when another conversation's title updates), leading to massive O(N) re-render overhead during high-frequency events like streaming.
+**Action:** Always use a targeted selector wrapped in `useCallback` when selecting specific items from a store array: `useStore(useCallback(s => s.array.find(item => item.id === id), [id]))`. This ensures the component only re-renders when the specific object reference changes.
