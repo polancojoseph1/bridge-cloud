@@ -1,3 +1,0 @@
-## 2025-01-20 - Add aria-controls and aria-labels for dropdowns and icon buttons
-**Learning:** React conditional rendering of dropdown panels without explicit `id` linkages makes it harder for screen readers to navigate complex custom dropdown/popover elements like `ProviderSelector` and `AgentSelector`. Additionally, icon-only buttons need explicit `aria-label`s.
-**Action:** When creating custom dropdown or popover components, ensure the trigger button has `aria-controls="[id]"` and `aria-expanded={isOpen}`, and that the dynamically rendered panel has `id="[id]"`. Always audit icon-only buttons like "New Chat" and "Scroll left/right" for descriptive `aria-label` attributes.
