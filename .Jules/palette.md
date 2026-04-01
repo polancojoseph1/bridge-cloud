@@ -1,3 +1,0 @@
-## 2024-05-18 - [ARIA Labels and Focus Management]
-**Learning:** NextJS 16 applications with headless UI components require explicit ARIA attributes (`aria-label`, `aria-busy`, `aria-expanded`, `aria-controls`) and focus ring classes (`focus-visible`) mapped manually on raw `button` elements since they aren't generated out of the box when omitting Radix UI or a fully-fleshed component library.
-**Action:** Always add `aria-label` to icon-only buttons (`lucide-react`) and explicitly manage `aria-busy` linked to state like `isChecking` for loading UX. Add `focus-visible:ring-2` to support keyboard navigation uniformly across Custom React functional components.

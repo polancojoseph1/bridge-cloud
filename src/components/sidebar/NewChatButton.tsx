@@ -16,6 +16,7 @@ export function NewChatButton() {
   return (
     <button
       onClick={handleClick}
+      aria-label="New chat"
       className={[
         'w-full flex items-center gap-2 px-3 py-2 rounded-md',
         'text-[13px] font-medium text-[#ececec]',

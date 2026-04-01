@@ -21,6 +21,7 @@ export async function streamFromProxy(
       serverKey: profile?.apiKey ?? '',
     }),
     signal,
+    redirect: 'error',
   });
 
   if (!res.ok || !res.body) {
@@ -32,7 +33,19 @@ export async function streamFromProxy(
   let buffer = '';
 
   while (true) {
+    if (signal?.aborted) {
+      const error = new Error('Aborted');
+      error.name = 'AbortError';
+      throw error;
+    }
+
     const { done, value } = await reader.read();
+
+    if (signal?.aborted) {
+      const error = new Error('Aborted');
+      error.name = 'AbortError';
+      throw error;
+    }
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });

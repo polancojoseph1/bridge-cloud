@@ -73,14 +73,28 @@ export const useInstanceStore = create<InstanceStore>()(
 
       closeInstance: (instanceId: string) => {
         set(s => {
-          const remaining = s.instances.filter(i => i.instanceId !== instanceId);
+          const remaining: Instance[] = [];
+          let targetIdx = -1;
+
+          // ⚡ Bolt: Replace double traversal (.filter + .findIndex) with a single pass
+          for (let i = 0; i < s.instances.length; i++) {
+            const inst = s.instances[i];
+            if (inst.instanceId === instanceId) {
+              targetIdx = i;
+            } else {
+              remaining.push(inst);
+            }
+          }
+
           if (remaining.length === 0) return s;
+
           const wasActive = s.activeInstanceId === instanceId;
           let newActiveId = s.activeInstanceId;
-          if (wasActive) {
-            const idx = s.instances.findIndex(i => i.instanceId === instanceId);
-            newActiveId = (remaining[idx - 1] ?? remaining[0]).instanceId;
+
+          if (wasActive && targetIdx !== -1) {
+            newActiveId = (remaining[targetIdx - 1] ?? remaining[0]).instanceId;
           }
+
           return { instances: remaining, activeInstanceId: newActiveId };
         });
       },

@@ -2,14 +2,32 @@ import { vi, describe, it, expect } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 import { checkHealth } from '@/lib/healthCheck';
+import dns from 'dns';
+import { promisify } from 'util';
 
 vi.mock('@/lib/healthCheck', () => ({
   checkHealth: vi.fn(),
 }));
 
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
+}));
+
+vi.mock('dns', () => {
+  return {
+    default: {
+      lookup: vi.fn((hostname, options, callback) => {
+        // Provide mock ip address to prevent tests from failing due to external lookup
+        callback(null, [{ address: '8.8.8.8', family: 4 }]);
+      })
+    }
+  };
+});
+
 function createMockRequest(body: any): NextRequest {
   return {
     json: async () => body,
+    headers: new Headers(),
   } as unknown as NextRequest;
 }
 

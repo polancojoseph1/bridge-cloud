@@ -44,6 +44,7 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, apiKey }),
       signal: controller.signal,
+      redirect: 'error',
     });
     clearTimeout(timeout);
 
