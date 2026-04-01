@@ -10,3 +10,8 @@
 **Vulnerability:** The `/api/proxy` and `/api/proxy/verify` routes allowed unauthenticated users to supply arbitrary `serverUrl` and `serverKey` payloads, acting as an open proxy relay. Additionally, the proxy accepted extremely large message payloads and did not validate the `Content-Length` header before attempting to parse the JSON body via `await req.json()`, leading to potential Out-Of-Memory (OOM) Denial of Service (DoS) attacks.
 **Learning:** Checking the input payload size *after* awaiting the JSON parsing is ineffective because the Node.js memory exhaustion occurs during the parsing phase. In addition, all public-facing backend proxy endpoints must be strictly authenticated.
 **Prevention:** Always use `@clerk/nextjs/server`'s `auth()` helper to authenticate requests on all sensitive backend proxy routes. Mitigate JSON parsing OOM DoS risks by explicitly checking `Number(req.headers.get('content-length'))` and returning `413 Payload Too Large` before calling `req.json()`.
+
+## 2024-04-20 - Secure mock chat endpoint against DoS
+**Vulnerability:** The `src/app/api/chat/route.ts` endpoint (used for mock agent responses) lacked authentication, payload size limits, and input validation. This allowed unauthenticated users to trigger excessive parsing or potential downstream processing, leading to potential memory exhaustion (DoS).
+**Learning:** Even mock or internal endpoints require the same level of security scrutiny as core proxy routes, as they remain exposed to public web traffic unless explicitly protected.
+**Prevention:** Always enforce Clerk `auth()`, implement a `content-length` check *before* `req.json()`, and validate the type and length of parsed JSON payload fields.
