@@ -74,6 +74,7 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
 
   const isEmpty = !activeConversationId || (activeConversation && activeConversation.messages.length === 0);
 
+  // We add an autoFocus prop passed to InputBar to force focus when switching from EmptyState
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0 overflow-hidden relative">
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -91,7 +92,7 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
              * InputBar is sticky-bottom, rendered after the message feed so it
              * naturally sits at the bottom of the column.
              */}
-            <InputBar />
+            <InputBar autoFocus={true} />
           </>
         )}
       </div>

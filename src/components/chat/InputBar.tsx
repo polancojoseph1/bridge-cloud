@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, useCallback, KeyboardEvent } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -20,7 +20,11 @@ const MAX_HEIGHT = LINE_HEIGHT_PX * MAX_LINES; // 120px
  * - While streaming, send button is replaced by a Stop button.
  * - Subtle gradient fade above the bar blends the message feed into the input.
  */
-export default function InputBar() {
+interface InputBarProps {
+  autoFocus?: boolean;
+}
+
+export default function InputBar({ autoFocus }: InputBarProps) {
   const isStreaming = useChatStore((s) => s.isStreaming);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const stopGeneration = useChatStore((s) => s.stopGeneration);
@@ -63,8 +67,33 @@ export default function InputBar() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      // Fallback focus attempt right away
+      textareaRef.current.focus();
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
+
+  // Refocus after streaming completes
+  const prevIsStreamingRef = useRef(isStreaming);
+  useEffect(() => {
+    if (prevIsStreamingRef.current && !isStreaming) {
+      // Use requestAnimationFrame to ensure the DOM is updated and the disabled attribute is removed
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (textareaRef.current) {
+            textareaRef.current.focus();
+          }
+        }, 50);
+      });
+    }
+    prevIsStreamingRef.current = isStreaming;
+  }, [isStreaming]);
+
+  // Initial focus if autoFocus is true
+  useEffect(() => {
+    if (autoFocus && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [autoFocus]);
 
   const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 

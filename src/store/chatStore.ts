@@ -42,11 +42,11 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
-        set({ isStreaming: false });
         if (activeAbortController) {
           activeAbortController.abort();
           activeAbortController = null;
         }
+        set({ isStreaming: false });
       },
 
       sendMessage: async (content: string) => {
@@ -133,7 +133,8 @@ export const useChatStore = create<ChatStore>()(
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
         } catch (error: unknown) {
-          if ((error as any)?.name === 'AbortError') {
+          // Both standard AbortError and the custom AbortError from streaming.ts
+          if ((error as any)?.name === 'AbortError' || error instanceof DOMException && error.name === 'AbortError') {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => ({

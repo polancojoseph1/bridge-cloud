@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
@@ -16,12 +17,13 @@ export default function EmptyState() {
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
   const router = useRouter();
+  const orchestrationMode = useOrchestrationStore(s => s.mode);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const startChat = useCallback((text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || orchestrationMode !== 'single') return;
 
     const store = useChatStore.getState();
     const activeConv = store.activeConversation();
@@ -33,15 +35,16 @@ export default function EmptyState() {
       router.push(`/chat/${id}`);
       setTimeout(() => sendMessage(text), 0);
     }
-  }, [newConversation, sendMessage, router]);
+  }, [newConversation, sendMessage, router, orchestrationMode]);
 
   const handleSubmit = () => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     setValue('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     startChat(trimmed);
   };
+
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -57,7 +60,7 @@ export default function EmptyState() {
     el.style.height = Math.min(el.scrollHeight, 120) + 'px';
   };
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0">
@@ -77,7 +80,8 @@ export default function EmptyState() {
             <button
               key={s}
               onClick={() => startChat(s)}
-              className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
+              disabled={orchestrationMode !== 'single'}
+              className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {s}
             </button>
@@ -99,6 +103,7 @@ export default function EmptyState() {
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
+              disabled={orchestrationMode !== 'single'}
               rows={1}
               placeholder="Message Bridge Cloud…"
               aria-label="Chat input"
