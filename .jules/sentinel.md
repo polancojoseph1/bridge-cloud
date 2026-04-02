@@ -15,3 +15,7 @@
 **Vulnerability:** The `src/app/api/chat/route.ts` endpoint (used for mock agent responses) lacked authentication, payload size limits, and input validation. This allowed unauthenticated users to trigger excessive parsing or potential downstream processing, leading to potential memory exhaustion (DoS).
 **Learning:** Even mock or internal endpoints require the same level of security scrutiny as core proxy routes, as they remain exposed to public web traffic unless explicitly protected.
 **Prevention:** Always enforce Clerk `auth()`, implement a `content-length` check *before* `req.json()`, and validate the type and length of parsed JSON payload fields.
+## 2024-05-18 - Prevent information disclosure in API routes
+**Vulnerability:** Found `await res.text()` propagating raw upstream server error bodies to users in `src/lib/healthCheck.ts`. Upstream error messages can inadvertently leak internal architecture details, internal database errors, stack traces, or configuration data.
+**Learning:** Upstream or proxy verification routes must implement standardized internal error handling to prevent leaking sensitive external service errors to the end-user.
+**Prevention:** Sanitize the text of external upstream errors and replace them with generic server error strings (`Server returned 400`, etc.) or generic network errors.

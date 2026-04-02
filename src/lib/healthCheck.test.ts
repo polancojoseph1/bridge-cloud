@@ -67,11 +67,11 @@ describe('checkHealth', () => {
     });
   });
 
-  it('should handle offline status on general server error', async () => {
+  it('should handle offline status on general server error and not leak raw text', async () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: false,
       status: 500,
-      text: async () => 'Server returned 500',
+      text: async () => 'Internal Error: Details you should not see',
     });
 
     const result = await checkHealth(mockUrl, mockApiKey);

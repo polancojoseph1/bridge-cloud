@@ -52,8 +52,8 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
       return { status: 'auth_error', error: 'API key rejected by server' };
     }
     if (!res.ok) {
-      const errorMsg = await res.text().catch(() => '');
-      return { status: 'offline', error: errorMsg || `Server returned ${res.status}` };
+      // 🛡️ Sentinel: Prevent information disclosure by sanitizing proxy and upstream errors
+      return { status: 'offline', error: `Server returned ${res.status}` };
     }
 
     const data = await res.json();
