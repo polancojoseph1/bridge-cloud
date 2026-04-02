@@ -14,3 +14,7 @@
 ## 2026-04-01 - [Zustand Targeted Selectors in Arrays]
 **Learning:** In React components (like `MessageList.tsx`) that extract a specific item from a Zustand store array via its ID, subscribing to the entire array and doing `.find(c => c.id === id)` locally causes the component to re-render for ANY mutation to that array (e.g., when another conversation's title updates), leading to massive O(N) re-render overhead during high-frequency events like streaming.
 **Action:** Always use a targeted selector wrapped in `useCallback` when selecting specific items from a store array: `useStore(useCallback(s => s.array.find(item => item.id === id), [id]))`. This ensures the component only re-renders when the specific object reference changes.
+
+## 2024-05-16 - [Memoize Expensive O(N) Reductions and Traversals]
+**Learning:** In frequently rendering components (like `NodeTray.tsx` which reacts to orchestration or server status changes), array length derivations (e.g. `onlineCount`) and data filtering maps (e.g. `orderedNodes`) that rely on chained array traversals (`.map().filter()`) or sequential `.reduce` cause O(N) operations and garbage collection churn on *every* render cycle, even when the underlying dependencies haven't changed.
+**Action:** Always wrap expensive derivations and partitions in `useMemo` strictly tied to their source data and replace chained traversals (`.map(...).filter(...)`) with a single, memoized `.reduce(...)` pass.
