@@ -108,7 +108,7 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       {/* Back */}
       <button
         onClick={onBack}
-        className="flex items-center gap-1.5 text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-colors mb-5 self-start"
+        className="flex items-center gap-1.5 text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-colors mb-5 self-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm"
       >
         <ArrowLeft size={13} />
         Back to servers
@@ -316,8 +316,9 @@ function ProfileCard({
             title={profile.pricingTier === 'pro'
               ? 'Pro: 10% flagship + 90% Chinese models. Click to switch to Free.'
               : 'Free: Chinese models only. Click to switch to Pro.'}
+            aria-label="Toggle pricing tier"
             className={cn(
-              'px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors cursor-pointer',
+              'px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]',
               profile.pricingTier === 'pro'
                 ? 'bg-[rgba(16,163,127,0.15)] text-[#10a37f] hover:bg-[rgba(16,163,127,0.25)]'
                 : 'bg-[rgba(142,142,142,0.10)] text-[#565656] hover:bg-[rgba(142,142,142,0.18)] hover:text-[#8e8e8e]'
@@ -375,13 +376,13 @@ function ProfileCard({
           <div className="flex gap-2">
             <button
               onClick={() => setConfirmDelete({ profileId: null })}
-              className="px-3 py-1 rounded-md text-[12px] text-[#8e8e8e] bg-[#1e3025] hover:bg-[#2d4035] transition-colors"
+              className="px-3 py-1 rounded-md text-[12px] text-[#8e8e8e] bg-[#1e3025] hover:bg-[#2d4035] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
             >
               Cancel
             </button>
             <button
               onClick={handleDelete}
-              className="px-3 py-1 rounded-md text-[12px] font-medium text-[#fca5a5] bg-[rgba(239,68,68,0.10)] hover:bg-[rgba(239,68,68,0.18)] transition-colors"
+              className="px-3 py-1 rounded-md text-[12px] font-medium text-[#fca5a5] bg-[rgba(239,68,68,0.10)] hover:bg-[rgba(239,68,68,0.18)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ef4444]"
             >
               Delete
             </button>
