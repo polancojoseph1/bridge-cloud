@@ -59,11 +59,18 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
           tabIndex={0}
           aria-label={`Close ${instance.label}`}
           onClick={e => { e.stopPropagation(); close(instanceId); }}
-          onKeyDown={e => { if (e.key === 'Enter') { e.stopPropagation(); close(instanceId); } }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              close(instanceId);
+            }
+          }}
           className={cn(
             'w-3.5 h-3.5 flex items-center justify-center rounded-sm flex-shrink-0',
             'opacity-0 group-hover:opacity-70 hover:!opacity-100 hover:bg-[#2d4035]',
             'transition-all duration-100',
+            'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
             isActive && 'opacity-50 group-hover:opacity-70'
           )}
         >

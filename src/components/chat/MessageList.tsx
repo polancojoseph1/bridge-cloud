@@ -12,6 +12,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
   const isProgrammaticScrollRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * ⚡ Bolt Optimization: Targeted Zustand Selector
@@ -34,8 +35,10 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
+    // If we recently programmatically scrolled, ignore this scroll event
     if (isProgrammaticScrollRef.current) {
-      isProgrammaticScrollRef.current = false;
+      // Don't clear it immediately because smooth scrolling fires multiple times.
+      // The timeout below will clear it.
       return;
     }
 
@@ -60,6 +63,11 @@ export default function MessageList({ conversationId }: MessageListProps) {
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
         isProgrammaticScrollRef.current = true;
         scrollRef.current.scrollTop = targetScrollTop;
+
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = setTimeout(() => {
+          isProgrammaticScrollRef.current = false;
+        }, 150); // 150ms covers most smooth scroll animations
       }
     }
   }, [messages.length, isStreaming, lastMsg?.role]);
@@ -71,6 +79,11 @@ export default function MessageList({ conversationId }: MessageListProps) {
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
         isProgrammaticScrollRef.current = true;
         scrollRef.current.scrollTop = targetScrollTop;
+
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = setTimeout(() => {
+          isProgrammaticScrollRef.current = false;
+        }, 150);
       }
     }
   }, [messages, isStreaming]);
