@@ -107,17 +107,21 @@ export default function NodeTray() {
 
   // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
   // to prevent O(N) memory allocations and reduce React GC pauses
-  const onlineCount = nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0);
-  const selectedCount = selectedNodeIds.reduce((count, id) =>
+  const onlineCount = useMemo(() => nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0), [nodes]);
+  const selectedCount = useMemo(() => selectedNodeIds.reduce((count, id) =>
     count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
-  );
+  ), [selectedNodeIds, nodes]);
 
-  const orderedNodes =
-    mode === 'pipeline'
-      ? pipelineOrder
-          .map(id => nodes.find(n => n.nodeId === id))
-          .filter(Boolean) as BridgeNode[]
-      : nodes;
+  // Optimize array mapping/filtering: replace O(2N) chained .map().filter() with single O(N) .reduce() pass
+  // and memoize to prevent O(N) allocations on every render cycle.
+  const orderedNodes = useMemo(() => {
+    if (mode !== 'pipeline') return nodes;
+    return pipelineOrder.reduce<BridgeNode[]>((acc, id) => {
+      const node = nodes.find(n => n.nodeId === id);
+      if (node) acc.push(node);
+      return acc;
+    }, []);
+  }, [mode, pipelineOrder, nodes]);
 
   const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
 

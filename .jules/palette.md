@@ -5,3 +5,7 @@
 ## 2024-05-29 - Consistent focus-visible for popover buttons
 **Learning:** Menu items and buttons inside custom popovers (like `ServerSwitcherPopover`) often rely on `hover` states for visual feedback but neglect `focus-visible` states, making them invisible to keyboard users navigating via Tab.
 **Action:** Always map hover styles to `focus-visible` equivalents (e.g. `hover:bg-[#152219]` -> `focus-visible:bg-[#152219] focus-visible:outline-none`) for internal popover/menu buttons to ensure keyboard navigation visibility.
+
+## 2024-04-02 - Custom interactive elements keyboard accessibility
+**Learning:** Custom interactive elements like `<span role="button">` often implement 'Enter' key handling for keyboard navigation but miss the spacebar support (`e.key === ' '`) which standard `<button>` elements have natively. They also frequently lack `focus-visible` states, making keyboard navigation difficult to track visually.
+**Action:** Always check custom interactive elements (buttons built with div/span) for both 'Enter' and 'Space' key support, prevent default spacebar scrolling, and ensure visual focus states are implemented.
