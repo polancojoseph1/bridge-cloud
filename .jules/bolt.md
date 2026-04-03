@@ -18,3 +18,7 @@
 ## 2024-05-16 - [Memoize Expensive O(N) Reductions and Traversals]
 **Learning:** In frequently rendering components (like `NodeTray.tsx` which reacts to orchestration or server status changes), array length derivations (e.g. `onlineCount`) and data filtering maps (e.g. `orderedNodes`) that rely on chained array traversals (`.map().filter()`) or sequential `.reduce` cause O(N) operations and garbage collection churn on *every* render cycle, even when the underlying dependencies haven't changed.
 **Action:** Always wrap expensive derivations and partitions in `useMemo` strictly tied to their source data and replace chained traversals (`.map(...).filter(...)`) with a single, memoized `.reduce(...)` pass.
+
+## 2025-05-18 - [ReactMarkdown Inline Objects in Streaming]
+**Learning:** In highly active components like `MarkdownRenderer` that receive rapidly streaming text (up to 60fps), defining the `components={{ ... }}` object and `remarkPlugins={[...]}` array inline forces React to destroy and recreate the entire Markdown DOM tree on every chunk because the plugin and component prop references change on every render cycle. This causes massive unnecessary CPU churn and garbage collection pauses.
+**Action:** Always extract static objects like `components` and `remarkPlugins` arrays outside of the `ReactMarkdown` component function, and wrap the component itself in `React.memo()`.
