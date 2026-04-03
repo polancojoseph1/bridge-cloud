@@ -74,7 +74,7 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
     <div className="min-h-screen bg-[#0a1410] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-[420px]">
         {/* Back */}
-        <button onClick={onBack} className="flex items-center gap-2 text-[13px] text-[#8e8e8e] hover:text-[#ececec] mb-6 transition-colors">
+        <button onClick={onBack} className="flex items-center gap-2 text-[13px] text-[#8e8e8e] hover:text-[#ececec] mb-6 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm">
           <ArrowLeft size={14} />
           Back
         </button>

@@ -19,3 +19,8 @@
 **Vulnerability:** Found `await res.text()` propagating raw upstream server error bodies to users in `src/lib/healthCheck.ts`. Upstream error messages can inadvertently leak internal architecture details, internal database errors, stack traces, or configuration data.
 **Learning:** Upstream or proxy verification routes must implement standardized internal error handling to prevent leaking sensitive external service errors to the end-user.
 **Prevention:** Sanitize the text of external upstream errors and replace them with generic server error strings (`Server returned 400`, etc.) or generic network errors.
+
+## 2024-05-18 - SSRF Proxy Loop & Information Disclosure
+**Vulnerability:** The proxy verification endpoint (`/api/proxy/verify/route.ts`) incorrectly imported and called a client-side helper (`checkHealth`) that made a recursive `fetch` call to the proxy route itself. This created an infinite proxy loop leading to a Denial of Service. Additionally, the proxy error handler leaked raw upstream response bodies to clients instead of generic JSON errors.
+**Learning:** Shared client/server utility functions that make HTTP requests to internal relative routes (`/api/...`) can cause recursive loops or throw relative URL errors when inadvertently imported into the target server-side route. Additionally, returning raw `.text()` responses from unvalidated upstream sources bypasses Information Disclosure controls.
+**Prevention:** Always implement the core HTTP request logic natively in the server-side proxy route instead of relying on generic health checking wrappers, and enforce the return of structured, generic JSON responses instead of exposing upstream error messages.

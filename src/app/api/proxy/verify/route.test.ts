@@ -1,13 +1,11 @@
 import { vi, describe, it, expect } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
-import { checkHealth } from '@/lib/healthCheck';
+
 import dns from 'dns';
 import { promisify } from 'util';
 
-vi.mock('@/lib/healthCheck', () => ({
-  checkHealth: vi.fn(),
-}));
+
 
 vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
@@ -51,10 +49,10 @@ describe('POST /api/proxy/verify', () => {
   });
 
   it('returns 200 with online status if health check passes', async () => {
-    vi.mocked(checkHealth).mockResolvedValueOnce({
-      status: 'online',
-      agentId: 'test-agent',
-      botName: 'Test Bot',
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ agent_id: 'test-agent', bot_name: 'Test Bot' })
     });
 
     const req = createMockRequest({ url: 'http://test.com', apiKey: 'test-key' });
@@ -66,13 +64,14 @@ describe('POST /api/proxy/verify', () => {
     expect(data.agentId).toBe('test-agent');
     expect(data.botName).toBe('Test Bot');
 
-    expect(checkHealth).toHaveBeenCalledWith('http://test.com', 'test-key');
+    expect(global.fetch).toHaveBeenCalledWith('http://test.com', expect.any(Object));
   });
 
   it('returns 503 if health check fails or returns offline', async () => {
-    vi.mocked(checkHealth).mockResolvedValueOnce({
-      status: 'offline',
-      error: 'Connection timed out',
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      text: async () => 'Connection timed out'
     });
 
     const req = createMockRequest({ url: 'http://test.com', apiKey: 'test-key' }); // apiKey provided
@@ -81,8 +80,8 @@ describe('POST /api/proxy/verify', () => {
     expect(res.status).toBe(503);
     const data = await res.json();
     expect(data.status).toBe('offline');
-    expect(data.error).toBe('Connection timed out');
+    expect(data.error).toBe('Server returned 500');
 
-    expect(checkHealth).toHaveBeenCalledWith('http://test.com', 'test-key');
+    expect(global.fetch).toHaveBeenCalledWith('http://test.com', expect.any(Object));
   });
 });

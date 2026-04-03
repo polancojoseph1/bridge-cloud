@@ -45,7 +45,7 @@ export const useChatStore = create<ChatStore>()(
         set({ isStreaming: false });
         if (activeAbortController) {
           activeAbortController.abort();
-          activeAbortController = null;
+          // Do not nullify here, let sendMessage cleanup
         }
       },
 
@@ -133,7 +133,7 @@ export const useChatStore = create<ChatStore>()(
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
         } catch (error: unknown) {
-          if ((error as any)?.name === 'AbortError') {
+          if ((error as any)?.name === 'AbortError' || (error instanceof DOMException && error.name === 'AbortError')) {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => ({

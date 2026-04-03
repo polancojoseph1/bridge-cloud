@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import { checkHealth } from '@/lib/healthCheck';
 import { isForbiddenHostname } from '@/lib/ssrf';
 import dns from 'dns';
 import { promisify } from 'util';
@@ -73,9 +72,50 @@ export async function POST(req: NextRequest) {
   }
 
   const endpoint = url.includes('openrouter.ai') ? `${url}/v1/chat/completions` : url;
-  const result = await checkHealth(endpoint, apiKey ?? '');
-  return new Response(JSON.stringify(result), {
-    status: result.status === 'online' ? 200 : 503,
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  let res: Response;
+  try {
+    res = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(url.includes('openrouter.ai') ? { 'Authorization': `Bearer ${apiKey ?? ''}` } : { 'X-API-Key': apiKey ?? '' })
+      },
+      signal: controller.signal,
+      redirect: 'error'
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      return new Response(JSON.stringify({ status: 'offline', error: 'Connection timed out after 8s' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    }
+    return new Response(JSON.stringify({ status: 'offline', error: err instanceof Error ? err.message : 'Network error' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (res.status === 401 || res.status === 403) {
+    return new Response(JSON.stringify({ status: 'auth_error', error: 'API key rejected by server' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+  }
+  if (!res.ok) {
+    // 🛡️ Sentinel: Do not leak raw upstream error body to prevent info disclosure
+    return new Response(JSON.stringify({ status: 'offline', error: `Server returned ${res.status}` }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = {};
+  }
+
+  return new Response(JSON.stringify({
+    status: 'online',
+    agentId: data.agent_id,
+    botName: data.bot_name,
+  }), {
+    status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
 }
