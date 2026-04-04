@@ -101,7 +101,7 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
     }
   }, [url, apiKey, name, addProfile, connectProfile, onConnected]);
 
-  const canSubmit = !!url && !isChecking && !success;
+  const canSubmit = !!url && !!apiKey.trim() && !isChecking && !success;
 
   return (
     <div className="flex flex-col">
@@ -122,10 +122,14 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       <div className="space-y-3.5">
         {/* URL */}
         <div>
-          <label htmlFor="server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
+          <label htmlFor="server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+            Server URL <span className="text-[#f87171]" aria-hidden="true">*</span>
+          </label>
           <input
             id="server-url"
             type="url"
+            required
+            aria-required="true"
             value={url}
             onChange={e => { setUrl(e.target.value); setError(null); }}
             placeholder="https://your-machine.tail9e6f48.ts.net"
@@ -135,11 +139,15 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
 
         {/* API Key */}
         <div>
-          <label htmlFor="api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
+          <label htmlFor="api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+            API Key <span className="text-[#f87171]" aria-hidden="true">*</span>
+          </label>
           <div className="relative">
             <input
               id="api-key"
               type={showKey ? 'text' : 'password'}
+              required
+              aria-required="true"
               value={apiKey}
               onChange={e => { setApiKey(e.target.value); setError(null); }}
               placeholder="bc_live_..."
