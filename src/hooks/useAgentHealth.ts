@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AGENTS } from '@/lib/agents';
 import { checkHealth } from '@/lib/healthCheck';
 import type { AgentWithHealth, HealthStatus } from '@/types';
@@ -53,11 +53,19 @@ export function useAgentHealth(): AgentWithHealth[] {
     return () => { listeners.delete(setStatus); };
   }, []);
 
-  return AGENTS.map(agent => ({
+  /**
+   * ⚡ Bolt Optimization: Memoized array return
+   * 💡 What: Wrapped the returned mapped array in `useMemo` tied to `status`.
+   * 🎯 Why: Previously, this custom hook returned a new array reference on *every* render cycle of the parent component.
+   *         This constantly invalidated downstream `useMemo` blocks (like the O(N) array partition in ProviderSelector.tsx),
+   *         causing them to needlessly re-execute and allocate memory.
+   * 📊 Impact: Preserves downstream memoizations. Reduces O(N) derivations from "every render" to "only when status changes".
+   */
+  return useMemo(() => AGENTS.map(agent => ({
     ...agent,
     isOnline: status === 'online',
     healthStatus: status,
     lastCheckedAt: null,
     profileId: null,
-  }));
+  })), [status]);
 }

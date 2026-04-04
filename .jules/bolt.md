@@ -22,3 +22,7 @@
 ## 2025-05-18 - [ReactMarkdown Inline Objects in Streaming]
 **Learning:** In highly active components like `MarkdownRenderer` that receive rapidly streaming text (up to 60fps), defining the `components={{ ... }}` object and `remarkPlugins={[...]}` array inline forces React to destroy and recreate the entire Markdown DOM tree on every chunk because the plugin and component prop references change on every render cycle. This causes massive unnecessary CPU churn and garbage collection pauses.
 **Action:** Always extract static objects like `components` and `remarkPlugins` arrays outside of the `ReactMarkdown` component function, and wrap the component itself in `React.memo()`.
+
+## 2024-05-19 - [Custom Hook Array Memoization]
+**Learning:** Custom hooks (like `useAgentHealth`) that map and return new array/object references on every execution defeat any `useMemo` optimizations in the components that consume them. Even if the underlying state (e.g., `status`) hasn't changed, a parent re-rendering for other reasons causes the hook to re-run, returning a new reference and causing expensive downstream operations to re-run needlessly.
+**Action:** Always wrap dynamically generated objects or arrays returned by custom hooks in `useMemo` tied to their source state, ensuring strict referential stability across unrelated render cycles.
