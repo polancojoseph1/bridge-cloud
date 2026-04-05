@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AGENTS } from '@/lib/agents';
 import { checkHealth } from '@/lib/healthCheck';
 import type { AgentWithHealth, HealthStatus } from '@/types';
@@ -53,11 +53,20 @@ export function useAgentHealth(): AgentWithHealth[] {
     return () => { listeners.delete(setStatus); };
   }, []);
 
-  return AGENTS.map(agent => ({
+  /**
+   * ⚡ Bolt Optimization: Wrap hook return mapped array in useMemo()
+   * 💡 What: Prevents useAgentHealth from returning a fresh array on every single render cycle.
+   * 🎯 Why: When not memoized, this hook returned a new array reference every render. Components
+   *         that call this hook (like ProviderSelector) wrap downstream logic in useMemo based
+   *         on this returned array. Since the array reference constantly changed, downstream useMemo
+   *         blocks were completely defeated, causing unnecessary O(N) array reductions on every render loop.
+   * 📊 Impact: O(1) referential stability between health polling updates, restoring O(N) performance gains in UI hooks.
+   */
+  return useMemo(() => AGENTS.map(agent => ({
     ...agent,
     isOnline: status === 'online',
     healthStatus: status,
     lastCheckedAt: null,
     profileId: null,
-  }));
+  })), [status]);
 }
