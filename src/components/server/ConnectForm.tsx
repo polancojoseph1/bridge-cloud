@@ -91,10 +91,14 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
         <div className="space-y-4">
           {/* URL */}
           <div>
-            <label htmlFor="connect-server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
+            <label htmlFor="connect-server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+              Server URL <span className="text-[#f87171]" aria-hidden="true">*</span>
+            </label>
             <input
               id="connect-server-url"
               type="url"
+              required
+              aria-required="true"
               value={url}
               onChange={e => { setUrl(e.target.value); setError(null); }}
               placeholder="https://your-machine.tail9e6f48.ts.net"
@@ -104,11 +108,15 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
 
           {/* API Key */}
           <div>
-            <label htmlFor="connect-api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
+            <label htmlFor="connect-api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+              API Key {tier === 'local' && <span className="text-[#f87171]" aria-hidden="true">*</span>}
+            </label>
             <div className="relative">
               <input
                 id="connect-api-key"
                 type={showKey ? 'text' : 'password'}
+                required={tier === 'local'}
+                aria-required={tier === 'local'}
                 value={apiKey}
                 onChange={e => { setApiKey(e.target.value); setError(null); }}
                 placeholder="bc_live_..."
@@ -161,11 +169,11 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
         {/* Submit */}
         <button
           onClick={handleTest}
-          disabled={isChecking || success || !url}
+          disabled={isChecking || success || !url || (tier === 'local' && !apiKey.trim())}
           className={cn(
             'mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-lg text-[14px] font-medium transition-colors duration-150',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]',
-            isChecking || success || !url
+            isChecking || success || !url || (tier === 'local' && !apiKey.trim())
               ? 'bg-[#152219] text-[#565656] cursor-not-allowed'
               : 'bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410]'
           )}
