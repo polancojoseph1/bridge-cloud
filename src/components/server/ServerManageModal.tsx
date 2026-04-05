@@ -122,10 +122,14 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       <div className="space-y-3.5">
         {/* URL */}
         <div>
-          <label htmlFor="server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">Server URL</label>
+          <label htmlFor="server-url" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+            Server URL <span className="text-red-500 ml-1" aria-hidden="true">*</span>
+          </label>
           <input
             id="server-url"
             type="url"
+            required
+            aria-required="true"
             value={url}
             onChange={e => { setUrl(e.target.value); setError(null); }}
             placeholder="https://your-machine.tail9e6f48.ts.net"
@@ -135,11 +139,15 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
 
         {/* API Key */}
         <div>
-          <label htmlFor="api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">API Key</label>
+          <label htmlFor="api-key" className="block text-[13px] font-medium text-[#8e8e8e] mb-1.5">
+            API Key <span className="text-red-500 ml-1" aria-hidden="true">*</span>
+          </label>
           <div className="relative">
             <input
               id="api-key"
               type={showKey ? 'text' : 'password'}
+              required
+              aria-required="true"
               value={apiKey}
               onChange={e => { setApiKey(e.target.value); setError(null); }}
               placeholder="bc_live_..."
@@ -148,7 +156,7 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
             <button
               type="button"
               onClick={() => setShowKey(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565656] hover:text-[#8e8e8e] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565656] hover:text-[#8e8e8e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm"
               aria-label={showKey ? "Hide API key" : "Show API key"}
             >
               {showKey ? <EyeOff size={14} /> : <Eye size={14} />}
