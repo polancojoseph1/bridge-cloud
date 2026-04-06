@@ -225,10 +225,19 @@ export async function POST(req: NextRequest) {
 function createSSEToNDJSONTransform() {
   let buffer = '';
   const decoder = new TextDecoder();
+  // Limit buffer to 512KB to prevent memory exhaustion DoS from streams without newlines
+  const MAX_BUFFER_LENGTH = 512 * 1024;
+
   return new TransformStream({
     transform(chunk, controller) {
       const text = decoder.decode(chunk, { stream: true });
       buffer += text;
+
+      if (buffer.length > MAX_BUFFER_LENGTH) {
+        controller.error(new Error('Buffer size exceeded maximum limit'));
+        return;
+      }
+
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
 
