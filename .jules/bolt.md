@@ -26,3 +26,7 @@
 ## 2024-05-19 - [Memoize Array Derivations in Custom Hooks]
 **Learning:** Custom hooks that map and return new array or object references on every execution (e.g., `useAgentHealth`) defeat downstream `useMemo` optimizations in components that consume them, causing unnecessary O(N) operations and re-renders on every render cycle.
 **Action:** Always wrap dynamically generated arrays or objects returned by custom hooks in `useMemo` tied strictly to their underlying state to maintain referential stability.
+
+## 2024-05-20 - [Targeted Selectors for Primitives]
+**Learning:** In Zustand stores with frequently mutating arrays (e.g., streaming chat messages), selecting the entire derived object (like `useChatStore(s => s.conversations.find(c => c.id === id))`) forces the component to re-render on every mutation to that object, even if the component only cares about a stable property (like `.messages.length`). During streaming, this causes massive, unnecessary component tree re-renders on every chunk.
+**Action:** Use a targeted selector that fetches only the specific primitive needed: `useChatStore(s => s.conversations.find(c => c.id === s.activeConversationId)?.messages.length ?? 0)`. This prevents unnecessary component re-renders when other object properties mutate.
