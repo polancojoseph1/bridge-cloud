@@ -225,10 +225,19 @@ export async function POST(req: NextRequest) {
 function createSSEToNDJSONTransform() {
   let buffer = '';
   const decoder = new TextDecoder();
+  const MAX_BUFFER_SIZE = 512 * 1024; // 512KB
+
   return new TransformStream({
     transform(chunk, controller) {
       const text = decoder.decode(chunk, { stream: true });
       buffer += text;
+
+      // 🛡️ Sentinel: Enforce max buffer size to prevent OOM DoS from streams without delimiters
+      if (buffer.length > MAX_BUFFER_SIZE) {
+        controller.error(new Error('Stream buffer exceeded maximum size'));
+        return;
+      }
+
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
 
