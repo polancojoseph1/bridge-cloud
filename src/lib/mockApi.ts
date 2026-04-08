@@ -16,7 +16,16 @@ export async function streamMockResponse(
       throw new DOMException('Aborted', 'AbortError');
     }
     const chunkSize = Math.ceil(Math.random() * 3 + 1);
-    await new Promise(r => setTimeout(r, 20 + Math.random() * 30));
+    await new Promise<void>((resolve, reject) => {
+      const ms = 20 + Math.random() * 30;
+      const timer = setTimeout(resolve, ms);
+      if (signal) {
+        signal.addEventListener('abort', () => {
+          clearTimeout(timer);
+          reject(new DOMException('Aborted', 'AbortError'));
+        }, { once: true });
+      }
+    });
     if (signal?.aborted) {
       throw new DOMException('Aborted', 'AbortError');
     }

@@ -29,6 +29,11 @@ export async function streamFromProxy(
   }
 
   const reader = res.body.getReader();
+  if (signal) {
+    signal.addEventListener('abort', () => {
+      reader.cancel().catch(() => {});
+    }, { once: true });
+  }
   const decoder = new TextDecoder();
   let buffer = '';
 

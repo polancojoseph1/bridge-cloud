@@ -32,6 +32,10 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
   const lastMsg = messages[messages.length - 1];
 
+  const handleUserInteraction = () => {
+    isProgrammaticScrollRef.current = false;
+  };
+
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
@@ -99,6 +103,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
     <div
       ref={scrollRef}
       onScroll={handleScroll}
+      onWheel={handleUserInteraction}
+      onTouchMove={handleUserInteraction}
       className="flex-1 overflow-y-auto py-6 scroll-smooth"
     >
       <div className="flex flex-col">
