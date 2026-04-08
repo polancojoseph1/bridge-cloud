@@ -26,3 +26,6 @@
 ## 2024-05-19 - [Memoize Array Derivations in Custom Hooks]
 **Learning:** Custom hooks that map and return new array or object references on every execution (e.g., `useAgentHealth`) defeat downstream `useMemo` optimizations in components that consume them, causing unnecessary O(N) operations and re-renders on every render cycle.
 **Action:** Always wrap dynamically generated arrays or objects returned by custom hooks in `useMemo` tied strictly to their underlying state to maintain referential stability.
+## 2025-04-08 - Optimized syncNodes array operations
+**Learning:** Found multiple chained O(N) array methods (`.filter().map()`) in a hot path within `useOrchestrationStore.syncNodes`. This was causing unnecessary intermediate array allocations and increasing React GC overhead.
+**Action:** Replaced chained methods with a single O(N) loop that mutates new arrays and preserves existing ones. This pattern should be applied wherever `.filter().map()` is used in frequent store updates to improve performance.

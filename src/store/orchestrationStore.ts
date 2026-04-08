@@ -48,19 +48,40 @@ export const useOrchestrationStore = create<OrchestrationStore>((set, get) => ({
       const prevIds = new Set(s.nodes.map(n => n.nodeId));
       const isFirstSync = s.nodes.length === 0;
 
-      const selectedNodeIds = isFirstSync
-        ? nodes.filter(n => n.online).map(n => n.nodeId)
-        : [
-            ...s.selectedNodeIds.filter(id => nodeIdsSet.has(id)),
-            ...nodes.filter(n => n.online && !prevIds.has(n.nodeId)).map(n => n.nodeId),
-          ];
+      // ⚡ Bolt: Replace multiple O(N) chained array methods (.filter().map())
+      // with a single O(N) pass to reduce intermediate array allocations and GC overhead
+      const newSelectedNodeIds: string[] = [];
+      const newPipelineOrder: string[] = [];
 
       const pipelineOrderSet = new Set(s.pipelineOrder);
-      const pipelineOrder = [
-        ...s.pipelineOrder.filter(id => nodeIdsSet.has(id)),
-        ...nodes.filter(n => !pipelineOrderSet.has(n.nodeId)).map(n => n.nodeId),
-      ];
-      return { nodes, selectedNodeIds, pipelineOrder };
+
+      // Preserve existing valid selected nodes
+      if (!isFirstSync) {
+        for (const id of s.selectedNodeIds) {
+          if (nodeIdsSet.has(id)) {
+            newSelectedNodeIds.push(id);
+          }
+        }
+      }
+
+      // Preserve existing valid pipeline order
+      for (const id of s.pipelineOrder) {
+        if (nodeIdsSet.has(id)) {
+          newPipelineOrder.push(id);
+        }
+      }
+
+      // Process new nodes in a single pass
+      for (const n of nodes) {
+        if (isFirstSync) {
+          if (n.online) newSelectedNodeIds.push(n.nodeId);
+        } else {
+          if (n.online && !prevIds.has(n.nodeId)) newSelectedNodeIds.push(n.nodeId);
+        }
+        if (!pipelineOrderSet.has(n.nodeId)) newPipelineOrder.push(n.nodeId);
+      }
+
+      return { nodes, selectedNodeIds: newSelectedNodeIds, pipelineOrder: newPipelineOrder };
     });
   },
 
