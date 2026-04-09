@@ -32,6 +32,12 @@ export async function streamFromProxy(
   const decoder = new TextDecoder();
   let buffer = '';
 
+  if (signal) {
+    signal.addEventListener('abort', () => {
+      reader.cancel();
+    }, { once: true });
+  }
+
   while (true) {
     if (signal?.aborted) {
       const error = new Error('Aborted');
