@@ -31,6 +31,7 @@ export async function streamFromProxy(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
+  const MAX_BUFFER_SIZE = 512 * 1024; // 512KB limit
 
   while (true) {
     if (signal?.aborted) {
@@ -49,6 +50,12 @@ export async function streamFromProxy(
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
+
+    // 🛡️ Sentinel: Enforce max buffer size to prevent Memory Exhaustion (DoS)
+    if (buffer.length > MAX_BUFFER_SIZE) {
+      throw new Error('Stream buffer exceeded maximum size (DoS prevention)');
+    }
+
     const lines = buffer.split('\n');
     buffer = lines.pop() ?? '';
 
