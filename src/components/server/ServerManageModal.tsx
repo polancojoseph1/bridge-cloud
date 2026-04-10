@@ -540,6 +540,7 @@ export default function ServerManageModal() {
             <button
               onClick={closeManage}
               aria-label="Close modal"
+              title="Close modal"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors"
             >
               <X size={16} />
@@ -588,6 +589,7 @@ export default function ServerManageModal() {
             <button
               onClick={closeManage}
               aria-label="Close modal"
+              title="Close modal"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors"
             >
               <X size={16} />
