@@ -35,6 +35,7 @@ export default function ServerStatusIndicator() {
       )}
       <button
         onClick={() => setShowPopover(v => !v)}
+        aria-label="Toggle server switcher"
         aria-haspopup="dialog"
         aria-expanded={showPopover}
         aria-controls={showPopover ? "server-switcher-popover" : undefined}
