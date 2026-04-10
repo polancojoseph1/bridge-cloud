@@ -26,7 +26,6 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
   const conversationIdFromUrl = resolvedParams?.id;
 
   const activeConversationId = useChatStore((s) => s.activeConversationId);
-  const activeConversation = useChatStore((s) => s.activeConversation());
   const setActiveConversation = useChatStore((s) => s.setActiveConversation);
   const activeAgentId = useChatStore((s) => s.activeAgentId);
   const setActiveAgent = useChatStore((s) => s.setActiveAgent);
@@ -72,7 +71,19 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
     setInstanceConversation
   ]);
 
-  const isEmpty = !activeConversationId || (activeConversation && activeConversation.messages.length === 0);
+  /**
+   * ⚡ Bolt Optimization: Targeted Zustand Selector
+   * 💡 What: Replaced `useChatStore(s => s.activeConversation())` with a targeted selector for `messages.length`.
+   * 🎯 Why: `s.activeConversation()` returns a fresh reference every time the store's state changes.
+   *         During streaming, the `conversations` array updates rapidly on every chunk, forcing ChatView
+   *         to needlessly re-render the entire chat layout on every chunk.
+   * 📊 Impact: Prevents ChatView from re-rendering during message streaming. O(1) instead of O(chunks) re-renders.
+   */
+  const activeConversationMessageCount = useChatStore(
+    (s) => s.conversations.find((c) => c.id === s.activeConversationId)?.messages.length ?? 0
+  );
+
+  const isEmpty = !activeConversationId || activeConversationMessageCount === 0;
 
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0 overflow-hidden relative">
