@@ -26,3 +26,7 @@
 ## 2024-05-19 - [Memoize Array Derivations in Custom Hooks]
 **Learning:** Custom hooks that map and return new array or object references on every execution (e.g., `useAgentHealth`) defeat downstream `useMemo` optimizations in components that consume them, causing unnecessary O(N) operations and re-renders on every render cycle.
 **Action:** Always wrap dynamically generated arrays or objects returned by custom hooks in `useMemo` tied strictly to their underlying state to maintain referential stability.
+
+## 2026-04-10 - [Zustand Store Array Updates]
+**Learning:** In frequently updated Zustand stores (e.g., handling rapid SSE text chunks for chat streaming), using nested `.map()` operations to update specific nested items (like a single message in a specific conversation) causes O(N*M) callback invocations and massive memory allocations, leading to CPU churn and GC pauses.
+**Action:** Replace nested `.map()` calls with `.findIndex()` lookups combined with shallow array spreading (`[...arr]`) and single index assignment. This ensures O(N+M) traversal time, minimizes memory allocations, and avoids GC churn.
