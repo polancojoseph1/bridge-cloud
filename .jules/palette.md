@@ -1,11 +1,4 @@
-## 2024-05-28 - Keyboard accessibility for custom dropdowns
-**Learning:** Custom dropdown components like `ProviderSelector` and `AgentSelector` were using `<div role="option">` but lacked proper keyboard support. While they worked for mouse users, keyboard users could not tab to the options or select them with Enter/Space.
-**Action:** When implementing custom dropdowns or comboboxes with `role="option"`, always ensure the options have `tabIndex={0}`, visible focus states (e.g., `focus-visible:ring`), and `onKeyDown` handlers that support at least 'Enter' and 'Space' selection.
-
-## 2024-05-29 - Consistent focus-visible for popover buttons
-**Learning:** Menu items and buttons inside custom popovers (like `ServerSwitcherPopover`) often rely on `hover` states for visual feedback but neglect `focus-visible` states, making them invisible to keyboard users navigating via Tab.
-**Action:** Always map hover styles to `focus-visible` equivalents (e.g. `hover:bg-[#152219]` -> `focus-visible:bg-[#152219] focus-visible:outline-none`) for internal popover/menu buttons to ensure keyboard navigation visibility.
-
-## 2024-04-02 - Custom interactive elements keyboard accessibility
-**Learning:** Custom interactive elements like `<span role="button">` often implement 'Enter' key handling for keyboard navigation but miss the spacebar support (`e.key === ' '`) which standard `<button>` elements have natively. They also frequently lack `focus-visible` states, making keyboard navigation difficult to track visually.
-**Action:** Always check custom interactive elements (buttons built with div/span) for both 'Enter' and 'Space' key support, prevent default spacebar scrolling, and ensure visual focus states are implemented.
+## 2026-04-03 - Popover Menu Accessibility
+**Learning:** Interactive items within custom popover menus (like `ServerSwitcherPopover`) can be easily missed for keyboard focus styling when they rely solely on hover states for background changes.
+**Action:** Always ensure that menu items map their visual `hover` styles to equivalent `focus-visible` styles (e.g., `hover:bg-[#152219]` paired with `focus-visible:bg-[#152219] focus-visible:outline-none`) so keyboard users get the same visual feedback as mouse users when navigating via Tab.
+## 2026-04-04 - Form Required Input Accessibility\n**Learning:** While form inputs may have proper `htmlFor` and `id` linkages, failing to explicitly mark mandatory fields with both visual indicators (like asterisks) and semantic attributes (`required`, `aria-required`) negatively impacts both sighted users and screen reader users, especially in configuration-heavy modals where validation occurs only on submit.\n**Action:** Always pair visual required indicators (`<span aria-hidden="true">*</span>`) with semantic `required` and `aria-required="true"` attributes on mandatory input fields.

@@ -28,3 +28,8 @@
 **Vulnerability:** Insecure validation of `.openrouter.ai` URL matching. `url.includes('openrouter.ai')` could be bypassed easily, creating SSRF risks (e.g. `http://internal.app.com/?target=openrouter.ai`).
 **Learning:** Using loosely typed string matching methods like `.includes` for domain/hostname verification is insecure and allows trivial logic bypasses.
 **Prevention:** Always parse the URL using `new URL(url)` and use strict equality or `.endsWith` on the `hostname` property (`parsedUrl.hostname.toLowerCase() === 'domain.com' || parsedUrl.hostname.toLowerCase().endsWith('.domain.com')`).
+
+## 2025-05-24 - Fix Memory Exhaustion (DoS) Vulnerability in Stream Processing
+**Vulnerability:** The stream processors in `src/app/api/proxy/route.ts` and `src/lib/streaming.ts` concatenated incoming chunks into an unbounded buffer (`buffer += text`). This could lead to an Out-Of-Memory (OOM) Denial of Service (DoS) attack if a malicious or malformed stream returned data without the expected newline delimiters, forcing the buffer to grow indefinitely.
+**Learning:** Whenever streams are aggregated into memory buffers to split on delimiters (e.g., SSE to NDJSON transformations or plain text decoding), an attacker controls the delimiter. An absence of delimiters causes the buffer to consume all available heap memory.
+**Prevention:** Always enforce a strict maximum buffer length (e.g., 512KB) inside stream reading loops and `TransformStream` implementations. If the buffer exceeds this limit, explicitly abort the stream and throw an error to reclaim memory.

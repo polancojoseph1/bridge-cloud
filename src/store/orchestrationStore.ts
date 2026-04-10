@@ -44,23 +44,43 @@ export const useOrchestrationStore = create<OrchestrationStore>((set, get) => ({
   // Called when server profiles change — syncs nodes, preserves user selections
   syncNodes: (nodes) => {
     set(s => {
-      const nodeIdsSet = new Set(nodes.map(n => n.nodeId));
-      const prevIds = new Set(s.nodes.map(n => n.nodeId));
+      const nodeIdsSet = new Set<string>();
+      const prevIds = new Set<string>();
+
+      // ⚡ Bolt: Replace chained .map().filter() traversals with single-pass accumulations
+      // to reduce intermediate array allocations and GC overhead
+      for (let i = 0; i < s.nodes.length; i++) prevIds.add(s.nodes[i].nodeId);
+      for (let i = 0; i < nodes.length; i++) nodeIdsSet.add(nodes[i].nodeId);
+
+      const newSelectedIds: string[] = [];
+      const newPipelineIds: string[] = [];
       const isFirstSync = s.nodes.length === 0;
 
-      const selectedNodeIds = isFirstSync
-        ? nodes.filter(n => n.online).map(n => n.nodeId)
-        : [
-            ...s.selectedNodeIds.filter(id => nodeIdsSet.has(id)),
-            ...nodes.filter(n => n.online && !prevIds.has(n.nodeId)).map(n => n.nodeId),
-          ];
+      if (!isFirstSync) {
+        for (let i = 0; i < s.selectedNodeIds.length; i++) {
+          if (nodeIdsSet.has(s.selectedNodeIds[i])) newSelectedIds.push(s.selectedNodeIds[i]);
+        }
+      }
 
       const pipelineOrderSet = new Set(s.pipelineOrder);
-      const pipelineOrder = [
-        ...s.pipelineOrder.filter(id => nodeIdsSet.has(id)),
-        ...nodes.filter(n => !pipelineOrderSet.has(n.nodeId)).map(n => n.nodeId),
-      ];
-      return { nodes, selectedNodeIds, pipelineOrder };
+      for (let i = 0; i < s.pipelineOrder.length; i++) {
+        if (nodeIdsSet.has(s.pipelineOrder[i])) newPipelineIds.push(s.pipelineOrder[i]);
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        if (isFirstSync) {
+          if (n.online) newSelectedIds.push(n.nodeId);
+        } else if (n.online && !prevIds.has(n.nodeId)) {
+          newSelectedIds.push(n.nodeId);
+        }
+
+        if (!pipelineOrderSet.has(n.nodeId)) {
+          newPipelineIds.push(n.nodeId);
+        }
+      }
+
+      return { nodes, selectedNodeIds: newSelectedIds, pipelineOrder: newPipelineIds };
     });
   },
 
@@ -77,7 +97,12 @@ export const useOrchestrationStore = create<OrchestrationStore>((set, get) => ({
   },
 
   selectAllNodes: (nodes) => {
-    set({ selectedNodeIds: nodes.filter(n => n.online).map(n => n.nodeId) });
+    set({
+      selectedNodeIds: nodes.reduce<string[]>((acc, n) => {
+        if (n.online) acc.push(n.nodeId);
+        return acc;
+      }, [])
+    });
   },
 
   clearNodeSelection: () => set({ selectedNodeIds: [] }),
