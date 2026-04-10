@@ -9,3 +9,9 @@
 ## 2024-04-02 - Custom interactive elements keyboard accessibility
 **Learning:** Custom interactive elements like `<span role="button">` often implement 'Enter' key handling for keyboard navigation but miss the spacebar support (`e.key === ' '`) which standard `<button>` elements have natively. They also frequently lack `focus-visible` states, making keyboard navigation difficult to track visually.
 **Action:** Always check custom interactive elements (buttons built with div/span) for both 'Enter' and 'Space' key support, prevent default spacebar scrolling, and ensure visual focus states are implemented.
+## 2026-04-10 - Add focus-visible to toggle buttons
+**Learning:** Header toggle buttons might be missing proper visual focus states, making keyboard navigation difficult for users.
+**Action:** Always ensure interactive elements like buttons have explicit  styles mapped to them (e.g. ) to provide clear visual feedback to keyboard users.
+## 2024-05-30 - Add focus-visible to toggle buttons
+**Learning:** Header toggle buttons might be missing proper visual focus states, making keyboard navigation difficult for users.
+**Action:** Always ensure interactive elements like buttons have explicit `focus-visible` styles mapped to them (e.g. `focus-visible:ring-2`) to provide clear visual feedback to keyboard users.
