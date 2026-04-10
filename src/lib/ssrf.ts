@@ -72,3 +72,13 @@ export function isForbiddenHostname(hn: string): boolean {
 
   return false;
 }
+
+export function isOpenRouterUrl(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    const hn = parsedUrl.hostname.toLowerCase();
+    return hn === 'openrouter.ai' || hn.endsWith('.openrouter.ai');
+  } catch {
+    return false;
+  }
+}
