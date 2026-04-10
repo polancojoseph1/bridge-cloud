@@ -114,6 +114,7 @@ export default function EmptyState() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
+              title="Send message"
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]',

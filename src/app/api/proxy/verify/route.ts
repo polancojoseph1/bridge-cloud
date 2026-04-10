@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { isForbiddenHostname } from '@/lib/ssrf';
+import { isForbiddenHostname, isOpenRouterUrl } from '@/lib/ssrf';
 import dns from 'dns';
 import { promisify } from 'util';
 import { auth } from '@clerk/nextjs/server';
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const endpoint = url.includes('openrouter.ai') ? `${url}/v1/chat/completions` : url;
+  const endpoint = isOpenRouterUrl(url) ? `${url}/v1/chat/completions` : url;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
 
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(url.includes('openrouter.ai') ? { 'Authorization': `Bearer ${apiKey ?? ''}` } : { 'X-API-Key': apiKey ?? '' })
+        ...(isOpenRouterUrl(url) ? { 'Authorization': `Bearer ${apiKey ?? ''}` } : { 'X-API-Key': apiKey ?? '' })
       },
       signal: controller.signal,
       redirect: 'error'

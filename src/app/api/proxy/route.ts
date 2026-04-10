@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { isForbiddenHostname } from '@/lib/ssrf';
+import { isForbiddenHostname, isOpenRouterUrl } from '@/lib/ssrf';
 import dns from 'dns';
 import { promisify } from 'util';
 import { auth } from '@clerk/nextjs/server';
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   if (agentId === 'free') {
     targetUrl = process.env.BRIDGEBOT_FREE_URL || 'https://openrouter.ai/api';
     // If the URL is explicitly openrouter, and no FREE_KEY is set, fallback to OPENROUTER_API_KEY
-    if (targetUrl.includes('openrouter.ai') && !process.env.BRIDGEBOT_FREE_KEY) {
+    if (isOpenRouterUrl(targetUrl) && !process.env.BRIDGEBOT_FREE_KEY) {
        targetKey = process.env.OPENROUTER_API_KEY || '';
     } else {
        targetKey = process.env.BRIDGEBOT_FREE_KEY || '';
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
   }
 
   let upstream: Response | null = null;
-  let isOpenRouter = targetUrl.includes('openrouter.ai');
+  let isOpenRouter = isOpenRouterUrl(targetUrl);
 
   const fetchUpstream = async (url: string, key: string, isOR: boolean) => {
     const endpoint = isOR ? `${url}/v1/chat/completions` : `${url}/v1/chat`;
@@ -225,10 +225,19 @@ export async function POST(req: NextRequest) {
 function createSSEToNDJSONTransform() {
   let buffer = '';
   const decoder = new TextDecoder();
+  const MAX_BUFFER_SIZE = 512 * 1024; // 512KB limit
+
   return new TransformStream({
     transform(chunk, controller) {
       const text = decoder.decode(chunk, { stream: true });
       buffer += text;
+
+      // 🛡️ Sentinel: Enforce max buffer size to prevent Memory Exhaustion (DoS)
+      if (buffer.length > MAX_BUFFER_SIZE) {
+        controller.error(new Error('Stream buffer exceeded maximum size (DoS prevention)'));
+        return;
+      }
+
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
 

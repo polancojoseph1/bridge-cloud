@@ -26,3 +26,14 @@
 ## 2024-05-19 - [Memoize Array Derivations in Custom Hooks]
 **Learning:** Custom hooks that map and return new array or object references on every execution (e.g., `useAgentHealth`) defeat downstream `useMemo` optimizations in components that consume them, causing unnecessary O(N) operations and re-renders on every render cycle.
 **Action:** Always wrap dynamically generated arrays or objects returned by custom hooks in `useMemo` tied strictly to their underlying state to maintain referential stability.
+## 2024-05-20 - [Targeted Selectors for Primitives]
+**Learning:** In Zustand stores with frequently mutating arrays (e.g., streaming chat messages), selecting the entire derived object (like `useChatStore(s => s.conversations.find(c => c.id === id))`) forces the component to re-render on every mutation to that object, even if the component only cares about a stable property (like `.messages.length`). During streaming, this causes massive, unnecessary component tree re-renders on every chunk.
+**Action:** Use a targeted selector that fetches only the specific primitive needed: `useChatStore(s => s.conversations.find(c => c.id === s.activeConversationId)?.messages.length ?? 0)`. This prevents unnecessary component re-renders when other object properties mutate.
+
+## 2024-05-20 - [Optimize Nested Array Traversals in Store Streaming]
+**Learning:** In frequently updated Zustand stores (e.g., handling rapid SSE text chunks in chat), executing nested `.map()` operations to find and update a specific message inside a specific conversation causes O(N*M) callback invocations and heavy garbage collection per chunk. This CPU overhead can significantly freeze or delay the React UI thread during streaming.
+**Action:** Replace nested `.map()` loops with `.findIndex()` lookups to bail out early or isolate the target, then construct the updated state using shallow array spreading (`[...arr]`) and single index assignment (`newArr[index] = ...`). This guarantees O(N+M) traversal time and significantly reduces memory churning.
+
+## 2026-04-07 - [Remove Chained Filters and Maps for Array Transformation]
+**Learning:** In frequently executed parts of Zustand stores (like `syncNodes` and `selectAllNodes` in `orchestrationStore.ts`), using chained `.filter()` and `.map()` calls on arrays (e.g., `nodes.filter(n => n.online).map(n => n.nodeId)`) causes unnecessary array allocations, leading to high garbage collection (GC) overhead and potential rendering delays.
+**Action:** Replace multiple chained array traversals with a single `reduce()` or native `for`-loop pass. Always preserve immutability and directly push into the accumulator when reducing or looping.
