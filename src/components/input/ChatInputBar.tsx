@@ -8,6 +8,7 @@ export default function ChatInputBar() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isStreaming = useChatStore(s => s.isStreaming);
   const sendMessage = useChatStore(s => s.sendMessage);
+  const stopGeneration = useChatStore(s => s.stopGeneration);
 
   const resizeTextarea = useCallback(() => {
     const el = textareaRef.current;
@@ -61,7 +62,7 @@ export default function ChatInputBar() {
           <SendButton
             disabled={isEmpty}
             isStreaming={isStreaming}
-            onClick={handleSubmit}
+            onClick={isStreaming ? stopGeneration : handleSubmit}
           />
         </div>
         {/* Footer hint */}

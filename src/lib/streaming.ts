@@ -33,6 +33,12 @@ export async function streamFromProxy(
   let buffer = '';
   const MAX_BUFFER_SIZE = 512 * 1024; // 512KB limit
 
+  if (signal) {
+    signal.addEventListener('abort', () => {
+      reader.cancel();
+    }, { once: true });
+  }
+
   while (true) {
     if (signal?.aborted) {
       const error = new Error('Aborted');
