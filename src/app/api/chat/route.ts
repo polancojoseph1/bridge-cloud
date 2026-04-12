@@ -31,6 +31,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 🛡️ Sentinel: Validate other payload fields
+  if (agentId !== undefined && (typeof agentId !== 'string' || agentId.length > 100)) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid agentId' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {

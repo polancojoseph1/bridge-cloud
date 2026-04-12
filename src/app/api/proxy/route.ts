@@ -44,6 +44,34 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 🛡️ Sentinel: Validate other payload fields
+  if (agentId !== undefined && (typeof agentId !== 'string' || agentId.length > 100)) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid agentId' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  if (conversationId !== undefined && (typeof conversationId !== 'string' || conversationId.length > 100)) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid conversationId' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  if (serverUrl !== undefined && (typeof serverUrl !== 'string' || serverUrl.length > 2048)) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid serverUrl' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  if (serverKey !== undefined && (typeof serverKey !== 'string' || serverKey.length > 1000)) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid serverKey' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+
+
   let targetUrl = '';
   let targetKey = '';
 
