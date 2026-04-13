@@ -54,8 +54,8 @@ function AgentRow({
         disabled
           ? 'opacity-40 cursor-not-allowed'
           : isActive
-          ? 'bg-[#1e2a4a] text-[#ececec] cursor-pointer'
-          : 'text-[#ececec] hover:bg-[#222222] cursor-pointer'
+          ? 'bg-[#1e2a4a] text-[#ececec] cursor-pointer focus-visible:bg-[#1e2a4a]'
+          : 'text-[#ececec] hover:bg-[#222222] cursor-pointer focus-visible:bg-[#222222]'
       )}
     >
       <HealthDot agent={agent} />
@@ -120,6 +120,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
       <button
         type="button"
         onClick={() => !isOrchestrating && setOpen(v => !v)}
+        onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? "provider-listbox" : undefined}
@@ -148,6 +149,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
           id="provider-listbox"
           role="listbox"
           aria-label="Select AI provider"
+          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
           className="absolute top-full right-0 mt-1 z-50 w-[260px] bg-[#181818] border border-[#1e3025] rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-1"
         >
           {onlineAgents.length > 0 && (
