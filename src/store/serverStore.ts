@@ -36,18 +36,33 @@ export const useServerStore = create<ServerStore>()(
           isDefault: draft.isDefault || isFirst,
         };
         set(s => {
-          const profiles = draft.isDefault || isFirst
-            ? s.profiles.map(p => ({ ...p, isDefault: false })).concat(profile)
-            : [...s.profiles, profile];
-          return { profiles };
+          // ⚡ Bolt Optimization: Replace O(N) array mapping with single target update or simple append
+          if (draft.isDefault || isFirst) {
+            const newProfiles = [...s.profiles];
+            for (let i = 0; i < newProfiles.length; i++) {
+              if (newProfiles[i].isDefault) {
+                newProfiles[i] = { ...newProfiles[i], isDefault: false };
+              }
+            }
+            newProfiles.push(profile);
+            return { profiles: newProfiles };
+          }
+          return { profiles: [...s.profiles, profile] };
         });
         return id;
       },
 
       updateProfile: (id, patch) => {
-        set(s => ({
-          profiles: s.profiles.map(p => p.id === id ? { ...p, ...patch } : p),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace O(N) array mapping with single target clone
+          // Avoids reallocating every item in the array if we only need to change one.
+          const targetIndex = s.profiles.findIndex(p => p.id === id);
+          if (targetIndex === -1) return s;
+
+          const newProfiles = [...s.profiles];
+          newProfiles[targetIndex] = { ...newProfiles[targetIndex], ...patch };
+          return { profiles: newProfiles };
+        });
       },
 
       removeProfile: (id) => {
@@ -79,9 +94,22 @@ export const useServerStore = create<ServerStore>()(
       },
 
       setDefault: (id) => {
-        set(s => ({
-          profiles: s.profiles.map(p => ({ ...p, isDefault: p.id === id })),
-        }));
+        set(s => {
+          // ⚡ Bolt: Prevent array allocation and GC overhead
+          // Only map if something actually changed. Find existing default first.
+          const hasChange = s.profiles.some(p => (p.isDefault && p.id !== id) || (!p.isDefault && p.id === id));
+          if (!hasChange) return s;
+
+          const newProfiles = [...s.profiles];
+          for (let i = 0; i < newProfiles.length; i++) {
+            if (newProfiles[i].isDefault && newProfiles[i].id !== id) {
+              newProfiles[i] = { ...newProfiles[i], isDefault: false };
+            } else if (!newProfiles[i].isDefault && newProfiles[i].id === id) {
+              newProfiles[i] = { ...newProfiles[i], isDefault: true };
+            }
+          }
+          return { profiles: newProfiles };
+        });
       },
 
       setActiveProfile: (id) => set({ activeProfileId: id }),
@@ -93,15 +121,25 @@ export const useServerStore = create<ServerStore>()(
         set({ connectionStatus: 'checking' });
         const result = await checkHealth(profile.url, profile.apiKey);
 
-        set(s => ({
-          connectionStatus: result.status,
-          activeProfileId: result.status === 'online' ? id : s.activeProfileId,
-          profiles: s.profiles.map(p =>
-            p.id === id
-              ? { ...p, lastHealthStatus: result.status, lastCheckedAt: Date.now() }
-              : p
-          ),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace O(N) array mapping with single target clone
+          const targetIndex = s.profiles.findIndex(p => p.id === id);
+          if (targetIndex === -1) {
+            return {
+              connectionStatus: result.status,
+              activeProfileId: result.status === 'online' ? id : s.activeProfileId,
+            };
+          }
+
+          const newProfiles = [...s.profiles];
+          newProfiles[targetIndex] = { ...newProfiles[targetIndex], lastHealthStatus: result.status, lastCheckedAt: Date.now() };
+
+          return {
+            connectionStatus: result.status,
+            activeProfileId: result.status === 'online' ? id : s.activeProfileId,
+            profiles: newProfiles
+          };
+        });
 
         return result.status;
       },
