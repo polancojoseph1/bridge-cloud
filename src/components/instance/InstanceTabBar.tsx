@@ -117,6 +117,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
           type="button"
           onClick={() => close(instanceId)}
           aria-label={`Close ${instance.label}`}
+          title={`Close ${instance.label}`}
           className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-[#2d4035] transition-colors"
         >
           <X className="w-2.5 h-2.5" />
@@ -163,6 +164,7 @@ export default function InstanceTabBar() {
             type="button"
             onClick={() => nudge('left')}
             aria-label="Scroll left"
+            title="Scroll left"
             className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-r from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
@@ -183,6 +185,7 @@ export default function InstanceTabBar() {
             type="button"
             onClick={() => nudge('right')}
             aria-label="Scroll right"
+            title="Scroll right"
             className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-l from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10"
           >
             <ChevronRight className="w-3.5 h-3.5" />
