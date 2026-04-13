@@ -62,8 +62,15 @@ export async function POST(req: NextRequest) {
     }
   } else {
     const cloud = CLOUD_CONFIGS[agentId as string];
-    targetUrl = (cloud?.url) || serverUrl;
-    targetKey = (cloud?.key) || serverKey;
+    // 🛡️ Sentinel: Prevent credential leak. Only use the cloud key if the cloud URL is explicitly configured.
+    // Otherwise, fallback entirely to the user-provided URL and key.
+    if (cloud && cloud.url) {
+      targetUrl = cloud.url;
+      targetKey = cloud.key || serverKey;
+    } else {
+      targetUrl = serverUrl;
+      targetKey = serverKey;
+    }
   }
 
   // Since .env.local NOW explicitly defines BRIDGEBOT_FREE_URL=http://localhost:8590
