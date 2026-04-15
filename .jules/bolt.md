@@ -37,3 +37,7 @@
 ## 2026-04-07 - [Remove Chained Filters and Maps for Array Transformation]
 **Learning:** In frequently executed parts of Zustand stores (like `syncNodes` and `selectAllNodes` in `orchestrationStore.ts`), using chained `.filter()` and `.map()` calls on arrays (e.g., `nodes.filter(n => n.online).map(n => n.nodeId)`) causes unnecessary array allocations, leading to high garbage collection (GC) overhead and potential rendering delays.
 **Action:** Replace multiple chained array traversals with a single `reduce()` or native `for`-loop pass. Always preserve immutability and directly push into the accumulator when reducing or looping.
+
+## 2024-04-15 - Replace map with findIndex for targeted Zustand store mutations
+**Learning:** Using `.map()` to update a single item within an array in Zustand stores is an anti-pattern. It forces O(N) traversal and creates unnecessary clones of unmodified items, leading to excessive garbage collection (GC) pressure, especially in frequently updated stores like chat messages or server statuses.
+**Action:** Always use `.findIndex()` to locate the specific item, shallow copy the array (`[...arr]`), and mutate only the targeted index (`arr[targetIndex] = {...arr[targetIndex], ...updates}`). This reduces the time complexity from O(N) to O(1) for assignments (with O(N) lookup) and avoids needless object allocations.
