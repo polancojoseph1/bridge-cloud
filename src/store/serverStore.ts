@@ -45,9 +45,14 @@ export const useServerStore = create<ServerStore>()(
       },
 
       updateProfile: (id, patch) => {
-        set(s => ({
-          profiles: s.profiles.map(p => p.id === id ? { ...p, ...patch } : p),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace .map with .findIndex for targeted index mutation to avoid O(N) traversal and reduce GC churn
+          const idx = s.profiles.findIndex(p => p.id === id);
+          if (idx === -1) return s;
+          const profiles = [...s.profiles];
+          profiles[idx] = { ...profiles[idx], ...patch };
+          return { profiles };
+        });
       },
 
       removeProfile: (id) => {
@@ -79,9 +84,21 @@ export const useServerStore = create<ServerStore>()(
       },
 
       setDefault: (id) => {
-        set(s => ({
-          profiles: s.profiles.map(p => ({ ...p, isDefault: p.id === id })),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace .map with .findIndex for targeted index mutation to avoid O(N) traversal and reduce GC churn
+          const prevDefaultIdx = s.profiles.findIndex(p => p.isDefault);
+          const newDefaultIdx = s.profiles.findIndex(p => p.id === id);
+
+          if (newDefaultIdx === -1) return s;
+
+          const profiles = [...s.profiles];
+          if (prevDefaultIdx !== -1 && prevDefaultIdx !== newDefaultIdx) {
+            profiles[prevDefaultIdx] = { ...profiles[prevDefaultIdx], isDefault: false };
+          }
+          profiles[newDefaultIdx] = { ...profiles[newDefaultIdx], isDefault: true };
+
+          return { profiles };
+        });
       },
 
       setActiveProfile: (id) => set({ activeProfileId: id }),
@@ -93,15 +110,20 @@ export const useServerStore = create<ServerStore>()(
         set({ connectionStatus: 'checking' });
         const result = await checkHealth(profile.url, profile.apiKey);
 
-        set(s => ({
-          connectionStatus: result.status,
-          activeProfileId: result.status === 'online' ? id : s.activeProfileId,
-          profiles: s.profiles.map(p =>
-            p.id === id
-              ? { ...p, lastHealthStatus: result.status, lastCheckedAt: Date.now() }
-              : p
-          ),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace .map with .findIndex for targeted index mutation to avoid O(N) traversal and reduce GC churn
+          const idx = s.profiles.findIndex(p => p.id === id);
+          const profiles = [...s.profiles];
+          if (idx !== -1) {
+            profiles[idx] = { ...profiles[idx], lastHealthStatus: result.status, lastCheckedAt: Date.now() };
+          }
+
+          return {
+            connectionStatus: result.status,
+            activeProfileId: result.status === 'online' ? id : s.activeProfileId,
+            profiles,
+          };
+        });
 
         return result.status;
       },
