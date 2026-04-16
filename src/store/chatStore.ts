@@ -42,7 +42,27 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
-        set({ isStreaming: false });
+        set(s => {
+          if (!s.activeConversationId) return { isStreaming: false };
+          const convIndex = s.conversations.findIndex(c => c.id === s.activeConversationId);
+          if (convIndex === -1) return { isStreaming: false };
+
+          const conv = s.conversations[convIndex];
+          if (conv.messages.length === 0) return { isStreaming: false };
+
+          const lastMsgIndex = conv.messages.length - 1;
+          const lastMsg = conv.messages[lastMsgIndex];
+
+          if (!lastMsg.isStreaming) return { isStreaming: false };
+
+          const newMessages = [...conv.messages];
+          newMessages[lastMsgIndex] = { ...lastMsg, isStreaming: false };
+
+          const newConversations = [...s.conversations];
+          newConversations[convIndex] = { ...conv, messages: newMessages };
+
+          return { isStreaming: false, conversations: newConversations };
+        });
         if (activeAbortController) {
           activeAbortController.abort();
           // Do not nullify here, let sendMessage cleanup

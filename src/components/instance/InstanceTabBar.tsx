@@ -175,7 +175,7 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-stretch h-full overflow-x-auto"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <InstanceTab key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => <InstanceTab key={`desktop-${i.instanceId}`} instanceId={i.instanceId} />)}
         </div>
 
         {canScrollRight && (
@@ -201,7 +201,7 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-center gap-2 overflow-x-auto px-3 h-full"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <MobileInstancePill key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => <MobileInstancePill key={`mobile-${i.instanceId}`} instanceId={i.instanceId} />)}
         </div>
         <div className="flex-shrink-0 pr-3 pl-2 border-l border-[#1e3025] h-full flex items-center">
           <NewInstanceButton />
