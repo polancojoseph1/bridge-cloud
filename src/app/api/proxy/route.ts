@@ -6,15 +6,16 @@ import { auth } from '@clerk/nextjs/server';
 
 const lookup = promisify(dns.lookup);
 
-// Env var config (Jefe's cloud bots — Option A)
-const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
-  claude: { url: process.env.BRIDGEBOT_CLAUDE_URL ?? '', key: process.env.BRIDGEBOT_CLAUDE_KEY ?? '' },
-  gemini: { url: process.env.BRIDGEBOT_GEMINI_URL ?? '', key: process.env.BRIDGEBOT_GEMINI_KEY ?? '' },
-  codex:  { url: process.env.BRIDGEBOT_CODEX_URL  ?? '', key: process.env.BRIDGEBOT_CODEX_KEY  ?? '' },
-  qwen:   { url: process.env.BRIDGEBOT_QWEN_URL   ?? '', key: process.env.BRIDGEBOT_QWEN_KEY   ?? '' },
-};
-
 export async function POST(req: NextRequest) {
+  // Env var config (Jefe's cloud bots — Option A)
+  // 🛡️ Sentinel: Move into request handler so tests can override process.env
+  const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
+    claude: { url: process.env.BRIDGEBOT_CLAUDE_URL ?? '', key: process.env.BRIDGEBOT_CLAUDE_KEY ?? '' },
+    gemini: { url: process.env.BRIDGEBOT_GEMINI_URL ?? '', key: process.env.BRIDGEBOT_GEMINI_KEY ?? '' },
+    codex:  { url: process.env.BRIDGEBOT_CODEX_URL  ?? '', key: process.env.BRIDGEBOT_CODEX_KEY  ?? '' },
+    qwen:   { url: process.env.BRIDGEBOT_QWEN_URL   ?? '', key: process.env.BRIDGEBOT_QWEN_KEY   ?? '' },
+  };
+
   // 🛡️ Sentinel: Close unauthenticated open proxy by requiring login
   const { userId } = await auth();
   if (!userId) {
@@ -62,8 +63,14 @@ export async function POST(req: NextRequest) {
     }
   } else {
     const cloud = CLOUD_CONFIGS[agentId as string];
-    targetUrl = (cloud?.url) || serverUrl;
-    targetKey = (cloud?.key) || serverKey;
+    // 🛡️ Sentinel: Prevent credential leakage by strictly pairing URLs with their keys
+    if (cloud?.url) {
+      targetUrl = cloud.url;
+      targetKey = cloud.key;
+    } else {
+      targetUrl = serverUrl;
+      targetKey = serverKey;
+    }
   }
 
   // Since .env.local NOW explicitly defines BRIDGEBOT_FREE_URL=http://localhost:8590

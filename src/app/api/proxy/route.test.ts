@@ -94,6 +94,41 @@ describe('POST /api/proxy', () => {
     expect(data).toEqual({ error: 'Invalid or forbidden server URL' });
   });
 
+  it('prevents credential leakage when mixing cloud config and user inputs', async () => {
+    // Mock environment where a cloud bot has a key but no URL
+    const originalEnv = process.env;
+    process.env = {
+      ...originalEnv,
+      BRIDGEBOT_CLAUDE_URL: '',
+      BRIDGEBOT_CLAUDE_KEY: 'internal-secret-key',
+    };
+
+    const req = createMockRequest({
+      agentId: 'claude',
+      serverUrl: 'http://custom-server.com',
+      serverKey: 'user-provided-key',
+      message: 'hello'
+    });
+
+    // Mock response with ok = false, simulating upstream leaking internal data
+    const mockUpstreamResponse = new Response(JSON.stringify({}), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    fetchMock.mockResolvedValueOnce(mockUpstreamResponse);
+
+    await POST(req);
+
+    // Verify fetch was called with the USER's key, NOT the internal secret key
+    expect(fetchMock).toHaveBeenCalledWith('http://custom-server.com/v1/chat', expect.objectContaining({
+      headers: expect.objectContaining({
+        'X-API-Key': 'user-provided-key'
+      })
+    }));
+
+    process.env = originalEnv;
+  });
+
   it('returns a streamed response with correct headers on success', async () => {
     const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key', message: 'hello' });
 
