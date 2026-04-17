@@ -102,25 +102,36 @@ export const useInstanceStore = create<InstanceStore>()(
       setActiveInstance: (instanceId: string) => set({ activeInstanceId: instanceId }),
 
       setInstanceConversation: (instanceId: string, conversationId: string) => {
-        set(s => ({
-          instances: s.instances.map(i => i.instanceId === instanceId ? { ...i, conversationId } : i),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], conversationId };
+          return { instances: newInstances };
+        });
       },
 
       renameInstance: (instanceId: string, label: string) => {
-        set(s => ({
-          instances: s.instances.map(i => i.instanceId === instanceId ? { ...i, label: label.slice(0, 24) } : i),
-        }));
+        set(s => {
+          // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], label: label.slice(0, 24) };
+          return { instances: newInstances };
+        });
       },
 
       setInstanceAgent: (instanceId: string, agentId: string) => {
         set(s => {
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
           const newLabel = generateLabel(agentId, s.instances.filter(i => i.instanceId !== instanceId));
-          return {
-            instances: s.instances.map(i =>
-              i.instanceId === instanceId ? { ...i, agentId, label: newLabel } : i
-            ),
-          };
+          // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], agentId, label: newLabel };
+          return { instances: newInstances };
         });
       },
     }),
