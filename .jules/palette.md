@@ -1,4 +1,7 @@
-## 2026-04-03 - Popover Menu Accessibility
-**Learning:** Interactive items within custom popover menus (like `ServerSwitcherPopover`) can be easily missed for keyboard focus styling when they rely solely on hover states for background changes.
-**Action:** Always ensure that menu items map their visual `hover` styles to equivalent `focus-visible` styles (e.g., `hover:bg-[#152219]` paired with `focus-visible:bg-[#152219] focus-visible:outline-none`) so keyboard users get the same visual feedback as mouse users when navigating via Tab.
-## 2026-04-04 - Form Required Input Accessibility\n**Learning:** While form inputs may have proper `htmlFor` and `id` linkages, failing to explicitly mark mandatory fields with both visual indicators (like asterisks) and semantic attributes (`required`, `aria-required`) negatively impacts both sighted users and screen reader users, especially in configuration-heavy modals where validation occurs only on submit.\n**Action:** Always pair visual required indicators (`<span aria-hidden="true">*</span>`) with semantic `required` and `aria-required="true"` attributes on mandatory input fields.
+## 2024-04-17 - Avoid `role="menu"` on native button popovers without arrow-key support
+**Learning:** Adding `role="menu"` and `role="menuitem"` to a container of native `<button>` elements (like `ServerSwitcherPopover`) without implementing full up/down arrow-key navigation is an accessibility anti-pattern. Native buttons are naturally accessible via the `Tab` key, but setting them as `menuitem` instructs screen readers to expect arrow-key navigation. If this isn't implemented, the experience is broken.
+**Action:** Rely on native `Tab` accessibility for popovers containing buttons. Only use `role="menu"` and `role="menuitem"` when explicitly building a custom dropdown that implements full keyboard arrow navigation.
+
+## 2024-04-17 - Add `title` to icon-only buttons
+**Learning:** Icon-only buttons (like a trash can for delete, or an eye for show password) are often confusing to sighted users who may not understand the icon's intent. While `aria-label` helps screen readers, sighted users need a native browser tooltip.
+**Action:** Always add a `title` attribute that matches the `aria-label` to icon-only buttons to provide a helpful native tooltip on hover.
