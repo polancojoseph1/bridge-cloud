@@ -45,9 +45,13 @@ export const useServerStore = create<ServerStore>()(
       },
 
       updateProfile: (id, patch) => {
-        set(s => ({
-          profiles: s.profiles.map(p => p.id === id ? { ...p, ...patch } : p),
-        }));
+        set(s => {
+          const idx = s.profiles.findIndex(p => p.id === id);
+          if (idx === -1) return s;
+          const newProfiles = [...s.profiles];
+          newProfiles[idx] = { ...newProfiles[idx], ...patch };
+          return { profiles: newProfiles };
+        });
       },
 
       removeProfile: (id) => {
@@ -79,9 +83,22 @@ export const useServerStore = create<ServerStore>()(
       },
 
       setDefault: (id) => {
-        set(s => ({
-          profiles: s.profiles.map(p => ({ ...p, isDefault: p.id === id })),
-        }));
+        set(s => {
+          let changed = false;
+          const newProfiles = [];
+          for (let i = 0; i < s.profiles.length; i++) {
+            const p = s.profiles[i];
+            const isTarget = p.id === id;
+            if (p.isDefault !== isTarget) {
+              newProfiles.push({ ...p, isDefault: isTarget });
+              changed = true;
+            } else {
+              newProfiles.push(p);
+            }
+          }
+          if (!changed) return s;
+          return { profiles: newProfiles };
+        });
       },
 
       setActiveProfile: (id) => set({ activeProfileId: id }),
@@ -93,15 +110,23 @@ export const useServerStore = create<ServerStore>()(
         set({ connectionStatus: 'checking' });
         const result = await checkHealth(profile.url, profile.apiKey);
 
-        set(s => ({
-          connectionStatus: result.status,
-          activeProfileId: result.status === 'online' ? id : s.activeProfileId,
-          profiles: s.profiles.map(p =>
-            p.id === id
-              ? { ...p, lastHealthStatus: result.status, lastCheckedAt: Date.now() }
-              : p
-          ),
-        }));
+        set(s => {
+          const idx = s.profiles.findIndex(p => p.id === id);
+          if (idx === -1) {
+            return {
+              connectionStatus: result.status,
+              activeProfileId: result.status === 'online' ? id : s.activeProfileId,
+            };
+          }
+          const newProfiles = [...s.profiles];
+          newProfiles[idx] = { ...newProfiles[idx], lastHealthStatus: result.status, lastCheckedAt: Date.now() };
+
+          return {
+            connectionStatus: result.status,
+            activeProfileId: result.status === 'online' ? id : s.activeProfileId,
+            profiles: newProfiles,
+          };
+        });
 
         return result.status;
       },
