@@ -37,3 +37,7 @@
 ## 2026-04-07 - [Remove Chained Filters and Maps for Array Transformation]
 **Learning:** In frequently executed parts of Zustand stores (like `syncNodes` and `selectAllNodes` in `orchestrationStore.ts`), using chained `.filter()` and `.map()` calls on arrays (e.g., `nodes.filter(n => n.online).map(n => n.nodeId)`) causes unnecessary array allocations, leading to high garbage collection (GC) overhead and potential rendering delays.
 **Action:** Replace multiple chained array traversals with a single `reduce()` or native `for`-loop pass. Always preserve immutability and directly push into the accumulator when reducing or looping.
+
+## 2024-05-21 - [Optimize Store Array Single-Item Mutations]
+**Learning:** In Zustand stores, using `.map()` to update a single item within an array creates unnecessary clones of all unmodified items, leading to high garbage collection pressure and unnecessary object reference changes. This causes React components depending on the unmodified items to re-render.
+**Action:** Use `.findIndex()` to locate the item. Include an early return (`if (idx === -1) return state;`) to prevent returning a new array reference when the item is not found, avoiding unnecessary React re-renders. Then, shallow copy the array (`[...arr]`), and mutate only the targeted index (`arr[targetIndex] = {...arr[targetIndex], ...updates}`).
