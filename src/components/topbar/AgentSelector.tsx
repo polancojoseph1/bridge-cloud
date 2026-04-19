@@ -33,7 +33,11 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" onKeyDown={(e) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    }}>
       {/* Trigger button */}
       <button
         type="button"
