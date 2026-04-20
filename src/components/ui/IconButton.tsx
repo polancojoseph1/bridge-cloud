@@ -9,6 +9,7 @@ export default function IconButton({ label, className, children, ...props }: Ico
   return (
     <button
       aria-label={label}
+      title={label}
       className={cn(
         'w-8 h-8 flex items-center justify-center rounded-md',
         'text-[#8e8e8e] hover:text-[#ececec] hover:bg-[#152219]',
