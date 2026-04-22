@@ -46,7 +46,7 @@ describe('ChatView Component', () => {
     const mockInstanceState = {
       activeInstanceId: 'inst-1',
       activeInstance: () => ({ id: 'inst-1', conversationId: 'test-conv-1', agentId: 'agent-1' }),
-      instances: [{ id: 'inst-1', conversationId: 'test-conv-1', agentId: 'agent-1' }],
+      instances: [{ instanceId: 'inst-1', id: 'inst-1', conversationId: 'test-conv-1', agentId: 'agent-1' }],
       addInstance: vi.fn(),
       removeInstance: vi.fn(),
       setActiveInstance: vi.fn(),
