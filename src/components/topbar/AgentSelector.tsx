@@ -77,6 +77,7 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
           id="agent-listbox"
           role="listbox"
           aria-label="Select agent"
+          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
           className={cn(
             'absolute top-full left-0 mt-1 z-50',
             'w-[240px] bg-[#181818] border border-[#1e3025] rounded-lg',
