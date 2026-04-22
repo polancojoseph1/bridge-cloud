@@ -101,7 +101,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       onScroll={handleScroll}
       onWheel={() => { isProgrammaticScrollRef.current = false; }}
       onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
-      className="flex-1 overflow-y-auto py-6 scroll-smooth"
+      onPointerDown={() => { isProgrammaticScrollRef.current = false; }}
+      className="flex-1 overflow-y-auto py-6"
     >
       <div className="flex flex-col">
         {messages.map(message => (

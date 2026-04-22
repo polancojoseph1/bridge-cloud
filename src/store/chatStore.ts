@@ -42,11 +42,29 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
-        set({ isStreaming: false });
         if (activeAbortController) {
           activeAbortController.abort();
-          // Do not nullify here, let sendMessage cleanup
         }
+        set(s => {
+          const convId = s.activeConversationId;
+          if (!convId) return { isStreaming: false };
+          const convIndex = s.conversations.findIndex(c => c.id === convId);
+          if (convIndex === -1) return { isStreaming: false };
+
+          const conv = s.conversations[convIndex];
+
+          // Find the active assistant message (the last one streaming)
+          const msgIndex = conv.messages.findLastIndex(m => m.isStreaming);
+          if (msgIndex === -1) return { isStreaming: false };
+
+          const newMessages = [...conv.messages];
+          newMessages[msgIndex] = { ...newMessages[msgIndex], isStreaming: false };
+
+          const newConversations = [...s.conversations];
+          newConversations[convIndex] = { ...conv, messages: newMessages };
+
+          return { isStreaming: false, conversations: newConversations };
+        });
       },
 
       sendMessage: async (content: string) => {
