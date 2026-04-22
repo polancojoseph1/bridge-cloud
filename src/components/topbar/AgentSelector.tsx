@@ -38,7 +38,12 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape' && open) {
+            e.stopPropagation();
+            setOpen(false);
+          }
+        }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? "agent-listbox" : undefined}
