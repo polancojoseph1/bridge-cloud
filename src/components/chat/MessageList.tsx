@@ -46,7 +46,12 @@ export default function MessageList({ conversationId }: MessageListProps) {
     // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
     // ensuring precision within the threshold
     const distanceToBottom = scrollHeight - Math.ceil(scrollTop + clientHeight);
-    isUserScrolledRef.current = distanceToBottom > 30;
+
+    if (distanceToBottom > 30) {
+      isUserScrolledRef.current = true;
+    } else {
+      isUserScrolledRef.current = false;
+    }
   };
 
   useEffect(() => {
