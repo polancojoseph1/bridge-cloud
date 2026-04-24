@@ -62,9 +62,9 @@ export async function POST(req: NextRequest) {
     }
   } else {
     const cloud = CLOUD_CONFIGS[agentId as string];
-    if (cloud?.url && cloud?.key) {
+    if (cloud?.url) {
       targetUrl = cloud.url;
-      targetKey = cloud.key;
+      targetKey = cloud.key || serverKey;
     } else {
       targetUrl = serverUrl;
       targetKey = serverKey;
