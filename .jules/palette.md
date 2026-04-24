@@ -5,3 +5,6 @@
 ## 2026-04-13 - Native Tooltips for Icon-Only Buttons
 **Learning:** Sighted users often struggle to identify the purpose of icon-only buttons if they lack native browser tooltips, even when `aria-label` is present for screen readers.
 **Action:** Always include a `title` attribute that perfectly matches the `aria-label` on all icon-only buttons to provide immediate visual feedback on hover.
+## 2026-04-14 - Native Tooltips for Interactive Inputs
+**Learning:** Icon-only buttons and interactive inputs lacking visible labels (e.g., chat textareas) must include a `title` attribute (matching the `aria-label`) to provide a native browser tooltip on hover for sighted users who may not immediately recognize the element's function.
+**Action:** Always pair `aria-label` with a matching `title` attribute on interactive elements that do not have a visible text label.
