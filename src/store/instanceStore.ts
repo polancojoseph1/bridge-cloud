@@ -102,25 +102,42 @@ export const useInstanceStore = create<InstanceStore>()(
       setActiveInstance: (instanceId: string) => set({ activeInstanceId: instanceId }),
 
       setInstanceConversation: (instanceId: string, conversationId: string) => {
-        set(s => ({
-          instances: s.instances.map(i => i.instanceId === instanceId ? { ...i, conversationId } : i),
-        }));
+        set(s => {
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+          const instances = [...s.instances];
+          instances[idx] = { ...instances[idx], conversationId };
+          return { instances };
+        });
       },
 
       renameInstance: (instanceId: string, label: string) => {
-        set(s => ({
-          instances: s.instances.map(i => i.instanceId === instanceId ? { ...i, label: label.slice(0, 24) } : i),
-        }));
+        set(s => {
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+          const instances = [...s.instances];
+          instances[idx] = { ...instances[idx], label: label.slice(0, 24) };
+          return { instances };
+        });
       },
 
       setInstanceAgent: (instanceId: string, agentId: string) => {
         set(s => {
-          const newLabel = generateLabel(agentId, s.instances.filter(i => i.instanceId !== instanceId));
-          return {
-            instances: s.instances.map(i =>
-              i.instanceId === instanceId ? { ...i, agentId, label: newLabel } : i
-            ),
-          };
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+
+          const remaining: Instance[] = [];
+          for (let i = 0; i < s.instances.length; i++) {
+            if (i !== idx) {
+              remaining.push(s.instances[i]);
+            }
+          }
+
+          const newLabel = generateLabel(agentId, remaining);
+          const instances = [...s.instances];
+          instances[idx] = { ...instances[idx], agentId, label: newLabel };
+
+          return { instances };
         });
       },
     }),

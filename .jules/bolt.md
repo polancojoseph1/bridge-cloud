@@ -40,3 +40,6 @@
 ## 2024-05-21 - [Zustand Targeted Single-Item Updates]
 **Learning:** In Zustand stores, updating a single item using `.map()` on the entire array forces React/Zustand to iterate over every item and allocate a new object or reference for all unchanged items, causing O(N) allocations and GC pressure.
 **Action:** For targeted single-item updates, always use `.findIndex()` to locate the item, bail out if not found, perform a shallow copy of the array (`[...arr]`), and mutate only the specific index (`arr[targetIndex] = {...arr[targetIndex], ...updates}`). This achieves O(N) traversal but only O(1) new allocations.
+## 2024-05-22 - [Optimize Array Mutation inside Zustand Updates]
+**Learning:** In Zustand store actions that mutate an array (like `setInstanceConversation`), using `.map` or `.filter` chains causes O(N) array allocation. Furthermore, `s.instances.map` forces the creation of a new array containing new object references for all matching elements.
+**Action:** Replace `s.instances.map` with `.findIndex` to locate the target item. If it exists (`!== -1`), make a shallow copy of the array (`[...s.instances]`) and selectively update the specific index to reduce allocations to O(1) inside `Zustand` updates. Replace `.filter` calls meant to exclude an element with a single-pass `for` loop that accumulates remaining elements.
