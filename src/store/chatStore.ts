@@ -9,6 +9,11 @@ import { generateId } from '@/lib/utils';
 // AbortController state is kept out of persist
 let activeAbortController: AbortController | null = null;
 
+// ⚡ Bolt Optimization: Module-level caching for dynamic imports in hot paths
+let serverStoreModule: typeof import('@/store/serverStore') | null = null;
+let streamingModule: typeof import('@/lib/streaming') | null = null;
+let mockApiModule: typeof import('@/lib/mockApi') | null = null;
+
 export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
@@ -148,14 +153,17 @@ export const useChatStore = create<ChatStore>()(
         };
         activeAbortController = new AbortController();
 
-        const { useServerStore } = await import('@/store/serverStore');
+        if (!serverStoreModule) serverStoreModule = await import('@/store/serverStore');
+        const { useServerStore } = serverStoreModule;
         const hasServer = useServerStore.getState().activeProfile() !== null;
         try {
           if (hasServer) {
-            const { streamFromProxy } = await import('@/lib/streaming');
+            if (!streamingModule) streamingModule = await import('@/lib/streaming');
+            const { streamFromProxy } = streamingModule;
             await streamFromProxy(agentId, content, convId, onChunk, undefined, activeAbortController.signal);
           } else {
-            const { streamMockResponse } = await import('@/lib/mockApi');
+            if (!mockApiModule) mockApiModule = await import('@/lib/mockApi');
+            const { streamMockResponse } = mockApiModule;
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
         } catch (error: unknown) {
