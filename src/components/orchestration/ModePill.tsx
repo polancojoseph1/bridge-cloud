@@ -30,7 +30,7 @@ export default function ModePill() {
             type="button"
             role="radio"
             aria-checked={isActive}
-            title={isDisabled ? "Coming soon" : m.title}
+            title={isDisabled ? "Orchestration modes coming soon!" : m.title}
             onClick={isDisabled ? undefined : () => setMode(m.id)}
             disabled={isDisabled}
             className={cn(

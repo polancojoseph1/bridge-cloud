@@ -20,7 +20,7 @@ export async function streamFromProxy(
       serverUrl: profile?.url ?? '',
       serverKey: profile?.apiKey ?? '',
     }),
-    signal,
+    signal, // Wired up to abort the fetch stream
     redirect: 'error',
   });
 
