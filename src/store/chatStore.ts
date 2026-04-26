@@ -42,9 +42,6 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
-        if (activeAbortController) {
-          activeAbortController.abort();
-        }
         set(s => {
           const convId = s.activeConversationId;
           if (!convId) return { isStreaming: false };
@@ -65,6 +62,9 @@ export const useChatStore = create<ChatStore>()(
 
           return { isStreaming: false, conversations: newConversations };
         });
+        if (activeAbortController) {
+          activeAbortController.abort();
+        }
       },
 
       sendMessage: async (content: string) => {

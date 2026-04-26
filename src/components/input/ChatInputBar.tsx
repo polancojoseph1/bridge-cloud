@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useCallback } from 'react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import SendButton from './SendButton';
 
 export default function ChatInputBar() {
@@ -9,6 +10,7 @@ export default function ChatInputBar() {
   const isStreaming = useChatStore(s => s.isStreaming);
   const sendMessage = useChatStore(s => s.sendMessage);
   const stopGeneration = useChatStore(s => s.stopGeneration);
+  const orchestrationMode = useOrchestrationStore((s) => s.mode);
 
   const resizeTextarea = useCallback(() => {
     const el = textareaRef.current;
@@ -24,7 +26,7 @@ export default function ChatInputBar() {
 
   const handleSubmit = async () => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     setValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -39,7 +41,7 @@ export default function ChatInputBar() {
     }
   };
 
-  const isEmpty = value.trim().length === 0;
+  const isEmpty = value.trim().length === 0 || orchestrationMode !== 'single';
 
   return (
     <div className="sticky bottom-0 bg-gradient-to-t from-[#0a1410] via-[#0a1410] to-transparent pt-6 pb-4 px-4 flex-shrink-0">
@@ -51,8 +53,8 @@ export default function ChatInputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
-            placeholder="Message Bridge Cloud..."
+            disabled={isStreaming || orchestrationMode !== 'single'}
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud..." : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             aria-multiline="true"
             rows={1}
