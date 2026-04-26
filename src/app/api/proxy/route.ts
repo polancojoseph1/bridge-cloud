@@ -6,6 +6,10 @@ import { auth } from '@clerk/nextjs/server';
 
 const lookup = promisify(dns.lookup);
 
+// ⚡ Bolt Optimization: Instantiate TextEncoder once globally since it is stateless,
+// avoiding redundant object allocation during high-frequency streaming.
+const encoder = new TextEncoder();
+
 // Env var config (Jefe's cloud bots — Option A)
 const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
   claude: { url: process.env.BRIDGEBOT_CLAUDE_URL ?? '', key: process.env.BRIDGEBOT_CLAUDE_KEY ?? '' },
@@ -256,7 +260,7 @@ function createSSEToNDJSONTransform() {
                 type: 'delta',
                 text: data.choices[0].delta.content,
               };
-              controller.enqueue(new TextEncoder().encode(JSON.stringify(ndjsonEvent) + '\n'));
+              controller.enqueue(encoder.encode(JSON.stringify(ndjsonEvent) + '\n'));
             }
           } catch (e) {
             // Ignore parse errors
@@ -273,7 +277,7 @@ function createSSEToNDJSONTransform() {
               type: 'delta',
               text: data.choices[0].delta.content,
             };
-            controller.enqueue(new TextEncoder().encode(JSON.stringify(ndjsonEvent) + '\n'));
+            controller.enqueue(encoder.encode(JSON.stringify(ndjsonEvent) + '\n'));
           }
         } catch (e) {
             // Ignore

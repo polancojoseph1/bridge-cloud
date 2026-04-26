@@ -40,3 +40,7 @@
 ## 2024-05-21 - [Zustand Targeted Single-Item Updates]
 **Learning:** In Zustand stores, updating a single item using `.map()` on the entire array forces React/Zustand to iterate over every item and allocate a new object or reference for all unchanged items, causing O(N) allocations and GC pressure.
 **Action:** For targeted single-item updates, always use `.findIndex()` to locate the item, bail out if not found, perform a shallow copy of the array (`[...arr]`), and mutate only the specific index (`arr[targetIndex] = {...arr[targetIndex], ...updates}`). This achieves O(N) traversal but only O(1) new allocations.
+
+## 2026-04-26 - [Module-Level TextEncoder Instantiation]
+**Learning:** `TextEncoder` is completely stateless and thread-safe in JavaScript, meaning it can be instantiated once at the module level. However, inside hot streaming paths (like `TransformStream` inside proxy routes or SSE stream generators), repeatedly doing `new TextEncoder()` adds unnecessary object allocation and garbage collection overhead. Note: `TextDecoder` instances used with `{ stream: true }` are stateful and must be instantiated per-stream.
+**Action:** Always extract `new TextEncoder()` to a module-level constant rather than creating it inside hot loops or request handlers.
