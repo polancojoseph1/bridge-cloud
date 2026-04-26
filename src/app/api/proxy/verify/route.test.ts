@@ -24,7 +24,7 @@ vi.mock('dns', () => {
 
 function createMockRequest(body: any): NextRequest {
   return {
-    json: async () => body,
+    body: new ReadableStream({start(c){c.enqueue(new TextEncoder().encode(JSON.stringify(body))); c.close();}}),
     headers: new Headers(),
   } as unknown as NextRequest;
 }
