@@ -6,6 +6,9 @@ import { auth } from '@clerk/nextjs/server';
 
 const lookup = promisify(dns.lookup);
 
+// Reuse stateless TextEncoder globally to reduce object creation overhead in hot path
+const textEncoder = new TextEncoder();
+
 // Env var config (Jefe's cloud bots — Option A)
 const CLOUD_CONFIGS: Record<string, { url: string; key: string }> = {
   claude: { url: process.env.BRIDGEBOT_CLAUDE_URL ?? '', key: process.env.BRIDGEBOT_CLAUDE_KEY ?? '' },
@@ -256,7 +259,7 @@ function createSSEToNDJSONTransform() {
                 type: 'delta',
                 text: data.choices[0].delta.content,
               };
-              controller.enqueue(new TextEncoder().encode(JSON.stringify(ndjsonEvent) + '\n'));
+              controller.enqueue(textEncoder.encode(JSON.stringify(ndjsonEvent) + '\n'));
             }
           } catch (e) {
             // Ignore parse errors
@@ -273,7 +276,7 @@ function createSSEToNDJSONTransform() {
               type: 'delta',
               text: data.choices[0].delta.content,
             };
-            controller.enqueue(new TextEncoder().encode(JSON.stringify(ndjsonEvent) + '\n'));
+            controller.enqueue(textEncoder.encode(JSON.stringify(ndjsonEvent) + '\n'));
           }
         } catch (e) {
             // Ignore
