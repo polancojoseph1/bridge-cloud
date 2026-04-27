@@ -5,8 +5,6 @@ import { NextRequest } from 'next/server';
 import dns from 'dns';
 import { promisify } from 'util';
 
-
-
 vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
 }));
@@ -23,9 +21,19 @@ vi.mock('dns', () => {
 });
 
 function createMockRequest(body: any): NextRequest {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(JSON.stringify(body)));
+      controller.close();
+    }
+  });
+  const headers = new Headers();
+  headers.set('content-length', JSON.stringify(body).length.toString());
   return {
+    body: stream,
+    headers,
     json: async () => body,
-    headers: new Headers(),
   } as unknown as NextRequest;
 }
 

@@ -7,9 +7,19 @@ vi.mock('@clerk/nextjs/server', () => ({
 }));
 
 function createMockRequest(body: Record<string, unknown>) {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(JSON.stringify(body)));
+      controller.close();
+    }
+  });
+  const headers = new Headers();
+  headers.set('content-length', JSON.stringify(body).length.toString());
   return {
+    body: stream,
+    headers,
     json: async () => body,
-    headers: new Headers(),
   } as unknown as NextRequest;
 }
 
@@ -41,6 +51,7 @@ describe('POST /api/proxy', () => {
       message: 'hello',
       conversationId: 'conv-123'
     });
+
     fetchMock.mockRejectedValueOnce(new Error('Network error'));
 
     const response = await POST(req);
@@ -107,7 +118,9 @@ describe('POST /api/proxy', () => {
 
     const mockUpstreamResponse = new Response(mockStream, {
       status: 200,
+      headers: { 'Content-Type': 'application/x-ndjson' }
     });
+
     fetchMock.mockResolvedValueOnce(mockUpstreamResponse);
 
     const response = await POST(req);
@@ -117,10 +130,10 @@ describe('POST /api/proxy', () => {
     expect(response.headers.get('Cache-Control')).toBe('no-cache');
     expect(response.headers.get('X-Accel-Buffering')).toBe('no');
 
-    // Verify the body is passed through
+    // Read stream to verify content
     const reader = response.body?.getReader();
     const { value, done } = await reader!.read();
-    expect(new TextDecoder().decode(value)).toBe('chunk 1');
     expect(done).toBe(false);
+    expect(new TextDecoder().decode(value)).toBe('chunk 1');
   });
 });
