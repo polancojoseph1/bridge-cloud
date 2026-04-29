@@ -3,6 +3,7 @@ import { isForbiddenHostname, isOpenRouterUrl } from '@/lib/ssrf';
 import dns from 'dns';
 import { promisify } from 'util';
 import { auth } from '@clerk/nextjs/server';
+import { parseJsonBodyWithLimit } from '@/lib/utils';
 
 const lookup = promisify(dns.lookup);
 
@@ -24,16 +25,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 🛡️ Sentinel: Mitigate DoS by enforcing a strict total request body size limit
-  const contentLength = Number(req.headers.get('content-length') || '0');
-  if (contentLength > 50000) {
+  let body;
+  try {
+    body = await parseJsonBodyWithLimit(req, 50000);
+  } catch (err) {
     return new Response(
-      JSON.stringify({ error: 'Request body too large' }),
+      JSON.stringify({ error: 'Request body too large or malformed' }),
       { status: 413, headers: { 'Content-Type': 'application/json' } }
     );
   }
-
-  const body = await req.json();
   const { agentId, message, conversationId, serverUrl, serverKey } = body;
 
   // 🛡️ Sentinel: Mitigate DoS by restricting message length and input validation

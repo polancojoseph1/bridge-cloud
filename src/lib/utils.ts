@@ -28,3 +28,25 @@ export function generateId(): string {
   }
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
+
+export async function parseJsonBodyWithLimit(req: Request, limit: number) {
+  if (!req.body) return {};
+  const reader = req.body.getReader();
+  const decoder = new TextDecoder();
+  let totalSize = 0;
+  let bodyString = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      totalSize += value.length;
+      if (totalSize > limit) {
+        throw new Error('Request body too large');
+      }
+      bodyString += decoder.decode(value, { stream: true });
+    }
+  }
+  bodyString += decoder.decode();
+  return JSON.parse(bodyString);
+}
