@@ -5,3 +5,7 @@
 ## 2026-04-13 - Native Tooltips for Icon-Only Buttons
 **Learning:** Sighted users often struggle to identify the purpose of icon-only buttons if they lack native browser tooltips, even when `aria-label` is present for screen readers.
 **Action:** Always include a `title` attribute that perfectly matches the `aria-label` on all icon-only buttons to provide immediate visual feedback on hover.
+
+## 2026-04-29 - Keyboard Navigation in Custom Popovers
+**Learning:** Native `<button>` elements in heavily styled custom popovers or dropdowns (like `ServerSwitcherPopover`) often lose their default browser focus indicators due to CSS resets or when using `focus-visible:outline-none` alongside background color changes (e.g., `focus-visible:bg-[#152219]`). This makes keyboard navigation impossible for users who rely on visual focus rings.
+**Action:** When overriding the default outline with `focus-visible:outline-none`, always explicitly provide a custom focus ring (e.g., `focus-visible:ring-2 focus-visible:ring-[#6c8cff] focus-visible:ring-inset`) to ensure interactive elements remain fully keyboard accessible via the `Tab` key.
