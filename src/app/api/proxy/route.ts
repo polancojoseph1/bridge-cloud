@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { isForbiddenHostname, isOpenRouterUrl } from '@/lib/ssrf';
+import { parseJsonBodyWithLimit } from '@/lib/bodyParser';
 import dns from 'dns';
 import { promisify } from 'util';
 import { auth } from '@clerk/nextjs/server';
@@ -33,7 +34,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const body = await req.json();
+  let body;
+  try {
+    body = await parseJsonBodyWithLimit(req.body, 50000);
+  } catch (err: any) {
+    if (err.message === 'Payload too large') {
+      return new Response(
+        JSON.stringify({ error: 'Request body too large' }),
+        { status: 413, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    return new Response(
+      JSON.stringify({ error: 'Invalid request body' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   const { agentId, message, conversationId, serverUrl, serverKey } = body;
 
   // 🛡️ Sentinel: Mitigate DoS by restricting message length and input validation
