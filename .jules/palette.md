@@ -5,3 +5,6 @@
 ## 2026-04-13 - Native Tooltips for Icon-Only Buttons
 **Learning:** Sighted users often struggle to identify the purpose of icon-only buttons if they lack native browser tooltips, even when `aria-label` is present for screen readers.
 **Action:** Always include a `title` attribute that perfectly matches the `aria-label` on all icon-only buttons to provide immediate visual feedback on hover.
+## 2026-04-14 - Keyboard Focus in Custom Component Menus
+**Learning:** Interactive items within custom popover menus or dialogs (like `ServerSwitcherPopover` or `ServerManageModal`) can be easily missed for keyboard focus styling when they rely solely on hover states for background changes.
+**Action:** Always ensure that menu items map their visual `hover` styles to equivalent `focus-visible` styles using `focus-visible:ring-2 focus-visible:ring-[#10a37f]` (or `focus-visible:ring-inset` to prevent overflow) so keyboard users get clear visual feedback when navigating via Tab.

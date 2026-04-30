@@ -14,12 +14,12 @@ export default function ServerGate({ onLocalSelect, onCloudSelect }: ServerGateP
       <div className="absolute top-4 right-4 flex items-center gap-3">
         <Show when="signed-out">
           <SignInButton mode="modal">
-            <button className="text-sm font-medium text-[#8e8e8e] hover:text-[#ececec] transition-colors">
+            <button className="text-sm font-medium text-[#8e8e8e] hover:text-[#ececec] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm px-1">
               Log in
             </button>
           </SignInButton>
           <SignUpButton mode="modal">
-            <button className="text-sm font-medium bg-[#1e3025] hover:bg-[#2a4334] text-[#ececec] px-3 py-1.5 rounded-md transition-colors">
+            <button className="text-sm font-medium bg-[#1e3025] hover:bg-[#2a4334] text-[#ececec] px-3 py-1.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]">
               Sign up
             </button>
           </SignUpButton>
@@ -74,12 +74,12 @@ export default function ServerGate({ onLocalSelect, onCloudSelect }: ServerGateP
           <Show when="signed-out">
             <div className="flex items-center gap-3">
               <SignInButton mode="modal">
-                <button className="flex-1 py-2 text-[13px] font-medium text-[#8e8e8e] bg-[#152219] border border-[#2d4035] hover:text-[#ececec] hover:border-[#3d5548] rounded-lg transition-colors">
+                <button className="flex-1 py-2 text-[13px] font-medium text-[#8e8e8e] bg-[#152219] border border-[#2d4035] hover:text-[#ececec] hover:border-[#3d5548] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]">
                   Log in
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="flex-1 py-2 text-[13px] font-medium text-[#0a1410] bg-[#10a37f] hover:bg-[#0d8f6f] rounded-lg transition-colors">
+                <button className="flex-1 py-2 text-[13px] font-medium text-[#0a1410] bg-[#10a37f] hover:bg-[#0d8f6f] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]">
                   Sign up
                 </button>
               </SignUpButton>
@@ -89,7 +89,7 @@ export default function ServerGate({ onLocalSelect, onCloudSelect }: ServerGateP
           <Show when="signed-in">
             <button
               onClick={onCloudSelect}
-              className="w-full py-2 text-[13px] font-medium text-[#0a1410] bg-[#10a37f] hover:bg-[#0d8f6f] rounded-lg transition-colors"
+              className="w-full py-2 text-[13px] font-medium text-[#0a1410] bg-[#10a37f] hover:bg-[#0d8f6f] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
             >
               Connect to Cloud →
             </button>
