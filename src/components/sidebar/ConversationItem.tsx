@@ -83,6 +83,7 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       <button
         onClick={handleDelete}
         aria-label="Delete conversation"
+        title="Delete conversation"
         className={cn(
           'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
           'text-[#5c5c5c] hover:text-[#e05c5c]',

@@ -45,9 +45,13 @@ export const useServerStore = create<ServerStore>()(
       },
 
       updateProfile: (id, patch) => {
-        set(s => ({
-          profiles: s.profiles.map(p => p.id === id ? { ...p, ...patch } : p),
-        }));
+        set(s => {
+          const index = s.profiles.findIndex(p => p.id === id);
+          if (index === -1) return s;
+          const profiles = [...s.profiles];
+          profiles[index] = { ...profiles[index], ...patch };
+          return { profiles };
+        });
       },
 
       removeProfile: (id) => {
@@ -79,9 +83,10 @@ export const useServerStore = create<ServerStore>()(
       },
 
       setDefault: (id) => {
-        set(s => ({
-          profiles: s.profiles.map(p => ({ ...p, isDefault: p.id === id })),
-        }));
+        set(s => {
+          const profiles = s.profiles.map(p => ({ ...p, isDefault: p.id === id }));
+          return { profiles };
+        });
       },
 
       setActiveProfile: (id) => set({ activeProfileId: id }),
@@ -93,15 +98,22 @@ export const useServerStore = create<ServerStore>()(
         set({ connectionStatus: 'checking' });
         const result = await checkHealth(profile.url, profile.apiKey);
 
-        set(s => ({
-          connectionStatus: result.status,
-          activeProfileId: result.status === 'online' ? id : s.activeProfileId,
-          profiles: s.profiles.map(p =>
-            p.id === id
-              ? { ...p, lastHealthStatus: result.status, lastCheckedAt: Date.now() }
-              : p
-          ),
-        }));
+        set(s => {
+          const index = s.profiles.findIndex(p => p.id === id);
+          const profiles = index !== -1 ? [...s.profiles] : s.profiles;
+          if (index !== -1) {
+            profiles[index] = {
+              ...profiles[index],
+              lastHealthStatus: result.status,
+              lastCheckedAt: Date.now()
+            };
+          }
+          return {
+            connectionStatus: result.status,
+            activeProfileId: result.status === 'online' ? id : s.activeProfileId,
+            profiles,
+          };
+        });
 
         return result.status;
       },
