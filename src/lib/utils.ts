@@ -26,5 +26,16 @@ export function generateId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+  // 🛡️ Sentinel: Use cryptographically secure fallback instead of predictable Math.random()
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return Array.from(array)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  // Final fallback (should rarely be hit in modern environments)
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
