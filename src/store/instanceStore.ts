@@ -101,26 +101,39 @@ export const useInstanceStore = create<InstanceStore>()(
 
       setActiveInstance: (instanceId: string) => set({ activeInstanceId: instanceId }),
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       setInstanceConversation: (instanceId: string, conversationId: string) => {
-        set(s => ({
-          instances: s.instances.map(i => i.instanceId === instanceId ? { ...i, conversationId } : i),
-        }));
+        set(s => {
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], conversationId };
+          return { instances: newInstances };
+        });
       },
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       renameInstance: (instanceId: string, label: string) => {
-        set(s => ({
-          instances: s.instances.map(i => i.instanceId === instanceId ? { ...i, label: label.slice(0, 24) } : i),
-        }));
+        set(s => {
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], label: label.slice(0, 24) };
+          return { instances: newInstances };
+        });
       },
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       setInstanceAgent: (instanceId: string, agentId: string) => {
         set(s => {
+          const idx = s.instances.findIndex(i => i.instanceId === instanceId);
+          if (idx === -1) return s;
+
           const newLabel = generateLabel(agentId, s.instances.filter(i => i.instanceId !== instanceId));
-          return {
-            instances: s.instances.map(i =>
-              i.instanceId === instanceId ? { ...i, agentId, label: newLabel } : i
-            ),
-          };
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], agentId, label: newLabel };
+
+          return { instances: newInstances };
         });
       },
     }),
