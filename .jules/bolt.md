@@ -37,3 +37,7 @@
 ## 2026-04-07 - [Remove Chained Filters and Maps for Array Transformation]
 **Learning:** In frequently executed parts of Zustand stores (like `syncNodes` and `selectAllNodes` in `orchestrationStore.ts`), using chained `.filter()` and `.map()` calls on arrays (e.g., `nodes.filter(n => n.online).map(n => n.nodeId)`) causes unnecessary array allocations, leading to high garbage collection (GC) overhead and potential rendering delays.
 **Action:** Replace multiple chained array traversals with a single `reduce()` or native `for`-loop pass. Always preserve immutability and directly push into the accumulator when reducing or looping.
+
+## 2024-05-21 - [Optimize store array deletions]
+**Learning:** Using `.filter()` to remove an item from an array creates an unnecessary intermediate allocation. While this is standard practice, doing it in a critical path or very frequently can cause memory pressure. Replacing `.filter()` with a single `for` loop pass that pushes to a new array prevents O(N) intermediate memory allocations and reduces React Garbage Collection (GC) pauses.
+**Action:** Replace multiple array traversals or `.filter()` with a single `for` loop pass when doing deletions in frequently used paths.
