@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
   }
 
   // 🛡️ Sentinel: Mitigate DoS by enforcing a strict total request body size limit
-  // This explicitly prevents chunked transfer encoding bypasses
   let body;
   try {
     body = await parseJsonBodyWithLimit(req, 50000);
