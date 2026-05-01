@@ -50,7 +50,7 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
         <button
           key={profile.id}
           onClick={async () => { await connectProfile(profile.id); onClose(); }}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors duration-100 text-left"
+          className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors duration-100 text-left"
         >
           <span
             className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', profile.lastHealthStatus === 'checking' && 'animate-pulse')}
@@ -70,14 +70,14 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
       <div className="border-t border-[#2d4035] mt-1 pt-1">
         <button
           onClick={() => { openManage('add'); onClose(); }}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]"
+          className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]"
         >
           <Plus size={13} />
           Add server
         </button>
         <button
           onClick={() => { openManage('list'); onClose(); }}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]"
+          className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]"
         >
           <Settings size={13} />
           Manage servers
@@ -87,20 +87,20 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
       {/* Account / Auth section */}
       <div className="border-t border-[#2d4035] mt-1 pt-1 pb-1">
         <Show when="signed-in">
-          <div className="w-full flex items-center gap-2.5 px-3 py-1.5 transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+          <div className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-1.5 transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
             <UserButton />
             <span className="flex-1">Account settings</span>
           </div>
         </Show>
         <Show when="signed-out">
           <SignInButton mode="modal">
-            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+            <button className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
               <LogIn size={13} />
               Log in
             </button>
           </SignInButton>
           <SignUpButton mode="modal">
-            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+            <button className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
               <UserPlus size={13} />
               Sign up
             </button>

@@ -47,6 +47,7 @@ export default function ConversationItem({ conversation, isActive }: Conversatio
         onClick={handleDelete}
         className="opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded text-[#565656] hover:text-[#e55] hover:bg-[#1e3025] transition-all duration-150 flex-shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
         aria-label="Delete conversation"
+        title="Delete conversation"
       >
         <Trash2 size={13} />
       </button>
