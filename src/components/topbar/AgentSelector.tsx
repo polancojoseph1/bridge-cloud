@@ -38,6 +38,12 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            setOpen(false);
+          }
+        }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? "agent-listbox" : undefined}
@@ -69,6 +75,12 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
       {open && (
         <div
           id="agent-listbox"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.stopPropagation();
+              handleClose();
+            }
+          }}
           role="listbox"
           aria-label="Select agent"
           className={cn(
@@ -93,6 +105,10 @@ export default function AgentSelector({ activeAgentId, onSelect }: AgentSelector
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     handleSelect(agent.id);
+                  } else if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    handleClose();
                   }
                 }}
                 className={cn(
