@@ -13,6 +13,7 @@ export default function SendButton({ disabled, isStreaming, onClick }: SendButto
       onClick={onClick}
       disabled={disabled && !isStreaming}
       aria-label={isStreaming ? 'Stop generating' : 'Send message'}
+      title={isStreaming ? 'Stop generating' : 'Send message'}
       className={cn(
         'w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 self-end mb-0.5',
         'transition-colors duration-150 active:scale-[0.94] transition-transform',
