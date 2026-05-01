@@ -37,3 +37,12 @@
 **Vulnerability:** The proxy route (`src/app/api/proxy/route.ts`) inadvertently paired external, untrusted fallback URLs (provided by the client as `serverUrl`) with internal environment secrets (`cloud?.key`) when a cloud configuration key was set but its URL was missing.
 **Learning:** Fallback assignment blocks that blend destructured elements from different sources (e.g., `targetUrl = cloud?.url || serverUrl`) create a dangerous cross-pollination risk where sensitive keys meant for one service can be leaked to another.
 **Prevention:** Always bundle related configuration credentials into explicit tuples or strict conditional blocks (e.g., `if (cloud.url) { use cloud.url and cloud.key } else { use fallback.url and fallback.key }`) to guarantee that secrets are only ever dispatched to their intended, trusted destinations.
+## 2024-04-30 - Fix Payload Chunking DoS Bypass
+**Vulnerability:** The application relied on `req.headers.get('content-length')` combined with `await req.json()` to mitigate DoS attacks. However, if an attacker uses Chunked Transfer Encoding, the `content-length` header is omitted, bypassing the check and allowing arbitrarily large payloads to consume memory during `req.json()` parsing.
+**Learning:** The `content-length` header cannot be exclusively trusted for payload size validation. Node's default JSON parser will buffer the entire payload into memory before parsing.
+**Prevention:** Manually read the `req.body` stream chunk-by-chunk using `getReader()` and enforce a strict byte limit during accumulation before executing `JSON.parse`.
+
+## 2024-05-25 - Fix Insecure Random Number Generation in ID Creation
+**Vulnerability:** The `generateId` function in `src/lib/utils.ts` relied on `Math.random()` as a fallback when `crypto.randomUUID` was unavailable. `Math.random()` is not cryptographically secure and produces predictable values, which could allow attackers to guess session, conversation, or message IDs if they observe enough generated values.
+**Learning:** Using predictable random numbers for generating unique identifiers used in security-sensitive contexts (like chat metadata) creates ID guessing vulnerabilities. Always use cryptographic APIs for randomness.
+**Prevention:** Prioritize `crypto.randomUUID()`. If unsupported, implement a cryptographically secure fallback using `crypto.getRandomValues()` (e.g., generating a 32-character hex string from a 16-byte `Uint8Array`). Only use `Math.random()` as a final, absolute fallback when no web crypto APIs are available.

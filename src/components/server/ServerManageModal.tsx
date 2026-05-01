@@ -156,7 +156,7 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
             <button
               type="button"
               onClick={() => setShowKey(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565656] hover:text-[#8e8e8e] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565656] hover:text-[#8e8e8e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm"
               aria-label={showKey ? "Hide API key" : "Show API key"}
               title={showKey ? "Hide API key" : "Show API key"}
             >
@@ -342,7 +342,7 @@ function ProfileCard({
             disabled={isChecking}
             title="Re-check connection"
             aria-label="Re-check connection"
-            className="p-1.5 rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
           >
             {isChecking
               ? <Loader2 size={13} className="animate-spin" />
@@ -356,7 +356,7 @@ function ProfileCard({
               onClick={() => setDefault(profile.id)}
               title="Set as default"
               aria-label="Set as default"
-              className="p-1.5 rounded-lg text-[#565656] hover:text-[#f59e0b] hover:bg-[#1e3025] transition-colors"
+              className="p-1.5 rounded-lg text-[#565656] hover:text-[#f59e0b] hover:bg-[#1e3025] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b]"
             >
               <Star size={13} />
             </button>
@@ -371,7 +371,7 @@ function ProfileCard({
             }
             title="Remove server"
             aria-label="Remove server"
-            className="p-1.5 rounded-lg text-[#565656] hover:text-[#f87171] hover:bg-[rgba(239,68,68,0.08)] transition-colors"
+            className="p-1.5 rounded-lg text-[#565656] hover:text-[#f87171] hover:bg-[rgba(239,68,68,0.08)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ef4444]"
           >
             <Trash2 size={13} />
           </button>
@@ -426,7 +426,7 @@ function ServerListView({ onAddServer }: ListViewProps) {
         </p>
         <button
           onClick={onAddServer}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[14px] font-medium transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111c15]"
         >
           <Plus size={15} />
           Connect your first server
@@ -531,7 +531,7 @@ export default function ServerManageModal() {
             {tab === 'list' && (
               <button
                 onClick={() => setTab('add')}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111c15]"
                 title="Add server"
                 aria-label="Add server"
               >
@@ -542,7 +542,7 @@ export default function ServerManageModal() {
               onClick={closeManage}
               aria-label="Close modal"
               title="Close modal"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
             >
               <X size={16} />
             </button>
@@ -581,7 +581,7 @@ export default function ServerManageModal() {
             {tab === 'list' && (
               <button
                 onClick={() => setTab('add')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[13px] font-medium transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111c15]"
               >
                 <Plus size={13} />
                 Add Server
@@ -591,7 +591,7 @@ export default function ServerManageModal() {
               onClick={closeManage}
               aria-label="Close modal"
               title="Close modal"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[#565656] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
             >
               <X size={16} />
             </button>

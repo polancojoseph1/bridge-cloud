@@ -8,3 +8,7 @@
 ## 2026-04-14 - Native Tooltips for Interactive Inputs
 **Learning:** Icon-only buttons and interactive inputs lacking visible labels (e.g., chat textareas) must include a `title` attribute (matching the `aria-label`) to provide a native browser tooltip on hover for sighted users who may not immediately recognize the element's function.
 **Action:** Always pair `aria-label` with a matching `title` attribute on interactive elements that do not have a visible text label.
+
+## 2026-04-14 - Native Buttons in Popovers Keyboard Accessibility
+**Learning:** Overriding native `<button>` styles in custom popovers (like `ServerSwitcherPopover`) using `w-full` and `focus-visible:outline-none` breaks Tab navigation visibility. Because the button spans the full width of the container, applying custom rings (e.g., `ring-2`) can cause the focus indicator to be clipped or hidden by parent overflow rules.
+**Action:** Always provide custom focus rings when hiding default outlines (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color]`). To prevent clipping in popovers, avoid `w-full` on children; instead use `w-[calc(100%-Xpx)] mx-auto rounded-md` so the focus ring can draw correctly within the bounds of the parent container.

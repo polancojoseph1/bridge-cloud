@@ -184,7 +184,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
             <button
               type="button"
               onClick={() => { setOpen(false); openManage('list'); }}
-              className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#5c5c5c] hover:text-[#9b9b9b] hover:bg-[#1a1a1a] transition-colors rounded-md mx-1 w-[calc(100%-8px)]"
+              className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#5c5c5c] hover:text-[#9b9b9b] hover:bg-[#1a1a1a] transition-colors rounded-md mx-1 w-[calc(100%-8px)] focus-visible:bg-[#1a1a1a] focus-visible:text-[#9b9b9b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
             >
               <Settings className="w-3.5 h-3.5" />
               Manage servers
