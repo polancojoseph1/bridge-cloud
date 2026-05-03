@@ -36,10 +36,17 @@ export const useServerStore = create<ServerStore>()(
           isDefault: draft.isDefault || isFirst,
         };
         set(s => {
-          const profiles = draft.isDefault || isFirst
-            ? s.profiles.map(p => ({ ...p, isDefault: false })).concat(profile)
-            : [...s.profiles, profile];
-          return { profiles };
+          if (draft.isDefault || isFirst) {
+            // ⚡ Bolt: Replace O(N) .map() with .findIndex() and selective mutation to prevent unnecessary object allocations for unchanged items.
+            const prevDefaultIndex = s.profiles.findIndex(p => p.isDefault);
+            const profiles = [...s.profiles];
+            if (prevDefaultIndex !== -1) {
+              profiles[prevDefaultIndex] = { ...profiles[prevDefaultIndex], isDefault: false };
+            }
+            profiles.push(profile);
+            return { profiles };
+          }
+          return { profiles: [...s.profiles, profile] };
         });
         return id;
       },
@@ -84,7 +91,18 @@ export const useServerStore = create<ServerStore>()(
 
       setDefault: (id) => {
         set(s => {
-          const profiles = s.profiles.map(p => ({ ...p, isDefault: p.id === id }));
+          // ⚡ Bolt: Replace O(N) .map() with .findIndex() and selective mutation to prevent unnecessary object allocations for unchanged items.
+          const prevDefaultIndex = s.profiles.findIndex(p => p.isDefault);
+          const newDefaultIndex = s.profiles.findIndex(p => p.id === id);
+
+          if (newDefaultIndex === -1 || prevDefaultIndex === newDefaultIndex) return s;
+
+          const profiles = [...s.profiles];
+          if (prevDefaultIndex !== -1) {
+            profiles[prevDefaultIndex] = { ...profiles[prevDefaultIndex], isDefault: false };
+          }
+          profiles[newDefaultIndex] = { ...profiles[newDefaultIndex], isDefault: true };
+
           return { profiles };
         });
       },
