@@ -46,3 +46,8 @@
 **Vulnerability:** The `generateId` function in `src/lib/utils.ts` relied on `Math.random()` as a fallback when `crypto.randomUUID` was unavailable. `Math.random()` is not cryptographically secure and produces predictable values, which could allow attackers to guess session, conversation, or message IDs if they observe enough generated values.
 **Learning:** Using predictable random numbers for generating unique identifiers used in security-sensitive contexts (like chat metadata) creates ID guessing vulnerabilities. Always use cryptographic APIs for randomness.
 **Prevention:** Prioritize `crypto.randomUUID()`. If unsupported, implement a cryptographically secure fallback using `crypto.getRandomValues()` (e.g., generating a 32-character hex string from a 16-byte `Uint8Array`). Only use `Math.random()` as a final, absolute fallback when no web crypto APIs are available.
+
+## 2024-03-05 - DoS Risk in req.json()
+**Vulnerability:** The chat route relied on `req.json()` which buffers the entire body into memory, ignoring the `content-length` check if an attacker uses Chunked Transfer Encoding.
+**Learning:** Checking `content-length` is insufficient to prevent DoS via large JSON payloads, as the header can be omitted.
+**Prevention:** Always use a custom stream reader (like `parseJsonBodyWithLimit`) to enforce a strict byte limit during payload accumulation before parsing.
