@@ -63,9 +63,7 @@ export const useChatStore = create<ChatStore>()(
           return { isStreaming: false, conversations: newConversations };
         });
 
-        if (activeAbortController) {
-          activeAbortController.abort();
-        }
+        if (activeAbortController) { activeAbortController.abort(new DOMException('Aborted', 'AbortError')); }
       },
 
       sendMessage: async (content: string) => {
