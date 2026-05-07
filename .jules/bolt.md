@@ -49,3 +49,7 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+
+## 2024-05-23 - [Optimize store item updates]
+**Learning:** In Zustand stores, updating a single property (like toggling an \`isDefault\` boolean across an array) using \`.map()\` forces React/Zustand to iterate over every item and allocate a new object or reference for all unchanged items, causing O(N) allocations and GC pressure.
+**Action:** For targeted property toggles across an array, always use \`.findIndex()\` to locate the specific items involved, bail out if unnecessary, perform a shallow copy of the array (\`[...arr]\`), and mutate only the specific indices (\`arr[index] = {...arr[index], ...updates}\`). This achieves O(N) traversal but only O(1) new allocations.

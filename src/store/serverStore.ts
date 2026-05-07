@@ -82,9 +82,19 @@ export const useServerStore = create<ServerStore>()(
         set({ profiles: updated, activeProfileId: newActive });
       },
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       setDefault: (id) => {
         set(s => {
-          const profiles = s.profiles.map(p => ({ ...p, isDefault: p.id === id }));
+          const oldDefaultIndex = s.profiles.findIndex(p => p.isDefault);
+          const newDefaultIndex = s.profiles.findIndex(p => p.id === id);
+          if (newDefaultIndex === -1) return s;
+
+          const profiles = [...s.profiles];
+          if (oldDefaultIndex !== -1) {
+            profiles[oldDefaultIndex] = { ...profiles[oldDefaultIndex], isDefault: false };
+          }
+          profiles[newDefaultIndex] = { ...profiles[newDefaultIndex], isDefault: true };
+
           return { profiles };
         });
       },
