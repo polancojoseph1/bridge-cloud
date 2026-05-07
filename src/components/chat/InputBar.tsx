@@ -89,6 +89,7 @@ export default function InputBar() {
         >
           <textarea
             ref={textareaRef}
+            autoFocus
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
