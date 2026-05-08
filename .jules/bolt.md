@@ -49,3 +49,7 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+
+## 2024-05-23 - [Reuse Stateless Classes in API Routes]
+**Learning:** `TextEncoder` is stateless. Instantiating `new TextEncoder()` inside request handlers (like `POST` in Next.js API routes) causes redundant object creation and adds unnecessary garbage collection overhead for every incoming request.
+**Action:** Always instantiate stateless objects like `TextEncoder` once at the module level to eliminate per-request instantiation overhead.
