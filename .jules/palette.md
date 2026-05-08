@@ -12,3 +12,7 @@
 ## 2026-04-14 - Native Buttons in Popovers Keyboard Accessibility
 **Learning:** Overriding native `<button>` styles in custom popovers (like `ServerSwitcherPopover`) using `w-full` and `focus-visible:outline-none` breaks Tab navigation visibility. Because the button spans the full width of the container, applying custom rings (e.g., `ring-2`) can cause the focus indicator to be clipped or hidden by parent overflow rules.
 **Action:** Always provide custom focus rings when hiding default outlines (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color]`). To prevent clipping in popovers, avoid `w-full` on children; instead use `w-[calc(100%-Xpx)] mx-auto rounded-md` so the focus ring can draw correctly within the bounds of the parent container.
+
+## 2026-05-08 - AutoFocus for Primary Inputs
+**Learning:** Users experience friction when navigating to chat interfaces or primary configuration forms (like Server Connect) if they must manually click or tab into the first text input to start typing.
+**Action:** Always add `autoFocus` to the primary text `<textarea>` or `<input>` in empty states, chat input bars, and critical modals so they are immediately keyboard-accessible.

@@ -96,6 +96,7 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
             </label>
             <input
               id="connect-server-url"
+              autoFocus
               type="url"
               required
               aria-required="true"
