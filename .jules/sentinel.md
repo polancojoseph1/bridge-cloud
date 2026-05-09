@@ -46,3 +46,7 @@
 **Vulnerability:** The `generateId` function in `src/lib/utils.ts` relied on `Math.random()` as a fallback when `crypto.randomUUID` was unavailable. `Math.random()` is not cryptographically secure and produces predictable values, which could allow attackers to guess session, conversation, or message IDs if they observe enough generated values.
 **Learning:** Using predictable random numbers for generating unique identifiers used in security-sensitive contexts (like chat metadata) creates ID guessing vulnerabilities. Always use cryptographic APIs for randomness.
 **Prevention:** Prioritize `crypto.randomUUID()`. If unsupported, implement a cryptographically secure fallback using `crypto.getRandomValues()` (e.g., generating a 32-character hex string from a 16-byte `Uint8Array`). Only use `Math.random()` as a final, absolute fallback when no web crypto APIs are available.
+## 2024-05-09 - JSON Body Limit Mitigation
+**Vulnerability:** Chunked transfer encoding could bypass content-length limits on JSON endpoints, leading to DoS via memory exhaustion.
+**Learning:** req.json() buffers the entire body in memory. Limits must be enforced at the stream layer instead.
+**Prevention:** Always use parseJsonBodyWithLimit across all endpoints to parse JSON payloads manually with strict byte limits.
