@@ -49,3 +49,7 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+
+## 2024-05-23 - [Optimize mutually exclusive boolean flags in arrays]
+**Learning:** When toggling a mutually exclusive boolean flag (like `isDefault`) across an array in a Zustand store, using `.map()` creates unnecessary O(N) intermediate memory allocations and forces React to process unchanged items.
+**Action:** Always replace O(N) `.map()` with `.findIndex()` lookups to identify the previously active and newly targeted items, shallow clone the array, and mutate only those specific indices to guarantee O(N) traversal time but only O(1) new memory allocations.
