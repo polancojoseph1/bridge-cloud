@@ -46,3 +46,8 @@
 **Vulnerability:** The `generateId` function in `src/lib/utils.ts` relied on `Math.random()` as a fallback when `crypto.randomUUID` was unavailable. `Math.random()` is not cryptographically secure and produces predictable values, which could allow attackers to guess session, conversation, or message IDs if they observe enough generated values.
 **Learning:** Using predictable random numbers for generating unique identifiers used in security-sensitive contexts (like chat metadata) creates ID guessing vulnerabilities. Always use cryptographic APIs for randomness.
 **Prevention:** Prioritize `crypto.randomUUID()`. If unsupported, implement a cryptographically secure fallback using `crypto.getRandomValues()` (e.g., generating a 32-character hex string from a 16-byte `Uint8Array`). Only use `Math.random()` as a final, absolute fallback when no web crypto APIs are available.
+
+## 2026-05-10 - Uniform JSON Parsing Limits
+**Vulnerability:** API route used `req.json()` which is vulnerable to DoS attacks via Chunked Transfer Encoding, bypassing `content-length` checks.
+**Learning:** Architectural security mitigations like `parseJsonBodyWithLimit` must be applied uniformly across *all* routes that process JSON payloads, not just external-facing proxy endpoints.
+**Prevention:** Always use `parseJsonBodyWithLimit(req.body, limit)` instead of native `req.json()` in Next.js API routes that accept stream payloads.
