@@ -116,7 +116,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
   }, [open]);
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}>
       <button
         type="button"
         onClick={() => !isOrchestrating && setOpen(v => !v)}
