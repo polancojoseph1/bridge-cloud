@@ -49,3 +49,7 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+
+## 2024-05-23 - [Avoid Redundant Array Shallow Clones in Zustand]
+**Learning:** In Zustand array stores, if an update operation (like setting a default item) discovers that the target item is already in the desired state (e.g., `isDefault === true`), proceeding to shallow clone the array and re-assign the index allocates unnecessary object references for all array elements. This causes completely unnecessary GC churn and forces React to re-render all downstream components that depend on those object references.
+**Action:** When performing targeted updates on specific items in a Zustand array, always check if the target item already matches the desired state *before* cloning the array. If it does, return the existing state immediately (e.g., `if (s.profiles[targetIndex].isDefault) return s;`).
