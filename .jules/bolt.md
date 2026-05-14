@@ -49,3 +49,6 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+## 2025-05-23 - Zustand Mutually Exclusive Flags O(N) Map Allocation
+**Learning:** When toggling a mutually exclusive boolean flag (e.g., `isDefault`) across an array in a Zustand store, using `.map()` causes O(N) object allocations (shallow clones) for every item, even those whose status did not change, increasing GC pressure.
+**Action:** Replace `.map()` with `.findIndex()` to locate both the previously active item and the newly targeted item, shallow clone the array once, and mutate only those specific indices to prevent O(N) allocations for unchanged items.
