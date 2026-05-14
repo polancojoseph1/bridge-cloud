@@ -84,7 +84,17 @@ export const useServerStore = create<ServerStore>()(
 
       setDefault: (id) => {
         set(s => {
-          const profiles = s.profiles.map(p => ({ ...p, isDefault: p.id === id }));
+          // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) mutations
+          // to prevent unnecessary object allocations for unchanged profiles.
+          const prevDefaultIdx = s.profiles.findIndex(p => p.isDefault);
+          const newDefaultIdx = s.profiles.findIndex(p => p.id === id);
+          if (newDefaultIdx === -1 || prevDefaultIdx === newDefaultIdx) return s;
+
+          const profiles = [...s.profiles];
+          if (prevDefaultIdx !== -1) {
+            profiles[prevDefaultIdx] = { ...profiles[prevDefaultIdx], isDefault: false };
+          }
+          profiles[newDefaultIdx] = { ...profiles[newDefaultIdx], isDefault: true };
           return { profiles };
         });
       },
