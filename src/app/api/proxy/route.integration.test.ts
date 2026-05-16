@@ -19,8 +19,17 @@ const url = process.env.BRIDGEBOT_CLAUDE_URL ?? '';
 const SKIP = !url || (!url.includes('localhost') && !url.includes('tail') && !url.includes('ts.net'));
 
 function createRequest(body: object) {
-  const headers = new Map<string, string>();
+  const payload = JSON.stringify(body);
+  const encoder = new TextEncoder();
+  const headers = new Map<string, string>([['content-length', payload.length.toString()]]);
+
   return {
+    body: new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(payload));
+        controller.close();
+      }
+    }),
     json: async () => body,
     headers: {
       get: (key: string) => headers.get(key)
