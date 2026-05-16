@@ -100,6 +100,7 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
+              autoFocus
               placeholder="Message Bridge Cloud…"
               aria-label="Chat input"
               title="Chat input"
