@@ -64,7 +64,7 @@ export const useChatStore = create<ChatStore>()(
         });
 
         if (activeAbortController) {
-          activeAbortController.abort();
+          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
         }
       },
 
@@ -116,6 +116,10 @@ export const useChatStore = create<ChatStore>()(
 
         const flushChunk = () => {
           if (!pendingChunk) return;
+          if (!get().isStreaming) {
+            pendingChunk = '';
+            return;
+          }
           const chunkToApply = pendingChunk;
           pendingChunk = '';
 
@@ -139,6 +143,7 @@ export const useChatStore = create<ChatStore>()(
         };
 
         const onChunk = (chunk: string) => {
+          if (!get().isStreaming) return;
           pendingChunk += chunk;
           if (!flushTimeout) {
             flushTimeout = setTimeout(() => {

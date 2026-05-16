@@ -12,3 +12,6 @@
 ## 2026-04-14 - Native Buttons in Popovers Keyboard Accessibility
 **Learning:** Overriding native `<button>` styles in custom popovers (like `ServerSwitcherPopover`) using `w-full` and `focus-visible:outline-none` breaks Tab navigation visibility. Because the button spans the full width of the container, applying custom rings (e.g., `ring-2`) can cause the focus indicator to be clipped or hidden by parent overflow rules.
 **Action:** Always provide custom focus rings when hiding default outlines (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color]`). To prevent clipping in popovers, avoid `w-full` on children; instead use `w-[calc(100%-Xpx)] mx-auto rounded-md` so the focus ring can draw correctly within the bounds of the parent container.
+## 2024-05-16 - Chat Auto-scroll Accuracy
+**Learning:** `setTimeout` based scroll debouncing masks user scrolls during high frequency updates.
+**Action:** Replace timeout-based debounce with `expectedScrollTop` value tracking that verifies programmatic scroll matching against a small pixel variance (e.g., `Math.abs(scrollTop - expectedScrollTop.current) <= 1`).

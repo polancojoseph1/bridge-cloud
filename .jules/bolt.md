@@ -49,3 +49,6 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+## 2024-05-16 - Stop Generation Abort Implementation
+**Learning:** When streaming with a mock response or proxy, aborting an AbortController is insufficient if `flushChunk` doesn't check the `!isStreaming` flag, since the chunk being flushed can still append text after the UI reflects a stop.
+**Action:** Always check `isStreaming` state both when receiving chunks (`onChunk`) and explicitly before applying any queued chunks (`flushChunk`) to instantly reflect the aborted state.
