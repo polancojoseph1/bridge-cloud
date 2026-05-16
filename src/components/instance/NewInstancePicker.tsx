@@ -37,17 +37,23 @@ function NewInstancePicker({ open, onClose, anchorRef }: NewInstancePickerProps)
 
   if (!open) return null;
 
-  // Optimize array filtering: replace O(2N) double .filter() with O(N) single-pass .reduce()
+  // Optimize array filtering: replace O(2N) double .filter() with O(N) single-pass native for-loop
   // to reduce memory allocations and React GC pauses during frequent health poll updates.
   // ⚡ Bolt Optimization: Wrap with useMemo to prevent recalculating on every re-render
   // when agents array hasn't changed.
-  const [onlineAgents, offlineAgents] = useMemo(() => agents.reduce<[typeof agents, typeof agents]>(
-    (acc, a) => {
-      acc[a.isOnline ? 0 : 1].push(a);
-      return acc;
-    },
-    [[], []]
-  ), [agents]);
+  const [onlineAgents, offlineAgents] = useMemo(() => {
+    const online: typeof agents = [];
+    const offline: typeof agents = [];
+    for (let i = 0; i < agents.length; i++) {
+      const a = agents[i];
+      if (a.isOnline) {
+        online.push(a);
+      } else {
+        offline.push(a);
+      }
+    }
+    return [online, offline];
+  }, [agents]);
 
   return (
     <div

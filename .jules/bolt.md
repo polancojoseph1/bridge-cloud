@@ -49,3 +49,6 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+## 2024-05-16 - Array Partitioning GC Pressure
+**Learning:** Using `.reduce()` for array partitioning inside high-frequency rendering components introduces callback overhead and intermediate destructuring allocations, increasing garbage collection pressure.
+**Action:** Replace `.reduce()` with a single native `for` loop that pushes directly into initialized accumulator arrays to eliminate callback overhead and intermediate allocations, reducing GC pressure.
