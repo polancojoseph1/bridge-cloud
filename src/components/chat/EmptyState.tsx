@@ -103,6 +103,7 @@ export default function EmptyState() {
               placeholder="Message Bridge Cloud…"
               aria-label="Chat input"
               title="Chat input"
+              autoFocus
               className={[
                 'flex-1 bg-transparent resize-none outline-none',
                 'text-sm text-[#ececec] placeholder:text-[#5c5c5c]',
