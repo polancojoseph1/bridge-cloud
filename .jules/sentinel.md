@@ -46,3 +46,7 @@
 **Vulnerability:** The `generateId` function in `src/lib/utils.ts` relied on `Math.random()` as a fallback when `crypto.randomUUID` was unavailable. `Math.random()` is not cryptographically secure and produces predictable values, which could allow attackers to guess session, conversation, or message IDs if they observe enough generated values.
 **Learning:** Using predictable random numbers for generating unique identifiers used in security-sensitive contexts (like chat metadata) creates ID guessing vulnerabilities. Always use cryptographic APIs for randomness.
 **Prevention:** Prioritize `crypto.randomUUID()`. If unsupported, implement a cryptographically secure fallback using `crypto.getRandomValues()` (e.g., generating a 32-character hex string from a 16-byte `Uint8Array`). Only use `Math.random()` as a final, absolute fallback when no web crypto APIs are available.
+## 2024-05-17 - Prevent DoS via Chunked Transfer Encoding in Internal Routes
+**Vulnerability:** Internal API routes used `req.json()` to parse request bodies, leaving them vulnerable to DoS attacks via chunked transfer encoding bypasses if `content-length` was spoofed or omitted.
+**Learning:** Even internal-facing routes must use architectural security mitigations like manual stream reading (`parseJsonBodyWithLimit`) to enforce strict payload size limits uniformly across all JSON endpoints.
+**Prevention:** Always use custom stream parsers with strict size limits (`parseJsonBodyWithLimit`) instead of relying on default `req.json()` and `content-length` headers.
