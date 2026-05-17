@@ -7,6 +7,9 @@ import { useEffect, useRef, use } from 'react';
 import EmptyState from './EmptyState';
 import InstanceTabBar from '@/components/instance/InstanceTabBar';
 import { useInstanceStore } from '@/store/instanceStore';
+import NodeTray from '@/components/orchestration/NodeTray';
+import OrchestrationPanel from '@/components/orchestration/OrchestrationPanel';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 
@@ -85,9 +88,18 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
 
   const isEmpty = !activeConversationId || activeConversationMessageCount === 0;
 
+  const mode = useOrchestrationStore(s => s.mode);
+  const activeJob = useOrchestrationStore(s => s.activeJob);
+
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0 overflow-hidden relative">
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        {mode !== 'single' && (
+          <div className="flex-shrink-0 pt-4 px-4 max-w-[720px] mx-auto w-full">
+            <NodeTray />
+          </div>
+        )}
+
         {isEmpty ? (
           <EmptyState />
         ) : (
@@ -96,7 +108,15 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
              * MessageList fills all remaining vertical space (flex-1 + overflow-y-auto
              * is handled inside MessageList itself).
              */}
-            <MessageList conversationId={activeConversationId} />
+            {mode !== 'single' && activeJob ? (
+              <div className="flex-1 overflow-y-auto py-6">
+                <div className="w-full max-w-[720px] mx-auto px-4">
+                  <OrchestrationPanel job={activeJob} />
+                </div>
+              </div>
+            ) : (
+              <MessageList conversationId={activeConversationId} />
+            )}
 
             {/*
              * InputBar is sticky-bottom, rendered after the message feed so it
