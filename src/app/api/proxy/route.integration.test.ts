@@ -18,10 +18,22 @@ import { NextRequest } from 'next/server';
 const url = process.env.BRIDGEBOT_CLAUDE_URL ?? '';
 const SKIP = !url || (!url.includes('localhost') && !url.includes('tail') && !url.includes('ts.net'));
 
-function createRequest(body: object) {
+function createRequest(bodyObj: object) {
+  const bodyStr = JSON.stringify(bodyObj);
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(bodyStr));
+      controller.close();
+    }
+  });
+
   const headers = new Map<string, string>();
+  headers.set('content-length', String(encoder.encode(bodyStr).length));
+
   return {
-    json: async () => body,
+    body: stream,
+    json: async () => bodyObj,
     headers: {
       get: (key: string) => headers.get(key)
     }
