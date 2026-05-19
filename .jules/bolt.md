@@ -49,3 +49,7 @@
 ## 2024-05-22 - [Global TextEncoder in Streaming]
 **Learning:** TextEncoder is stateless and instantiating it inline on every chunk within a streaming processing loop (like converting SSE to NDJSON in API routes) causes redundant object creation and garbage collection overhead in performance-critical hot paths. However, TextDecoder instances used with `{ stream: true }` are stateful and must be kept per-stream.
 **Action:** Always instantiate `TextEncoder` once at the module level for streaming pipelines to eliminate instantiation overhead per chunk, but retain per-stream `TextDecoder` instances if stateful stream decoding is required.
+
+## 2026-05-19 - [Avoid O(N^2) Lookups in Zustand List Rendering]
+**Learning:** When a parent component renders a list from a Zustand array (e.g., `instances.map(i => ...)`), if each child component independently uses a selector to find itself in that same array (`useStore(s => s.instances.find(i => i.id === id))`), it creates an O(N^2) bottleneck. Every time the array updates, the parent re-renders N children, and each child performs an O(N) find operation.
+**Action:** For lists rendered from a store array, pass the full item object as a prop from the parent and wrap the child component in `React.memo()`. This entirely removes the O(N) lookup from the children, reducing rendering complexity to O(N).
