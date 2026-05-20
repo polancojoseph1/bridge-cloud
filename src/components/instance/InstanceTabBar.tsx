@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,12 +10,18 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo() and pass `instance` directly.
+ * 💡 What: Replaced O(N) array `.find()` inside the child with direct prop passing + React.memo().
+ * 🎯 Why: When `instances` changes, rendering N tabs each doing an O(N) find results in O(N^2) complexity.
+ *         Now, parent passes the item directly, avoiding lookup overhead.
+ * 📊 Impact: O(1) lookup per tab instead of O(N), significantly reducing CPU overhead during list updates.
+ */
+const InstanceTab = memo(function InstanceTab({ instanceId, instance }: { instanceId: string; instance: Instance }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
 
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
   const instancesLength = useInstanceStore(s => s.instances.length);
 
   if (!instance) return null;
@@ -79,16 +85,15 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+const MobileInstancePill = memo(function MobileInstancePill({ instanceId, instance }: { instanceId: string; instance: Instance }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
 
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
   const instancesLength = useInstanceStore(s => s.instances.length);
 
   if (!instance) return null;
@@ -125,7 +130,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
@@ -177,7 +182,7 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-stretch h-full overflow-x-auto"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <InstanceTab key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => <InstanceTab key={i.instanceId} instanceId={i.instanceId} instance={i} />)}
         </div>
 
         {canScrollRight && (
@@ -204,7 +209,7 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-center gap-2 overflow-x-auto px-3 h-full"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <MobileInstancePill key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => <MobileInstancePill key={i.instanceId} instanceId={i.instanceId} instance={i} />)}
         </div>
         <div className="flex-shrink-0 pr-3 pl-2 border-l border-[#1e3025] h-full flex items-center">
           <NewInstanceButton />
