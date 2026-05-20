@@ -96,6 +96,7 @@ export default function InputBar() {
             rows={1}
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
+            autoFocus
             title="Chat input"
             aria-multiline="true"
             className={[
