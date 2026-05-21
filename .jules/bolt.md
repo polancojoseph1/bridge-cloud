@@ -1,0 +1,3 @@
+## 2024-05-18 - Optimize O(N^2) complexity in Zustand store list rendering
+**Learning:** When rendering a list of items from a Zustand store array, having each child component independently use a selector with `.find()` to locate its own state causes O(N^2) complexity. Every time the array changes, N components each perform an O(N) search.
+**Action:** Instead of passing IDs and having children look up their state, pass the full item object as a prop from the parent component (which already has the array) and wrap the child in `React.memo`. This guarantees O(1) rendering time per child and avoids unnecessary re-renders.
