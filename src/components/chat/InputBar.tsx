@@ -92,6 +92,7 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            autoFocus
             disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
