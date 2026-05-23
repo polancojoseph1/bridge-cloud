@@ -93,6 +93,7 @@ export default function InputBar() {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={isStreaming || orchestrationMode !== 'single'}
+            autoFocus
             rows={1}
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
