@@ -52,6 +52,7 @@ export default function ChatInputBar() {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
+            autoFocus
             placeholder="Message Bridge Cloud..."
             aria-label="Chat input"
             aria-multiline="true"
