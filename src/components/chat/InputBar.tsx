@@ -56,7 +56,7 @@ export default function InputBar() {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
+    if (!trimmed || isStreaming || false /* disabled orchestration check */) return;
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
