@@ -88,6 +88,7 @@ export default function InputBar() {
           ].join(' ')}
         >
           <textarea
+            autoFocus
             ref={textareaRef}
             value={value}
             onChange={handleChange}
