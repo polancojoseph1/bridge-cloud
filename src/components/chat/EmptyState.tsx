@@ -39,7 +39,10 @@ export default function EmptyState() {
     const trimmed = value.trim();
     if (!trimmed || isStreaming) return;
     setValue('');
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.focus();
+    }
     startChat(trimmed);
   };
 
@@ -100,6 +103,7 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
+              autoFocus
               placeholder="Message Bridge Cloud…"
               aria-label="Chat input"
               title="Chat input"
