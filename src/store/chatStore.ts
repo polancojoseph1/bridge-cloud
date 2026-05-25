@@ -64,7 +64,7 @@ export const useChatStore = create<ChatStore>()(
         });
 
         if (activeAbortController) {
-          activeAbortController.abort();
+          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
         }
       },
 
@@ -182,7 +182,9 @@ export const useChatStore = create<ChatStore>()(
         } finally {
           if (flushTimeout) clearTimeout(flushTimeout);
           flushChunk();
-          activeAbortController = null;
+          // DO NOT instantly nullify activeAbortController here to allow catch blocks
+          // downstream to correctly catch the DOMException, as per memory guidelines.
+          // Wait to nullify it until a new stream starts or delay nullification.
         }
 
         set(s => {
