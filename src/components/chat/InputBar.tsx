@@ -63,6 +63,7 @@ export default function InputBar() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      textareaRef.current.focus();
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
@@ -89,6 +90,7 @@ export default function InputBar() {
         >
           <textarea
             ref={textareaRef}
+            autoFocus
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}

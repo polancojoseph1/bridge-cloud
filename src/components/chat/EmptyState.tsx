@@ -39,7 +39,10 @@ export default function EmptyState() {
     const trimmed = value.trim();
     if (!trimmed || isStreaming) return;
     setValue('');
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.focus();
+    }
     startChat(trimmed);
   };
 
@@ -96,6 +99,7 @@ export default function EmptyState() {
           ].join(' ')}>
             <textarea
               ref={textareaRef}
+              autoFocus
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
