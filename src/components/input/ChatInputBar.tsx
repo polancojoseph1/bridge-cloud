@@ -28,6 +28,7 @@ export default function ChatInputBar() {
     setValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
+      textareaRef.current.focus();
     }
     await sendMessage(trimmed);
   };
@@ -52,6 +53,7 @@ export default function ChatInputBar() {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
+            autoFocus
             placeholder="Message Bridge Cloud..."
             aria-label="Chat input"
             aria-multiline="true"
