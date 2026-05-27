@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,15 +10,13 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+const InstanceTab = memo(function InstanceTab({ instance }: { instance: Instance }) {
+  const instanceId = instance.instanceId;
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
 
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
   const instancesLength = useInstanceStore(s => s.instances.length);
-
-  if (!instance) return null;
 
   const isActive  = activeInstanceId === instanceId;
   const dotColor  = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
@@ -79,19 +77,17 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+const MobileInstancePill = memo(function MobileInstancePill({ instance }: { instance: Instance }) {
+  const instanceId = instance.instanceId;
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
 
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
   const instancesLength = useInstanceStore(s => s.instances.length);
-
-  if (!instance) return null;
 
   const isActive = activeInstanceId === instanceId;
   const dotColor = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
@@ -125,7 +121,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
@@ -177,7 +173,7 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-stretch h-full overflow-x-auto"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <InstanceTab key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => <InstanceTab key={i.instanceId} instance={i} />)}
         </div>
 
         {canScrollRight && (
@@ -204,7 +200,7 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-center gap-2 overflow-x-auto px-3 h-full"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <MobileInstancePill key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => <MobileInstancePill key={i.instanceId} instance={i} />)}
         </div>
         <div className="flex-shrink-0 pr-3 pl-2 border-l border-[#1e3025] h-full flex items-center">
           <NewInstanceButton />
