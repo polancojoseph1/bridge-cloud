@@ -63,6 +63,7 @@ export default function InputBar() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      textareaRef.current.focus();
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
@@ -94,6 +95,7 @@ export default function InputBar() {
             onKeyDown={handleKeyDown}
             disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
+            autoFocus
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
