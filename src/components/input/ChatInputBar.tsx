@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useChatStore } from '@/store/chatStore';
 import SendButton from './SendButton';
 
@@ -17,6 +17,12 @@ export default function ChatInputBar() {
     el.style.height = Math.min(el.scrollHeight, 180) + 'px';
   }, []);
 
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
     resizeTextarea();
@@ -28,6 +34,7 @@ export default function ChatInputBar() {
     setValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
+      textareaRef.current.focus();
     }
     await sendMessage(trimmed);
   };
@@ -54,7 +61,9 @@ export default function ChatInputBar() {
             disabled={isStreaming}
             placeholder="Message Bridge Cloud..."
             aria-label="Chat input"
+            title="Chat input"
             aria-multiline="true"
+            autoFocus
             rows={1}
             className="flex-1 bg-transparent text-[15px] text-[#ececec] placeholder-[#565656] resize-none outline-none leading-[1.65] min-h-[26px] max-h-[180px] overflow-y-auto disabled:opacity-60 disabled:cursor-not-allowed"
             style={{ height: 'auto' }}
