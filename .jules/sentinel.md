@@ -1,0 +1,4 @@
+## 2024-05-29 - Prevent DoS via Chunked Transfer Encoding bypass in API routes
+**Vulnerability:** The `/api/chat` route relied on `req.headers.get('content-length')` to enforce body size limits, but fell back to unbounded `await req.json()` parsing. An attacker could bypass the length check entirely by omitting `Content-Length` and sending a massive payload using `Transfer-Encoding: chunked`, leading to potential Out-Of-Memory (OOM) Denial of Service.
+**Learning:** Checking `Content-Length` headers is insufficient for body size limits since clients can use chunked encoding to stream unbounded payloads.
+**Prevention:** Always read request streams manually using a bounded stream processor (like `parseJsonBodyWithLimit`) on all routes handling JSON payloads, rather than relying on headers and `.json()`.
