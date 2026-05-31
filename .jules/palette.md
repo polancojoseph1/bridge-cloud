@@ -1,0 +1,3 @@
+## 2024-05-31 - Auto-focus for chat input after streaming
+**Learning:** When a streaming chat ends, the input field loses focus and requires the user to click it again to type. Simply adding `autoFocus` isn't enough because disabled inputs (during streaming) can't hold focus. Calling `.focus()` requires an effect that watches `isStreaming` state.
+**Action:** When working on chat inputs that get disabled during streaming, always pair `autoFocus` with a `useEffect` that watches the streaming state to re-focus when streaming completes, otherwise keyboard users have to manually re-focus the input after every message.
