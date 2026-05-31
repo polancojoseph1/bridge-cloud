@@ -111,7 +111,7 @@ describe('checkHealth', () => {
 
     expect(result).toEqual({
       status: 'offline',
-      error: 'Failed to fetch',
+      error: 'Network error',
     });
   });
 
