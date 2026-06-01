@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,25 +10,31 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
-  const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
-  const setActive       = useInstanceStore(s => s.setActiveInstance);
-  const close           = useInstanceStore(s => s.closeInstance);
-
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
-  const instancesLength = useInstanceStore(s => s.instances.length);
-
-  if (!instance) return null;
-
-  const isActive  = activeInstanceId === instanceId;
+// ⚡ Bolt Optimization:
+// Wrapped child in React.memo and passed data as props.
+// This prevents an O(N^2) rendering bottleneck where N children independently run O(N) .find() lookups.
+// It also ensures that toggling the active tab only re-renders the changed tabs, not the entire list.
+const InstanceTab = React.memo(function InstanceTab({
+  instance,
+  instancesLength,
+  isActive,
+  setActive,
+  close
+}: {
+  instance: Instance;
+  instancesLength: number;
+  isActive: boolean;
+  setActive: (id: string) => void;
+  close: (id: string) => void;
+}) {
   const dotColor  = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
   const canClose  = instancesLength > 1 && !instance.isPinned;
 
   return (
     <button
       type="button"
-      data-instance-id={instanceId}
-      onClick={() => setActive(instanceId)}
+      data-instance-id={instance.instanceId}
+      onClick={() => setActive(instance.instanceId)}
       className={cn(
         'group flex items-center gap-1.5 px-3 h-full flex-shrink-0 relative',
         'text-[12px] font-medium transition-all duration-150',
@@ -58,12 +64,12 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
           role="button"
           tabIndex={0}
           aria-label={`Close ${instance.label}`}
-          onClick={e => { e.stopPropagation(); close(instanceId); }}
+          onClick={e => { e.stopPropagation(); close(instance.instanceId); }}
           onKeyDown={e => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               e.stopPropagation();
-              close(instanceId);
+              close(instance.instanceId);
             }
           }}
           className={cn(
@@ -79,27 +85,30 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
-  const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
-  const setActive        = useInstanceStore(s => s.setActiveInstance);
-  const close            = useInstanceStore(s => s.closeInstance);
-
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
-  const instancesLength = useInstanceStore(s => s.instances.length);
-
-  if (!instance) return null;
-
-  const isActive = activeInstanceId === instanceId;
+// ⚡ Bolt Optimization: Memoized to maintain O(1) referential stability and prevent unnecessary re-renders when other tabs change state.
+const MobileInstancePill = React.memo(function MobileInstancePill({
+  instance,
+  instancesLength,
+  isActive,
+  setActive,
+  close
+}: {
+  instance: Instance;
+  instancesLength: number;
+  isActive: boolean;
+  setActive: (id: string) => void;
+  close: (id: string) => void;
+}) {
   const dotColor = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
   const canClose = instancesLength > 1;
 
   return (
     <div
-      data-instance-id={instanceId}
+      data-instance-id={instance.instanceId}
       className={cn(
         'flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full flex-shrink-0',
         'text-[12px] font-medium transition-colors duration-150',
@@ -108,14 +117,14 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
           : 'bg-[#0d1a11] text-[#5c5c5c] border border-[#1e3025]'
       )}
     >
-      <button type="button" onClick={() => setActive(instanceId)} className="flex items-center gap-1.5">
+      <button type="button" onClick={() => setActive(instance.instanceId)} className="flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? dotColor : '#3c3c3c' }} />
         <span>{instance.label}</span>
       </button>
       {canClose && (
         <button
           type="button"
-          onClick={() => close(instanceId)}
+          onClick={() => close(instance.instanceId)}
           aria-label={`Close ${instance.label}`}
           title={`Close ${instance.label}`}
           className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-[#2d4035] transition-colors"
@@ -125,13 +134,15 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
 export default function InstanceTabBar() {
   const instances        = useInstanceStore(s => s.instances);
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
+  const setActive        = useInstanceStore(s => s.setActiveInstance);
+  const close            = useInstanceStore(s => s.closeInstance);
   const scrollRef        = useRef<HTMLDivElement>(null);
   const mobileScrollRef  = useRef<HTMLDivElement>(null);
   const [canScrollLeft,  setCanScrollLeft]  = useState(false);
@@ -177,7 +188,16 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-stretch h-full overflow-x-auto"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <InstanceTab key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => (
+            <InstanceTab
+              key={i.instanceId}
+              instance={i}
+              instancesLength={instances.length}
+              isActive={activeInstanceId === i.instanceId}
+              setActive={setActive}
+              close={close}
+            />
+          ))}
         </div>
 
         {canScrollRight && (
@@ -204,7 +224,16 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-center gap-2 overflow-x-auto px-3 h-full"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <MobileInstancePill key={i.instanceId} instanceId={i.instanceId} />)}
+          {instances.map(i => (
+            <MobileInstancePill
+              key={i.instanceId}
+              instance={i}
+              instancesLength={instances.length}
+              isActive={activeInstanceId === i.instanceId}
+              setActive={setActive}
+              close={close}
+            />
+          ))}
         </div>
         <div className="flex-shrink-0 pr-3 pl-2 border-l border-[#1e3025] h-full flex items-center">
           <NewInstanceButton />

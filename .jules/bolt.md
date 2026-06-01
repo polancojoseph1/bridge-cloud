@@ -1,0 +1,3 @@
+## 2024-05-29 - Avoid O(N^2) `.find()` lookups in mapped Zustand list children
+**Learning:** When mapping an array from a Zustand store into child components, having each child independently use `.find()` on the same store array causes an O(N^2) rendering complexity bottleneck. Also, having children independently subscribe to `activeItemId` causes *all* children to unnecessarily re-render whenever the active item changes.
+**Action:** Always fetch the array in the parent component and pass the specific item object and a computed `isActive` boolean as props to `React.memo` wrapped child components to achieve O(1) referential stability and minimal re-renders.
