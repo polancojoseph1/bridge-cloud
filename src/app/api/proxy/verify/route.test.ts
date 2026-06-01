@@ -2,11 +2,6 @@ import { vi, describe, it, expect } from 'vitest';
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 
-import dns from 'dns';
-import { promisify } from 'util';
-
-
-
 vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
 }));
@@ -22,10 +17,10 @@ vi.mock('dns', () => {
   };
 });
 
-function createMockRequest(body: any): NextRequest {
+function createMockRequest(payload: any): NextRequest {
   return {
-    json: async () => body,
-    headers: new Headers(),
+    body: new ReadableStream({ start(controller) { controller.enqueue(new TextEncoder().encode(JSON.stringify(payload))); controller.close(); } }),
+    headers: new Headers({ 'content-length': JSON.stringify(payload).length.toString() }),
   } as unknown as NextRequest;
 }
 

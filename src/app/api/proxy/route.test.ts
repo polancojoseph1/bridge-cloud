@@ -6,10 +6,10 @@ vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
 }));
 
-function createMockRequest(body: Record<string, unknown>) {
-  return {
-    json: async () => body,
-    headers: new Headers(),
+function createMockRequest(payload: Record<string, unknown>) {
+  return { body: new ReadableStream({ start(controller) { controller.enqueue(new TextEncoder().encode(JSON.stringify(payload))); controller.close(); } }),
+    json: async () => payload,
+    headers: new Headers({ 'content-length': JSON.stringify(payload).length.toString() }),
   } as unknown as NextRequest;
 }
 

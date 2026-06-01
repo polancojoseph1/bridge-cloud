@@ -101,6 +101,7 @@ export const useInstanceStore = create<InstanceStore>()(
 
       setActiveInstance: (instanceId: string) => set({ activeInstanceId: instanceId }),
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       setInstanceConversation: (instanceId: string, conversationId: string) => {
         set(s => {
           // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
@@ -112,6 +113,7 @@ export const useInstanceStore = create<InstanceStore>()(
         });
       },
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       renameInstance: (instanceId: string, label: string) => {
         set(s => {
           // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
@@ -123,6 +125,7 @@ export const useInstanceStore = create<InstanceStore>()(
         });
       },
 
+      // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       setInstanceAgent: (instanceId: string, agentId: string) => {
         set(s => {
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);

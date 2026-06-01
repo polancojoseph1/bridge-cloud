@@ -54,8 +54,8 @@ function AgentRow({
         disabled
           ? 'opacity-40 cursor-not-allowed'
           : isActive
-          ? 'bg-[#1e2a4a] text-[#ececec] cursor-pointer'
-          : 'text-[#ececec] hover:bg-[#222222] cursor-pointer'
+          ? 'bg-[#1e2a4a] text-[#ececec] cursor-pointer focus-visible:bg-[#1e2a4a]'
+          : 'text-[#ececec] hover:bg-[#222222] cursor-pointer focus-visible:bg-[#222222]'
       )}
     >
       <HealthDot agent={agent} />
@@ -120,6 +120,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
       <button
         type="button"
         onClick={() => !isOrchestrating && setOpen(v => !v)}
+        onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? "provider-listbox" : undefined}
@@ -148,6 +149,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
           id="provider-listbox"
           role="listbox"
           aria-label="Select AI provider"
+          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
           className="absolute top-full right-0 mt-1 z-50 w-[260px] bg-[#181818] border border-[#1e3025] rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-1"
         >
           {onlineAgents.length > 0 && (
@@ -182,7 +184,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
             <button
               type="button"
               onClick={() => { setOpen(false); openManage('list'); }}
-              className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#5c5c5c] hover:text-[#9b9b9b] hover:bg-[#1a1a1a] transition-colors rounded-md mx-1 w-[calc(100%-8px)]"
+              className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#5c5c5c] hover:text-[#9b9b9b] hover:bg-[#1a1a1a] transition-colors rounded-md mx-1 w-[calc(100%-8px)] focus-visible:bg-[#1a1a1a] focus-visible:text-[#9b9b9b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
             >
               <Settings className="w-3.5 h-3.5" />
               Manage servers
