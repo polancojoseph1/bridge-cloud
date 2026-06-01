@@ -35,6 +35,7 @@ export default function ServerStatusIndicator() {
       )}
       <button
         onClick={() => setShowPopover(v => !v)}
+        onKeyDown={(e) => { if (e.key === 'Escape') setShowPopover(false); }}
         aria-label="Toggle server switcher"
         title="Toggle server switcher"
         aria-haspopup="dialog"
