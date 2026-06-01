@@ -59,10 +59,11 @@ export default function InputBar() {
     if (!trimmed || isStreaming) return;
     sendMessage(trimmed);
     setValue('');
-    // Reset textarea height
+    // Reset textarea height and refocus
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      textareaRef.current.focus();
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
@@ -105,6 +106,7 @@ export default function InputBar() {
               'disabled:cursor-not-allowed disabled:opacity-50',
             ].join(' ')}
             style={{ maxHeight: `${MAX_HEIGHT}px` }}
+            autoFocus
           />
 
           {/* Send / Stop button */}
