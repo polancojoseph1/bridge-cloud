@@ -55,6 +55,7 @@ export default function EmptyState() {
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    el.style.overflowY = el.scrollHeight > 120 ? 'auto' : 'hidden';
   };
 
   const canSend = value.trim().length > 0 && !isStreaming;
