@@ -106,9 +106,9 @@ export const useInstanceStore = create<InstanceStore>()(
         set(s => {
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);
           if (idx === -1) return s;
-          const newInstances = [...s.instances];
-          newInstances[idx] = { ...newInstances[idx], conversationId };
-          return { instances: newInstances };
+          const instances = [...s.instances];
+          instances[idx] = { ...instances[idx], conversationId };
+          return { instances };
         });
       },
 
@@ -117,9 +117,9 @@ export const useInstanceStore = create<InstanceStore>()(
         set(s => {
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);
           if (idx === -1) return s;
-          const newInstances = [...s.instances];
-          newInstances[idx] = { ...newInstances[idx], label: label.slice(0, 24) };
-          return { instances: newInstances };
+          const instances = [...s.instances];
+          instances[idx] = { ...instances[idx], label: label.slice(0, 24) };
+          return { instances };
         });
       },
 
@@ -129,11 +129,17 @@ export const useInstanceStore = create<InstanceStore>()(
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);
           if (idx === -1) return s;
 
-          const newLabel = generateLabel(agentId, s.instances.filter(i => i.instanceId !== instanceId));
-          const newInstances = [...s.instances];
-          newInstances[idx] = { ...newInstances[idx], agentId, label: newLabel };
+          // ⚡ Bolt: Replace array traversals (.filter + .map) with targeted index updates
+          const others = [];
+          for (let i = 0; i < s.instances.length; i++) {
+            if (i !== idx) others.push(s.instances[i]);
+          }
 
-          return { instances: newInstances };
+          const newLabel = generateLabel(agentId, others);
+          const instances = [...s.instances];
+          instances[idx] = { ...instances[idx], agentId, label: newLabel };
+
+          return { instances };
         });
       },
     }),
