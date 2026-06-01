@@ -1,0 +1,4 @@
+## 2023-10-27 - [Fix DoS vulnerability in /api/chat via Chunked Transfer Encoding bypass]
+**Vulnerability:** The `/api/chat` route was vulnerable to a memory exhaustion Denial of Service (DoS) attack. It used `await req.json()` to parse the incoming request body. While a check on the `content-length` header was present, it could be bypassed using `Transfer-Encoding: chunked`, allowing a malicious actor to send an arbitrarily large payload that Next.js would buffer in memory before parsing.
+**Learning:** Relying solely on the `content-length` header is insufficient for enforcing request body size limits in Next.js App Router, as chunked requests omit this header and bypass the check.
+**Prevention:** Always use a custom streaming JSON parser (like `parseJsonBodyWithLimit`) that explicitly limits the number of bytes read from the underlying `ReadableStream` (e.g., `req.body`), regardless of the provided headers.
