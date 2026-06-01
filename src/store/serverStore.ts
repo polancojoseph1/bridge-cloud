@@ -84,7 +84,19 @@ export const useServerStore = create<ServerStore>()(
 
       setDefault: (id) => {
         set(s => {
-          const profiles = s.profiles.map(p => ({ ...p, isDefault: p.id === id }));
+          // ⚡ Bolt Optimization: Replaced O(N) .map() with targeted O(N) .findIndex() and O(1) mutations for setting default profile to prevent unnecessary object allocations.
+          const targetIndex = s.profiles.findIndex(p => p.id === id);
+          if (targetIndex === -1) return s;
+
+          const currentIndex = s.profiles.findIndex(p => p.isDefault);
+          if (currentIndex === targetIndex) return s;
+
+          const profiles = [...s.profiles];
+          if (currentIndex !== -1) {
+            profiles[currentIndex] = { ...profiles[currentIndex], isDefault: false };
+          }
+          profiles[targetIndex] = { ...profiles[targetIndex], isDefault: true };
+
           return { profiles };
         });
       },
