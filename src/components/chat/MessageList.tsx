@@ -32,20 +32,23 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
   const lastMsg = messages[messages.length - 1];
 
+  const expectedScrollTop = useRef(0);
+
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
-    // If we recently programmatically scrolled, ignore this scroll event
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+
     if (isProgrammaticScrollRef.current) {
-      // Don't clear it immediately because smooth scrolling fires multiple times.
-      // The timeout below will clear it.
-      return;
+      if (Math.abs(scrollTop - expectedScrollTop.current) <= 1) {
+        isProgrammaticScrollRef.current = false;
+        return;
+      }
     }
 
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
+    // Fix: Using Math.round(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
     // ensuring precision within the threshold
-    const distanceToBottom = scrollHeight - Math.ceil(scrollTop + clientHeight);
+    const distanceToBottom = scrollHeight - Math.round(scrollTop + clientHeight);
 
     if (distanceToBottom > 30) {
       isUserScrolledRef.current = true;
@@ -72,12 +75,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
         isProgrammaticScrollRef.current = true;
+        expectedScrollTop.current = targetScrollTop;
         scrollRef.current.scrollTop = targetScrollTop;
-
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 150); // 150ms covers most smooth scroll animations
       }
     }
   }, [messages.length, isStreaming, lastMsg?.role]);
@@ -88,12 +87,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
         isProgrammaticScrollRef.current = true;
+        expectedScrollTop.current = targetScrollTop;
         scrollRef.current.scrollTop = targetScrollTop;
-
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 150);
       }
     }
   }, [messages, isStreaming]);

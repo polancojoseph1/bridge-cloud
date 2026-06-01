@@ -1,0 +1,3 @@
+## 2024-05-22 - Fix programmatic scroll early return regression
+**Learning:** Returning early on programmatic scroll while the smooth scroll animation is ongoing means that intermediate scroll events during the animation fall through to the manual user scroll detection, wrongly assuming a manual scroll has occurred and breaking auto-scroll.
+**Action:** When refining programmatic scroll tracking with `expectedScrollTop`, clear the `isProgrammaticScrollRef.current` flag when target is reached, but *always* return early from the `onScroll` handler as long as `isProgrammaticScrollRef.current` was true at the start of the handler to ignore all events fired by the animation.
