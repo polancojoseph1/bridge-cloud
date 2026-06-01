@@ -59,6 +59,7 @@ export default function InputBar() {
     if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     sendMessage(trimmed);
     setValue('');
+    textareaRef.current?.focus();
     // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -92,6 +93,7 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            autoFocus
             disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
