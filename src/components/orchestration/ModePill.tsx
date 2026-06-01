@@ -26,7 +26,7 @@ export default function ModePill() {
     >
       {MODES.map(m => {
         const isActive = mode === m.id;
-        const isDisabled = m.id !== 'single';
+        const isDisabled = false;
         return (
           <button
             key={m.id}
