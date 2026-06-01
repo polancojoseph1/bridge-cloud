@@ -98,6 +98,7 @@ export default function InputBar() {
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
+            autoFocus
             className={[
               'flex-1 bg-transparent resize-none outline-none',
               'text-sm text-[#ececec] placeholder:text-[#5c5c5c]',
