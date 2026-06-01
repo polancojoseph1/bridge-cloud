@@ -6,7 +6,12 @@
  * These tests validate the HTTP layer only — not actual AI responses.
  */
 
-import { describe, it, expect } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
+
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: () => Promise.resolve({ userId: 'test-user-id' })
+}));
+
 import { POST } from './route';
 import { NextRequest } from 'next/server';
 
@@ -14,7 +19,13 @@ const url = process.env.BRIDGEBOT_CLAUDE_URL ?? '';
 const SKIP = !url || (!url.includes('localhost') && !url.includes('tail') && !url.includes('ts.net'));
 
 function createRequest(body: object) {
-  return { json: async () => body } as unknown as NextRequest;
+  const headers = new Map<string, string>();
+  return {
+    json: async () => body,
+    headers: {
+      get: (key: string) => headers.get(key)
+    }
+  } as unknown as NextRequest;
 }
 
 describe.skipIf(SKIP)('Integration: POST /api/proxy → live bridgebot', () => {
@@ -26,15 +37,13 @@ describe.skipIf(SKIP)('Integration: POST /api/proxy → live bridgebot', () => {
   });
 
   it('rejects request with wrong API key (401)', async () => {
-    const req = {
-      json: async () => ({
+    const req = createRequest({
         agentId: 'custom',
         serverUrl: process.env.BRIDGEBOT_CLAUDE_URL,
         serverKey: 'wrong-key',
         message: 'ping',
         conversationId: 'integration-test',
-      }),
-    } as unknown as NextRequest;
+      });
 
     const res = await POST(req);
     expect(res.status).toBe(401);

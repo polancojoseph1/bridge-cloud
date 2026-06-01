@@ -63,9 +63,12 @@ export const useChatStore = create<ChatStore>()(
 
           return { isStreaming: false, conversations: newConversations };
         });
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         if (activeAbortController) {
-          activeAbortController.abort();
-          // Do not nullify here, let sendMessage cleanup
+          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
         }
       },
 
@@ -204,8 +207,19 @@ export const useChatStore = create<ChatStore>()(
       },
 
       deleteConversation: (id: string) => {
-        const convs = get().conversations.filter(c => c.id !== id);
-        const next = convs.length > 0 ? convs[0].id : null;
+        // ⚡ Bolt: Replace multiple array traversals (.filter) with a single pass
+        // to prevent O(N) memory allocations and reduce React GC pauses.
+        const conversations = get().conversations;
+        const convs: Conversation[] = [];
+        let next: string | null = null;
+        for (let i = 0; i < conversations.length; i++) {
+          if (conversations[i].id !== id) {
+            convs.push(conversations[i]);
+          }
+        }
+        if (convs.length > 0) {
+          next = convs[0].id;
+        }
         set({
           conversations: convs,
           activeConversationId: get().activeConversationId === id ? next : get().activeConversationId,

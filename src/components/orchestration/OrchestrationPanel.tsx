@@ -35,6 +35,7 @@ function SubtaskCard({
         onClick={() => setOpen(v => !v)}
         aria-expanded={open}
         aria-label={`${open ? 'Collapse' : 'Expand'} result for ${task.nodeName}`}
+        title={`${open ? 'Collapse' : 'Expand'} result for ${task.nodeName}`}
         className="w-full flex items-center gap-2 px-3 py-2 bg-[#0d1a11] hover:bg-[#111f15] transition-colors"
       >
         <StatusIcon status={task.status} />
