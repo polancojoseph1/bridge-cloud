@@ -32,19 +32,23 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
   const lastMsg = messages[messages.length - 1];
 
+  // ⚡ Bolt Optimization: Use exact expectedScrollTop instead of timeouts for programmatic scroll tracking
+  const expectedScrollTopRef = useRef<number | null>(null);
+
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
-    // If we recently programmatically scrolled, ignore this scroll event
-    if (isProgrammaticScrollRef.current) {
-      // Don't clear it immediately because smooth scrolling fires multiple times.
-      // The timeout below will clear it.
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+
+    // If we are at the exact expected scroll position from a programmatic scroll, ignore this event
+    if (expectedScrollTopRef.current !== null && Math.abs(scrollTop - expectedScrollTopRef.current) <= 1) {
       return;
     }
 
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
-    // ensuring precision within the threshold
+    // It's a user scroll
+    isProgrammaticScrollRef.current = false;
+    expectedScrollTopRef.current = null;
+
     const distanceToBottom = scrollHeight - Math.ceil(scrollTop + clientHeight);
 
     if (distanceToBottom > 30) {
@@ -68,16 +72,10 @@ export default function MessageList({ conversationId }: MessageListProps) {
     prevCountRef.current = messages.length;
 
     if (scrollRef.current && !isUserScrolledRef.current) {
-      // Only set programmatic true if we actually move it
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
-        isProgrammaticScrollRef.current = true;
+        expectedScrollTopRef.current = targetScrollTop;
         scrollRef.current.scrollTop = targetScrollTop;
-
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 150); // 150ms covers most smooth scroll animations
       }
     }
   }, [messages.length, isStreaming, lastMsg?.role]);
@@ -87,13 +85,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
     if (isStreaming && scrollRef.current && !isUserScrolledRef.current) {
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
-        isProgrammaticScrollRef.current = true;
+        expectedScrollTopRef.current = targetScrollTop;
         scrollRef.current.scrollTop = targetScrollTop;
-
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 150);
       }
     }
   }, [messages, isStreaming]);
