@@ -11,8 +11,7 @@ interface MessageListProps {
 export default function MessageList({ conversationId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef(false);
-  const isProgrammaticScrollRef = useRef(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const expectedScrollTop = useRef<number | null>(null);
 
   /**
    * ⚡ Bolt Optimization: Targeted Zustand Selector
@@ -35,14 +34,16 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
-    // If we recently programmatically scrolled, ignore this scroll event
-    if (isProgrammaticScrollRef.current) {
-      // Don't clear it immediately because smooth scrolling fires multiple times.
-      // The timeout below will clear it.
-      return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+
+    // If we recently programmatically scrolled, check against expectedScrollTop
+    if (expectedScrollTop.current !== null) {
+      if (Math.abs(scrollTop - expectedScrollTop.current) <= 1) {
+        expectedScrollTop.current = null;
+        return;
+      }
     }
 
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
     // ensuring precision within the threshold
     const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
@@ -71,13 +72,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       // Only set programmatic true if we actually move it
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
-        isProgrammaticScrollRef.current = true;
+        expectedScrollTop.current = targetScrollTop;
         scrollRef.current.scrollTop = targetScrollTop;
-
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 150); // 150ms covers most smooth scroll animations
       }
     }
   }, [messages.length, isStreaming, lastMsg?.role]);
@@ -87,13 +83,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
     if (isStreaming && scrollRef.current && !isUserScrolledRef.current) {
       const targetScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
       if (Math.abs(scrollRef.current.scrollTop - targetScrollTop) > 1) {
-        isProgrammaticScrollRef.current = true;
+        expectedScrollTop.current = targetScrollTop;
         scrollRef.current.scrollTop = targetScrollTop;
-
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 150);
       }
     }
   }, [messages, isStreaming]);
@@ -104,9 +95,9 @@ export default function MessageList({ conversationId }: MessageListProps) {
     <div
       ref={scrollRef}
       onScroll={handleScroll}
-      onWheel={() => { isProgrammaticScrollRef.current = false; }}
-      onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
-      onPointerDown={() => { isProgrammaticScrollRef.current = false; }}
+      onWheel={() => { expectedScrollTop.current = null; }}
+      onTouchMove={() => { expectedScrollTop.current = null; }}
+      onPointerDown={() => { expectedScrollTop.current = null; }}
       className="flex-1 overflow-y-auto py-6"
     >
       <div className="flex flex-col">
