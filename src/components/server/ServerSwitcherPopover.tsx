@@ -87,7 +87,7 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
       {/* Account / Auth section */}
       <div className="border-t border-[#2d4035] mt-1 pt-1 pb-1">
         <Show when="signed-in">
-          <div className="w-full flex items-center gap-2.5 px-3 py-1.5 transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+          <div className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-1.5 transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
             <UserButton />
             <span className="flex-1">Account settings</span>
           </div>

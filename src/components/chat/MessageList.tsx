@@ -45,8 +45,13 @@ export default function MessageList({ conversationId }: MessageListProps) {
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
     // ensuring precision within the threshold
-    const distanceToBottom = scrollHeight - Math.ceil(scrollTop + clientHeight);
-    isUserScrolledRef.current = distanceToBottom > 30;
+    const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
+
+    if (distanceToBottom > 30) {
+      isUserScrolledRef.current = true;
+    } else {
+      isUserScrolledRef.current = false;
+    }
   };
 
   useEffect(() => {
@@ -101,7 +106,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       onScroll={handleScroll}
       onWheel={() => { isProgrammaticScrollRef.current = false; }}
       onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
-      className="flex-1 overflow-y-auto py-6 scroll-smooth"
+      onPointerDown={() => { isProgrammaticScrollRef.current = false; }}
+      className="flex-1 overflow-y-auto py-6"
     >
       <div className="flex flex-col">
         {messages.map(message => (

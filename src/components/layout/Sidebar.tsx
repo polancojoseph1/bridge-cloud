@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { SquarePen } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
-import AgentSelector from '@/components/agent/AgentSelector';
+import ProviderSelector from '@/components/topbar/ProviderSelector';
 import ConversationList from '@/components/chat/ConversationList';
 import ServerStatusIndicator from '@/components/server/ServerStatusIndicator';
 
@@ -36,7 +36,7 @@ export default function Sidebar() {
 
       {/* Agent selector */}
       <div className="px-2 pb-3 flex-shrink-0">
-        <AgentSelector activeAgentId={activeAgentId} onSelect={setActiveAgent} />
+        <ProviderSelector activeAgentId={activeAgentId} onSelect={setActiveAgent} />
       </div>
 
       {/* Divider */}
