@@ -93,9 +93,6 @@ export default function NodeTray() {
     syncNodes(profilesToNodes(profiles));
   }, [profiles, syncNodes]);
 
-  // Currently disabled gracefully as it's not wired to the proxy
-  return null;
-
   if (!nodeTrayOpen || mode === 'single') return null;
 
   const modeLabel: Record<string, string> = {
