@@ -64,7 +64,7 @@ export const useChatStore = create<ChatStore>()(
         });
 
         if (activeAbortController) {
-          activeAbortController.abort();
+          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
         }
       },
 
@@ -154,10 +154,10 @@ export const useChatStore = create<ChatStore>()(
         try {
           if (hasServer) {
             const { streamFromProxy } = await import('@/lib/streaming');
-            await streamFromProxy(agentId, content, convId, onChunk, undefined, activeAbortController.signal);
+            await streamFromProxy(agentId, content, convId, onChunk, undefined, activeAbortController?.signal);
           } else {
             const { streamMockResponse } = await import('@/lib/mockApi');
-            await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
+            await streamMockResponse(content, agentId, onChunk, activeAbortController?.signal);
           }
         } catch (error: unknown) {
           if ((error as any)?.name === 'AbortError' || (error instanceof DOMException && error.name === 'AbortError') || (error as any)?.message === 'Aborted') {
