@@ -5,13 +5,15 @@ interface SendButtonProps {
   disabled: boolean;
   isStreaming: boolean;
   onClick: () => void;
+  title?: string;
 }
 
-export default function SendButton({ disabled, isStreaming, onClick }: SendButtonProps) {
+export default function SendButton({ disabled, isStreaming, onClick, title }: SendButtonProps) {
   return (
     <button
       onClick={onClick}
       disabled={disabled && !isStreaming}
+      title={title}
       aria-label={isStreaming ? 'Stop generating' : 'Send message'}
       title={isStreaming ? 'Stop generating' : 'Send message'}
       className={cn(

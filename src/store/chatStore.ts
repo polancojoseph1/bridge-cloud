@@ -43,26 +43,26 @@ export const useChatStore = create<ChatStore>()(
 
       stopGeneration: () => {
         set(s => {
-          const convId = s.activeConversationId;
-          if (!convId) return { isStreaming: false };
-          const convIndex = s.conversations.findIndex(c => c.id === convId);
+          if (!s.activeConversationId) return { isStreaming: false };
+          const convIndex = s.conversations.findIndex(c => c.id === s.activeConversationId);
           if (convIndex === -1) return { isStreaming: false };
 
           const conv = s.conversations[convIndex];
+          if (conv.messages.length === 0) return { isStreaming: false };
 
-          // Find the active assistant message (the last one streaming)
-          const msgIndex = conv.messages.findLastIndex(m => m.isStreaming);
-          if (msgIndex === -1) return { isStreaming: false };
+          const lastMsgIndex = conv.messages.length - 1;
+          const lastMsg = conv.messages[lastMsgIndex];
+
+          if (!lastMsg.isStreaming) return { isStreaming: false };
 
           const newMessages = [...conv.messages];
-          newMessages[msgIndex] = { ...newMessages[msgIndex], isStreaming: false };
+          newMessages[lastMsgIndex] = { ...lastMsg, isStreaming: false };
 
           const newConversations = [...s.conversations];
           newConversations[convIndex] = { ...conv, messages: newMessages };
 
           return { isStreaming: false, conversations: newConversations };
         });
-
         if (activeAbortController) {
           activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
         }
