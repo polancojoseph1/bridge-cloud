@@ -64,7 +64,7 @@ export const useChatStore = create<ChatStore>()(
         });
 
         if (activeAbortController) {
-          activeAbortController.abort();
+          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
         }
       },
 

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useRouter } from 'next/navigation';
@@ -57,6 +57,12 @@ export default function EmptyState() {
     el.style.height = Math.min(el.scrollHeight, 120) + 'px';
   };
 
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
+
   const canSend = value.trim().length > 0 && !isStreaming;
 
   return (
@@ -100,6 +106,7 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
+              autoFocus
               placeholder="Message Bridge Cloud…"
               aria-label="Chat input"
               title="Chat input"

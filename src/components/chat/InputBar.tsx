@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -28,6 +28,12 @@ export default function InputBar() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
 
   // ── Auto-resize ─────────────────────────────────────────────────────────────
   const resizeTextarea = useCallback(() => {
@@ -94,6 +100,7 @@ export default function InputBar() {
             onKeyDown={handleKeyDown}
             disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
+            autoFocus
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
