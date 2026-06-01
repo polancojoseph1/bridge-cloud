@@ -109,6 +109,7 @@ export default function EmptyState() {
                 'leading-[1.6] min-h-[24px] overflow-hidden',
               ].join(' ')}
               style={{ maxHeight: '120px' }}
+              autoFocus
             />
             <button
               type="button"
