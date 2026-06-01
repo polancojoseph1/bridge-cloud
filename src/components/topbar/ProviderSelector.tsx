@@ -123,6 +123,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
         onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-label="Select AI provider"
         aria-controls={open ? "provider-listbox" : undefined}
         title={isOrchestrating ? 'Agent selection disabled in orchestration mode' : undefined}
         className={cn(
