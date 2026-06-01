@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { streamMockResponse } from '@/lib/mockApi';
+import { parseJsonBodyWithLimit } from '@/lib/bodyParser';
 import { auth } from '@clerk/nextjs/server';
 
 export async function POST(req: NextRequest) {
@@ -21,7 +22,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { message, agentId } = await req.json();
+  let body;
+  try {
+    body = await parseJsonBodyWithLimit(req.body, 50000);
+  } catch (err: any) {
+    if (err.message === 'Payload too large') {
+      return new Response(
+        JSON.stringify({ error: 'Request body too large' }),
+        { status: 413, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    return new Response(
+      JSON.stringify({ error: 'Invalid request body' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const { message, agentId } = body;
 
   // 🛡️ Sentinel: Mitigate DoS by restricting message length and input validation
   if (!message || typeof message !== 'string' || message.length > 20000) {
