@@ -52,21 +52,25 @@ export function Sidebar() {
 
     const sorted = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt);
 
-    // Optimize array filtering: replace O(3N) multiple .filter() calls with a single O(N) pass
-    // to reduce memory allocations and prevent unnecessary React GC pauses during re-renders.
-    return sorted.reduce<GroupedConversations>(
-      (acc, c) => {
-        if (c.updatedAt >= todayStart) {
-          acc.today.push(c);
-        } else if (c.updatedAt >= yesterdayStart) {
-          acc.yesterday.push(c);
-        } else {
-          acc.older.push(c);
-        }
-        return acc;
-      },
-      { today: [], yesterday: [], older: [] }
-    );
+    // ⚡ Bolt Optimization: Replace .reduce() with native for loop
+    // 💡 What: Replaced Array.reduce with a pre-initialized object and a standard for loop.
+    // 🎯 Why: In high-frequency render components, .reduce() creates intermediate callback allocations.
+    //         A native for loop pushing directly to initialized arrays eliminates this overhead,
+    //         reducing Garbage Collection (GC) pressure.
+    // 📊 Impact: Zero callback allocations during partitioning, reducing GC pauses.
+    // 🔬 Measurement: Profile React renders during rapid active conversation switching.
+    const acc: GroupedConversations = { today: [], yesterday: [], older: [] };
+    for (let i = 0; i < sorted.length; i++) {
+      const c = sorted[i];
+      if (c.updatedAt >= todayStart) {
+        acc.today.push(c);
+      } else if (c.updatedAt >= yesterdayStart) {
+        acc.yesterday.push(c);
+      } else {
+        acc.older.push(c);
+      }
+    }
+    return acc;
   }, [conversations]);
 
   const hasAny = conversations.length > 0;
