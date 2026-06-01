@@ -97,6 +97,7 @@ export default function InputBar() {
             placeholder="Message Bridge Cloud…"
             aria-label="Chat input"
             title="Chat input"
+            autoFocus
             aria-multiline="true"
             className={[
               'flex-1 bg-transparent resize-none outline-none',
