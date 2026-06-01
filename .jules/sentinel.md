@@ -1,0 +1,4 @@
+## 2025-02-24 - SSRF Filter Bypass via IPv6 Normalization
+**Vulnerability:** The custom IPv4-parsing logic in `src/lib/ssrf.ts` manually rejected `127.0.0.1` but completely ignored IPv6 equivalents (`::1` or `::ffff:127.0.0.1`) if obfuscated with standard bracket notations (`[::1]`) since `new URL` handles them properly but passes them raw. Additionally, custom loop logic was complex.
+**Learning:** `new URL(url).hostname` automatically normalizes most IP addresses. But custom URL filters must explicitly strip brackets or natively handle both standard and obfuscated IPv6 notations to be effective against SSRF bypasses.
+**Prevention:** Rely on `new URL`'s built-in resolution, then strictly block `localhost`, `127.0.0.1`, and explicit IPv6 equivalents `::1`, `::ffff:127.0.0.1`, etc. using standardized parsed outputs.
