@@ -1,4 +1,0 @@
-## 2024-05-18 - [CRITICAL] Fix proxy credential leakage during internal fallback
-**Vulnerability:** The proxy routing logic for cloud agent configuration (`src/app/api/proxy/route.ts`) resolved the target URL and authentication key independently using a fallback chain (`targetUrl = cloud?.url || serverUrl`, `targetKey = cloud?.key || serverKey`). This allowed an internal API key to be sent to an attacker-controlled, user-provided `serverUrl` if the internal cloud configuration was partially defined (e.g., missing the URL but having the key).
-**Learning:** Relying on independent logical OR (`||`) fallbacks for authentication credentials and endpoint URLs is extremely dangerous, as it can decouple the secret from its intended destination.
-**Prevention:** Always explicitly pair and scope the resolution of target URLs and their associated authentication keys within the same conditional block.
