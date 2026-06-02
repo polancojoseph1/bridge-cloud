@@ -96,6 +96,7 @@ export default function EmptyState() {
             'focus-within:shadow-[0_0_0_1px_rgba(108,140,255,0.15)]',
           ].join(' ')}>
             <textarea
+              autoFocus
               ref={textareaRef}
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
