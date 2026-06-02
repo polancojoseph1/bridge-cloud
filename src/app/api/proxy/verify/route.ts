@@ -107,7 +107,8 @@ export async function POST(req: NextRequest) {
     if (err instanceof Error && err.name === 'AbortError') {
       return new Response(JSON.stringify({ status: 'offline', error: 'Connection timed out after 8s' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
     }
-    return new Response(JSON.stringify({ status: 'offline', error: err instanceof Error ? err.message : 'Network error' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    // 🛡️ Sentinel: Prevent information disclosure by sanitizing outbound error messages
+    return new Response(JSON.stringify({ status: 'offline', error: 'Network error' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
   } finally {
     clearTimeout(timeout);
   }
