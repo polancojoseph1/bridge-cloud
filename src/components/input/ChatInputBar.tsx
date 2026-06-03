@@ -58,6 +58,7 @@ export default function ChatInputBar() {
             aria-label="Chat input"
             aria-multiline="true"
             rows={1}
+            autoFocus
             className="flex-1 bg-transparent text-[15px] text-[#ececec] placeholder-[#565656] resize-none outline-none leading-[1.65] min-h-[26px] max-h-[180px] overflow-y-auto disabled:opacity-60 disabled:cursor-not-allowed"
             style={{ height: 'auto' }}
           />
