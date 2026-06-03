@@ -71,6 +71,6 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
     if (err instanceof Error && err.name === 'AbortError') {
       return { status: 'offline', error: 'Connection timed out after 8s' };
     }
-    return { status: 'offline', error: err instanceof Error ? err.message : 'Network error' };
+    return { status: 'offline', error: 'Network error' };
   }
 }
