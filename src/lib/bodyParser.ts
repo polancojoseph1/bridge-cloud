@@ -1,3 +1,6 @@
+// ⚡ Bolt Optimization: Reuse stateless TextDecoder globally to prevent redundant object creation and garbage collection on every parse
+const decoder = new TextDecoder();
+
 export async function parseJsonBodyWithLimit(body: ReadableStream<Uint8Array> | null, limit: number) {
   if (!body) return {};
   const reader = body.getReader();
@@ -21,7 +24,7 @@ export async function parseJsonBodyWithLimit(body: ReadableStream<Uint8Array> | 
     totalBuffer.set(chunk, offset);
     offset += chunk.length;
   }
-  const text = new TextDecoder().decode(totalBuffer);
+  const text = decoder.decode(totalBuffer);
   if (!text.trim()) return {};
   return JSON.parse(text);
 }
