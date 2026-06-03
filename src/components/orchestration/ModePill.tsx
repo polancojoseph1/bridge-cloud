@@ -15,9 +15,6 @@ export default function ModePill() {
   const mode = useOrchestrationStore(s => s.mode);
   const setMode = useOrchestrationStore(s => s.setMode);
 
-  // Currently disabled gracefully as it's not wired to the proxy
-  return null;
-
   return (
     <div
       className="flex items-center gap-0.5 bg-[#0d1a11] border border-[#1e3025] rounded-lg p-0.5"
@@ -26,7 +23,7 @@ export default function ModePill() {
     >
       {MODES.map(m => {
         const isActive = mode === m.id;
-        const isDisabled = false;
+        const isDisabled = m.id !== 'single';
         return (
           <button
             key={m.id}
