@@ -81,7 +81,9 @@ export async function POST(req: NextRequest) {
     }
   } else {
     const cloud = CLOUD_CONFIGS[agentId as string];
-    if (cloud?.url && cloud?.key) {
+    // 🛡️ Sentinel: Strictly pair targetUrl and targetKey from either the internal config or user input
+    // to prevent leaking internal environment secrets to an attacker-controlled serverUrl.
+    if (cloud && cloud.url) {
       targetUrl = cloud.url;
       targetKey = cloud.key;
     } else {
