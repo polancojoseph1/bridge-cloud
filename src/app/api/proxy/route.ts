@@ -181,13 +181,19 @@ export async function POST(req: NextRequest) {
 
   try {
     upstream = await fetchUpstream(targetUrl, targetKey, isOpenRouter);
-  } catch {
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      return new Response(null, { status: 499 });
+    }
     // If primary fails and it's the free bot, fallback to openrouter
     if (agentId === 'free' && !isOpenRouter && process.env.OPENROUTER_API_KEY) {
         try {
             isOpenRouter = true;
             upstream = await fetchUpstream('https://openrouter.ai/api', process.env.OPENROUTER_API_KEY, true);
-        } catch {
+        } catch (fallbackErr: any) {
+            if (fallbackErr.name === 'AbortError') {
+              return new Response(null, { status: 499 });
+            }
             return new Response(
               JSON.stringify({ error: 'Could not reach bot server or fallback' }),
               { status: 503, headers: { 'Content-Type': 'application/json' } }
@@ -206,7 +212,10 @@ export async function POST(req: NextRequest) {
         try {
             isOpenRouter = true;
             upstream = await fetchUpstream('https://openrouter.ai/api', process.env.OPENROUTER_API_KEY, true);
-        } catch {
+        } catch (fallbackErr: any) {
+            if (fallbackErr.name === 'AbortError') {
+              return new Response(null, { status: 499 });
+            }
             return new Response(
               JSON.stringify({ error: 'Could not reach bot server or fallback' }),
               { status: 503, headers: { 'Content-Type': 'application/json' } }
