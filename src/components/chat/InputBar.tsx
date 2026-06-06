@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, useEffect, KeyboardEvent } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -40,6 +40,13 @@ export default function InputBar() {
     // Allow scrolling inside textarea once max height is reached
     el.style.overflowY = el.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
   }, []);
+
+  // ── Refocus ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -93,6 +100,7 @@ export default function InputBar() {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
+            autoFocus
             rows={1}
             placeholder="Message Bridge Cloud…"
             aria-label="Chat input"
