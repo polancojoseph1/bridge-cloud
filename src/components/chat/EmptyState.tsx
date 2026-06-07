@@ -97,6 +97,7 @@ export default function EmptyState() {
           ].join(' ')}>
             <textarea
               ref={textareaRef}
+              autoFocus
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
