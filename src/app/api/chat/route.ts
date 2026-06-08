@@ -3,6 +3,10 @@ import { streamMockResponse } from '@/lib/mockApi';
 import { auth } from '@clerk/nextjs/server';
 import { parseJsonBodyWithLimit } from '@/lib/bodyParser';
 
+// ⚡ Bolt Optimization: Reuse stateless TextEncoder globally
+// Instantiating it per request adds unnecessary overhead and garbage collection.
+const encoder = new TextEncoder();
+
 export async function POST(req: NextRequest) {
   // 🛡️ Sentinel: Close unauthenticated open proxy by requiring login
   const { userId } = await auth();
@@ -47,7 +51,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       await streamMockResponse(message, agentId, (chunk) => {
