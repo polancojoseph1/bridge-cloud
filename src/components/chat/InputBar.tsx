@@ -94,6 +94,7 @@ export default function InputBar() {
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
             rows={1}
+            autoFocus
             placeholder="Message Bridge Cloud…"
             aria-label="Chat input"
             title="Chat input"
