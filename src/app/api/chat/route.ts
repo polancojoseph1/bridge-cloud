@@ -3,6 +3,8 @@ import { streamMockResponse } from '@/lib/mockApi';
 import { auth } from '@clerk/nextjs/server';
 import { parseJsonBodyWithLimit } from '@/lib/bodyParser';
 
+const textEncoder = new TextEncoder();
+
 export async function POST(req: NextRequest) {
   // 🛡️ Sentinel: Close unauthenticated open proxy by requiring login
   const { userId } = await auth();
@@ -47,13 +49,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       await streamMockResponse(message, agentId, (chunk) => {
-        controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+        controller.enqueue(textEncoder.encode(`data: ${chunk}\n\n`));
       });
-      controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+      controller.enqueue(textEncoder.encode('data: [DONE]\n\n'));
       controller.close();
     },
   });
