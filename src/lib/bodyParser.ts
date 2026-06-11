@@ -1,3 +1,12 @@
+/**
+ * ⚡ Bolt Optimization: Hoisted TextDecoder
+ * 💡 What: Moved TextDecoder instantiation to the module scope.
+ * 🎯 Why: TextDecoder (without { stream: true }) is stateless. Reusing a single instance avoids
+ *         allocating a new object on every request, reducing GC pressure in this hot path.
+ * 📊 Impact: Decreased CPU overhead and garbage collection pauses during high-throughput JSON parsing.
+ */
+const textDecoder = new TextDecoder();
+
 export async function parseJsonBodyWithLimit(body: ReadableStream<Uint8Array> | null, limit: number) {
   if (!body) return {};
   const reader = body.getReader();
@@ -21,7 +30,7 @@ export async function parseJsonBodyWithLimit(body: ReadableStream<Uint8Array> | 
     totalBuffer.set(chunk, offset);
     offset += chunk.length;
   }
-  const text = new TextDecoder().decode(totalBuffer);
+  const text = textDecoder.decode(totalBuffer);
   if (!text.trim()) return {};
   return JSON.parse(text);
 }
