@@ -1,0 +1,4 @@
+## 2025-06-11 - SSRF bypass via trailing dot FQDNs and URL-encoding
+**Vulnerability:** The SSRF prevention logic (isForbiddenHostname) failed to block hostnames ending with a trailing dot (e.g., `localhost.`) and URL-encoded hostnames (e.g., `%6C%6F%63%61%6C%68%6F%73%74`), allowing an attacker to bypass the blocklist while still successfully resolving the address in `fetch` or DNS lookups.
+**Learning:** When validating hostnames using exact string matches or suffix checks, Fully Qualified Domain Names (FQDNs) with a trailing root dot and URL-encoded representations must be normalized prior to validation. Node's `new URL(url).hostname` preserves URL encoding and trailing dots.
+**Prevention:** Always use `decodeURIComponent` and strip trailing dots (`.replace(/\.+$/, '')`) along with brackets before comparing hostnames against SSRF blocklists.
