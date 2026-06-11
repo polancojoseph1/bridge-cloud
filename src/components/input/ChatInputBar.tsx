@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
 import SendButton from './SendButton';
@@ -34,6 +34,16 @@ export default function ChatInputBar() {
     await sendMessage(trimmed);
   };
 
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+        }
+      }, 0);
+    }
+  }, [isStreaming]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -56,6 +66,8 @@ export default function ChatInputBar() {
             disabled={isStreaming || orchestrationMode !== 'single'}
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud..." : "Orchestration modes coming soon!"}
             aria-label="Chat input"
+            autoFocus
+            title={orchestrationMode === 'single' ? "Chat input" : "Orchestration modes coming soon!"}
             aria-multiline="true"
             rows={1}
             className="flex-1 bg-transparent text-[15px] text-[#ececec] placeholder-[#565656] resize-none outline-none leading-[1.65] min-h-[26px] max-h-[180px] overflow-y-auto disabled:opacity-60 disabled:cursor-not-allowed"
