@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
 import SendButton from './SendButton';
@@ -8,6 +8,12 @@ export default function ChatInputBar() {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isStreaming = useChatStore(s => s.isStreaming);
+
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
   const sendMessage = useChatStore(s => s.sendMessage);
   const stopGeneration = useChatStore(s => s.stopGeneration);
   const orchestrationMode = useOrchestrationStore(s => s.mode);
@@ -49,6 +55,7 @@ export default function ChatInputBar() {
         {/* Input container */}
         <div className="bg-[#152219] border border-[#2d4035] rounded-[14px] flex items-end gap-2 px-4 py-3 focus-within:border-[#3d5548] transition-colors duration-150">
           <textarea
+            autoFocus
             ref={textareaRef}
             value={value}
             onChange={handleChange}
