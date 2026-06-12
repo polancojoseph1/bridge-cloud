@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -13,7 +13,13 @@ interface ProviderSelectorProps {
   onSelect: (agentId: string) => void;
 }
 
-function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boolean }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Wrapped `HealthDot` with `React.memo()`.
+ * 🎯 Why: Prevents unnecessary re-renders of health indicator dots when the dropdown menu opens/closes.
+ * 📊 Impact: Reduces render overhead for the list of agents.
+ */
+const HealthDot = React.memo(function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boolean }) {
   const color =
     agent.healthStatus === 'online'   ? agent.dotColor :
     agent.healthStatus === 'checking' ? '#f59e0b' : '#3c3c3c';
@@ -27,23 +33,29 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
       style={{ backgroundColor: color }}
     />
   );
-}
+});
 
-function AgentRow({
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Wrapped `AgentRow` with `React.memo()`.
+ * 🎯 Why: Prevents unnecessary re-renders of the agent rows when the dropdown menu state toggles or unrelated components update.
+ * 📊 Impact: Significantly improves rendering performance of the provider list, especially when many agents are present.
+ */
+const AgentRow = React.memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
-  agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
+  agent: AgentWithHealth; isActive: boolean; onSelect: (agentId: string) => void; disabled?: boolean;
 }) {
   return (
     <div
       role="option"
       aria-selected={isActive}
       tabIndex={disabled ? -1 : 0}
-      onClick={disabled ? undefined : onSelect}
+      onClick={disabled ? undefined : () => onSelect(agent.id)}
       onKeyDown={(e) => {
         if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
-          onSelect();
+          onSelect(agent.id);
         }
       }}
       title={disabled ? `${agent.name} is offline` : undefined}
@@ -75,7 +87,7 @@ function AgentRow({
       </div>
     </div>
   );
-}
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
@@ -84,6 +96,11 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
   const orchMode = useOrchestrationStore(s => s.mode);
   const openManage = useServerStore(s => s.openManage);
   const isOrchestrating = orchMode !== 'single';
+
+  const handleSelect = React.useCallback((id: string) => {
+    onSelect(id);
+    setOpen(false);
+  }, [onSelect, setOpen]);
 
   const activeAgent = useMemo(() => {
     return agents.find(a => a.id === activeAgentId) ?? agents[0];
@@ -159,7 +176,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {onlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => { onSelect(agent.id); setOpen(false); }} />
+                  onSelect={handleSelect} />
               ))}
             </>
           )}
@@ -175,7 +192,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {offlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => {}} disabled />
+                  onSelect={handleSelect} disabled />
               ))}
             </>
           )}
