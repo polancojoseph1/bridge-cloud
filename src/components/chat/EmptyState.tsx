@@ -102,6 +102,7 @@ export default function EmptyState() {
               onKeyDown={handleKeyDown}
               rows={1}
               placeholder="Message Bridge Cloud…"
+              autoFocus
               aria-label="Chat input"
               title="Chat input"
               className={[

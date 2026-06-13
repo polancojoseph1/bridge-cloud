@@ -95,6 +95,7 @@ export default function InputBar() {
             disabled={isStreaming}
             rows={1}
             placeholder="Message Bridge Cloud…"
+            autoFocus
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
