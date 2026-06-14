@@ -36,9 +36,15 @@ export const useServerStore = create<ServerStore>()(
           isDefault: draft.isDefault || isFirst,
         };
         set(s => {
-          const profiles = draft.isDefault || isFirst
-            ? s.profiles.map(p => ({ ...p, isDefault: false })).concat(profile)
-            : [...s.profiles, profile];
+          // ⚡ Bolt Optimization: Replace O(N) .map() with targeted O(N) .findIndex() and O(1) mutations
+          let profiles = [...s.profiles];
+          if (draft.isDefault || isFirst) {
+            const currentIndex = profiles.findIndex(p => p.isDefault);
+            if (currentIndex !== -1) {
+              profiles[currentIndex] = { ...profiles[currentIndex], isDefault: false };
+            }
+          }
+          profiles.push(profile);
           return { profiles };
         });
         return id;
