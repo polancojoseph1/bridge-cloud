@@ -99,6 +99,7 @@ export default function EmptyState() {
               ref={textareaRef}
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
+              autoFocus
               onKeyDown={handleKeyDown}
               rows={1}
               placeholder="Message Bridge Cloud…"

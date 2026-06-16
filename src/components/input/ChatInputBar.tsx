@@ -52,6 +52,7 @@ export default function ChatInputBar() {
             ref={textareaRef}
             value={value}
             onChange={handleChange}
+            autoFocus
             onKeyDown={handleKeyDown}
             disabled={isStreaming || orchestrationMode !== 'single'}
             placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud..." : "Orchestration modes coming soon!"}
