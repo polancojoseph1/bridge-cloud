@@ -91,6 +91,7 @@ export default function InputBar() {
             ref={textareaRef}
             value={value}
             onChange={handleChange}
+            autoFocus
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
             rows={1}
