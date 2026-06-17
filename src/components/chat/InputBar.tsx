@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, useEffect, KeyboardEvent } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -68,6 +68,12 @@ export default function InputBar() {
 
   const canSend = value.trim().length > 0 && !isStreaming;
 
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
+
   return (
     /*
      * Sticky bottom wrapper with a gradient fade so the message feed
@@ -97,6 +103,7 @@ export default function InputBar() {
             placeholder="Message Bridge Cloud…"
             aria-label="Chat input"
             title="Chat input"
+            autoFocus
             aria-multiline="true"
             className={[
               'flex-1 bg-transparent resize-none outline-none',
