@@ -102,23 +102,31 @@ export default function NodeTray() {
     gather:    'Gather from:',
   };
 
+  const nodeMap = useMemo(() => {
+    const map = new Map<string, BridgeNode>();
+    for (const n of nodes) map.set(n.nodeId, n);
+    return map;
+  }, [nodes]);
+
   // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
   // to prevent O(N) memory allocations and reduce React GC pauses
   const onlineCount = useMemo(() => nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0), [nodes]);
-  const selectedCount = useMemo(() => selectedNodeIds.reduce((count, id) =>
-    count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
-  ), [selectedNodeIds, nodes]);
 
-  // Optimize array mapping/filtering: replace O(2N) chained .map().filter() with single O(N) .reduce() pass
+  // ⚡ Bolt Optimization: Replace O(N) .find() lookup inside .reduce() with O(1) Map lookup
+  const selectedCount = useMemo(() => selectedNodeIds.reduce((count, id) =>
+    count + (nodeMap.get(id)?.online ? 1 : 0), 0
+  ), [selectedNodeIds, nodeMap]);
+
+  // ⚡ Bolt Optimization: Replace O(N) .find() lookup inside .reduce() with O(1) Map lookup
   // and memoize to prevent O(N) allocations on every render cycle.
   const orderedNodes = useMemo(() => {
     if (mode !== 'pipeline') return nodes;
     return pipelineOrder.reduce<BridgeNode[]>((acc, id) => {
-      const node = nodes.find(n => n.nodeId === id);
+      const node = nodeMap.get(id);
       if (node) acc.push(node);
       return acc;
     }, []);
-  }, [mode, pipelineOrder, nodes]);
+  }, [mode, pipelineOrder, nodeMap, nodes]);
 
   const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
 
