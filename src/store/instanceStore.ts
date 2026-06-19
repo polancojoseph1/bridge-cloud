@@ -104,22 +104,24 @@ export const useInstanceStore = create<InstanceStore>()(
       // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       setInstanceConversation: (instanceId: string, conversationId: string) => {
         set(s => {
+          // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);
           if (idx === -1) return s;
-          const instances = [...s.instances];
-          instances[idx] = { ...instances[idx], conversationId };
-          return { instances };
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], conversationId };
+          return { instances: newInstances };
         });
       },
 
       // ⚡ Bolt: Replace O(N) .map() with O(N) .findIndex() and O(1) assignment to prevent unnecessary array allocations for unchanged items.
       renameInstance: (instanceId: string, label: string) => {
         set(s => {
+          // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);
           if (idx === -1) return s;
-          const instances = [...s.instances];
-          instances[idx] = { ...instances[idx], label: label.slice(0, 24) };
-          return { instances };
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], label: label.slice(0, 24) };
+          return { instances: newInstances };
         });
       },
 
@@ -128,18 +130,11 @@ export const useInstanceStore = create<InstanceStore>()(
         set(s => {
           const idx = s.instances.findIndex(i => i.instanceId === instanceId);
           if (idx === -1) return s;
-
-          // ⚡ Bolt: Replace array traversals (.filter + .map) with targeted index updates
-          const others = [];
-          for (let i = 0; i < s.instances.length; i++) {
-            if (i !== idx) others.push(s.instances[i]);
-          }
-
-          const newLabel = generateLabel(agentId, others);
-          const instances = [...s.instances];
-          instances[idx] = { ...instances[idx], agentId, label: newLabel };
-
-          return { instances };
+          const newLabel = generateLabel(agentId, s.instances.filter(i => i.instanceId !== instanceId));
+          // ⚡ Bolt Optimization: Replace O(N) .map() cloning with O(N) findIndex + O(1) targeted mutation
+          const newInstances = [...s.instances];
+          newInstances[idx] = { ...newInstances[idx], agentId, label: newLabel };
+          return { instances: newInstances };
         });
       },
     }),
