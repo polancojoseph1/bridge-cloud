@@ -89,16 +89,20 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
     return agents.find(a => a.id === activeAgentId) ?? agents[0];
   }, [agents, activeAgentId]);
 
-  // Optimize array filtering: replace O(2N) double .filter() with O(N) single-pass .reduce()
+  // Optimize array filtering: replace O(2N) double .filter() with O(N) single-pass native for-loop
   // to reduce memory allocations and React GC pauses during frequent health poll updates.
   const [onlineAgents, offlineAgents] = useMemo(() => {
-    return agents.reduce<[AgentWithHealth[], AgentWithHealth[]]>(
-      (acc, a) => {
-        acc[a.isOnline ? 0 : 1].push(a);
-        return acc;
-      },
-      [[], []]
-    );
+    const online: AgentWithHealth[] = [];
+    const offline: AgentWithHealth[] = [];
+    for (let i = 0; i < agents.length; i++) {
+      const a = agents[i];
+      if (a.isOnline) {
+        online.push(a);
+      } else {
+        offline.push(a);
+      }
+    }
+    return [online, offline];
   }, [agents]);
 
   useEffect(() => {
