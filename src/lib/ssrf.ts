@@ -43,7 +43,7 @@ export function isForbiddenHostname(hn: string): boolean {
   const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
 
   // Block localhost and .local domains
-  if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
+  if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local') || cleanHn.endsWith('.internal')) {
     return true;
   }
 
