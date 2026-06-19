@@ -49,6 +49,7 @@ export default function ChatInputBar() {
         {/* Input container */}
         <div className="bg-[#152219] border border-[#2d4035] rounded-[14px] flex items-end gap-2 px-4 py-3 focus-within:border-[#3d5548] transition-colors duration-150">
           <textarea
+            autoFocus
             ref={textareaRef}
             value={value}
             onChange={handleChange}
