@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -28,6 +28,13 @@ export default function InputBar() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // ── Focus Management ────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isStreaming && orchestrationMode === 'single' && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming, orchestrationMode]);
 
   // ── Auto-resize ─────────────────────────────────────────────────────────────
   const resizeTextarea = useCallback(() => {
@@ -105,6 +112,7 @@ export default function InputBar() {
               'disabled:cursor-not-allowed disabled:opacity-50',
             ].join(' ')}
             style={{ maxHeight: `${MAX_HEIGHT}px` }}
+            autoFocus
           />
 
           {/* Send / Stop button */}
