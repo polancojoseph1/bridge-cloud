@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, useEffect, KeyboardEvent } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -68,6 +68,12 @@ export default function InputBar() {
 
   const canSend = value.trim().length > 0 && !isStreaming;
 
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
+
   return (
     /*
      * Sticky bottom wrapper with a gradient fade so the message feed
@@ -89,6 +95,7 @@ export default function InputBar() {
         >
           <textarea
             ref={textareaRef}
+            autoFocus
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
