@@ -147,7 +147,10 @@ describe('checkHealth', () => {
       'http://[::1]',
       'http://[::ffff:127.0.0.1]', // IPv4 mapped
       'http://10.0.0.1',
-      'http://0.0.0.0'
+      'http://0.0.0.0',
+      'http://localhost.', // trailing dot
+      'http://127.0.0.1.', // trailing dot
+      'http://localhost%2e' // url encoded dot
     ];
 
     for (const url of testUrls) {
