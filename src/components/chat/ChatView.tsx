@@ -31,7 +31,7 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
   const setActiveAgent = useChatStore((s) => s.setActiveAgent);
 
   const activeInstanceId = useInstanceStore((s) => s.activeInstanceId);
-  const activeInstance = useInstanceStore((s) => s.activeInstance());
+  const activeInstance = useInstanceStore((s) => s.instances.find(i => i.instanceId === s.activeInstanceId) ?? s.instances[0] ?? null);
   const setInstanceConversation = useInstanceStore((s) => s.setInstanceConversation);
 
   // Keep track of previous active instance ID to know when a tab switch occurred

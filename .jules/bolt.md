@@ -1,0 +1,3 @@
+## 2024-06-15 - Zustand selector function reference anti-pattern
+**Learning:** Components subscribing to store getter methods using `useStore(s => s.getterMethod)()` subscribe to the stable function reference itself, not the underlying data. This completely breaks React component reactivity and causes stale UI, because the component will never re-render when the actual state values (like active profiles or items) change.
+**Action:** Always select and compute the required state directly within the selector function (e.g., `useStore(s => s.items.find(i => i.id === s.activeId))`) instead of returning and invoking a store getter method.
