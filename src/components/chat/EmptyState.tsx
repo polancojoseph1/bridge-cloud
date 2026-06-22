@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useRouter } from 'next/navigation';
@@ -60,6 +60,12 @@ export default function EmptyState() {
 
   const canSend = value.trim().length > 0 && !isStreaming;
 
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isStreaming]);
+
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0">
       {/* Centered welcome content */}
@@ -97,6 +103,7 @@ export default function EmptyState() {
           ].join(' ')}>
             <textarea
               ref={textareaRef}
+              autoFocus={true}
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}

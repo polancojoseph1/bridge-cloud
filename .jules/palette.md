@@ -1,0 +1,3 @@
+## 2026-06-18 - Fix Auto-Scroll User Interruption
+**Learning:** When using a programmatic scroll flag (`isProgrammaticScrollRef`) combined with an `onScroll` listener to manage chat auto-scrolling, rapid programmatic scrolling can mask genuine user interruptions because the `onScroll` handler is temporarily disabled or ignoring events.
+**Action:** Explicitly set `isUserScrolledRef.current = true` inside the chat container's `onWheel` and `onTouchMove` event handlers to guarantee that manual user interactions reliably interrupt the auto-scroll loop, even during high-frequency programmatic updates.
