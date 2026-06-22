@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,25 +10,24 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
-  const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
+/**
+ * ⚡ Bolt Optimization: Added React.memo() and removed internal Zustand selectors.
+ * 💡 What: InstanceTab now receives `instance`, `isActive`, and `canClose` directly as props from the parent mapping.
+ * 🎯 Why: Previously, every child component independently called `useInstanceStore(s => s.instances.find(...))`.
+ *         This caused an O(N^2) complexity and meant all tabs re-rendered globally when `activeInstanceId` changed.
+ * 📊 Impact: Eliminates O(N^2) array searches. Achieves O(1) rendering for unchanged tabs during instance switches.
+ */
+const InstanceTab = memo(function InstanceTab({ instance, isActive, canClose }: { instance: Instance; isActive: boolean; canClose: boolean }) {
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
 
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
-  const instancesLength = useInstanceStore(s => s.instances.length);
-
-  if (!instance) return null;
-
-  const isActive  = activeInstanceId === instanceId;
   const dotColor  = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
-  const canClose  = instancesLength > 1 && !instance.isPinned;
 
   return (
     <button
       type="button"
-      data-instance-id={instanceId}
-      onClick={() => setActive(instanceId)}
+      data-instance-id={instance.instanceId}
+      onClick={() => setActive(instance.instanceId)}
       className={cn(
         'group flex items-center gap-1.5 px-3 h-full flex-shrink-0 relative',
         'text-[12px] font-medium transition-all duration-150',
@@ -58,12 +57,12 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
           role="button"
           tabIndex={0}
           aria-label={`Close ${instance.label}`}
-          onClick={e => { e.stopPropagation(); close(instanceId); }}
+          onClick={e => { e.stopPropagation(); close(instance.instanceId); }}
           onKeyDown={e => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               e.stopPropagation();
-              close(instanceId);
+              close(instance.instanceId);
             }
           }}
           className={cn(
@@ -79,27 +78,19 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
-  const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
+const MobileInstancePill = memo(function MobileInstancePill({ instance, isActive, canClose }: { instance: Instance; isActive: boolean; canClose: boolean }) {
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
 
-  const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
-  const instancesLength = useInstanceStore(s => s.instances.length);
-
-  if (!instance) return null;
-
-  const isActive = activeInstanceId === instanceId;
   const dotColor = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
-  const canClose = instancesLength > 1;
 
   return (
     <div
-      data-instance-id={instanceId}
+      data-instance-id={instance.instanceId}
       className={cn(
         'flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full flex-shrink-0',
         'text-[12px] font-medium transition-colors duration-150',
@@ -108,14 +99,14 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
           : 'bg-[#0d1a11] text-[#5c5c5c] border border-[#1e3025]'
       )}
     >
-      <button type="button" onClick={() => setActive(instanceId)} className="flex items-center gap-1.5">
+      <button type="button" onClick={() => setActive(instance.instanceId)} className="flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? dotColor : '#3c3c3c' }} />
         <span>{instance.label}</span>
       </button>
       {canClose && (
         <button
           type="button"
-          onClick={() => close(instanceId)}
+          onClick={() => close(instance.instanceId)}
           aria-label={`Close ${instance.label}`}
           title={`Close ${instance.label}`}
           className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-[#2d4035] transition-colors"
@@ -125,7 +116,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
@@ -177,7 +168,14 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-stretch h-full overflow-x-auto"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <InstanceTab key={`desktop-${i.instanceId}`} instanceId={i.instanceId} />)}
+          {instances.map(i => (
+            <InstanceTab
+              key={`desktop-${i.instanceId}`}
+              instance={i}
+              isActive={activeInstanceId === i.instanceId}
+              canClose={instances.length > 1 && !i.isPinned}
+            />
+          ))}
         </div>
 
         {canScrollRight && (
@@ -204,7 +202,14 @@ export default function InstanceTabBar() {
           className="flex-1 flex items-center gap-2 overflow-x-auto px-3 h-full"
           style={{ scrollbarWidth: 'none' }}
         >
-          {instances.map(i => <MobileInstancePill key={`mobile-${i.instanceId}`} instanceId={i.instanceId} />)}
+          {instances.map(i => (
+            <MobileInstancePill
+              key={`mobile-${i.instanceId}`}
+              instance={i}
+              isActive={activeInstanceId === i.instanceId}
+              canClose={instances.length > 1}
+            />
+          ))}
         </div>
         <div className="flex-shrink-0 pr-3 pl-2 border-l border-[#1e3025] h-full flex items-center">
           <NewInstanceButton />
