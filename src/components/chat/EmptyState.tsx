@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
@@ -16,6 +17,7 @@ export default function EmptyState() {
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
   const router = useRouter();
+  const orchestrationMode = useOrchestrationStore(s => s.mode);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -78,7 +80,13 @@ export default function EmptyState() {
             <button
               key={s}
               onClick={() => startChat(s)}
-              className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
+              disabled={orchestrationMode !== 'single'}
+              className={[
+                'px-4 py-3 rounded-xl text-[13px] text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]',
+                orchestrationMode === 'single'
+                  ? 'bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[#8e8e8e] hover:text-[#ececec]'
+                  : 'bg-[#0a1410] border border-[#1e3025] text-[#5c5c5c] opacity-50 cursor-not-allowed'
+              ].join(' ')}
             >
               {s}
             </button>
@@ -101,7 +109,8 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
-              placeholder="Message Bridge Cloud…"
+              placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
+              disabled={orchestrationMode !== 'single'}
               aria-label="Chat input"
               title="Chat input"
               className={[
@@ -114,7 +123,7 @@ export default function EmptyState() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
               title="Send message"
               className={[
