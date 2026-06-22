@@ -10,8 +10,12 @@ vi.mock('@/store/chatStore', () => ({
 vi.mock('@/store/instanceStore', () => ({
   useInstanceStore: vi.fn(),
 }));
+vi.mock('@/store/orchestrationStore', () => ({
+  useOrchestrationStore: vi.fn(),
+}));
 
 import { useInstanceStore } from '@/store/instanceStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 
 describe('ChatView Component', () => {
   beforeEach(() => {
@@ -53,8 +57,13 @@ describe('ChatView Component', () => {
       setInstanceConversation: vi.fn(),
     };
 
+    const mockOrchestrationState = {
+      mode: 'single',
+    };
+
     (useChatStore as any).mockImplementation((selector: any) => selector(mockState));
     (useInstanceStore as any).mockImplementation((selector: any) => selector(mockInstanceState));
+    (useOrchestrationStore as any).mockImplementation((selector: any) => selector(mockOrchestrationState));
 
     // Mock scrollIntoView
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
