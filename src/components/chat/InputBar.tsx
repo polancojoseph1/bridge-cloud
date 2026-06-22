@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -66,7 +66,17 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const isOrchestrating = orchestrationMode !== 'single';
+  const canSend = value.trim().length > 0 && !isStreaming && !isOrchestrating;
+
+  // Refocus input after streaming ends
+  const wasStreamingRef = useRef(isStreaming);
+  useEffect(() => {
+    if (wasStreamingRef.current && !isStreaming) {
+      textareaRef.current?.focus();
+    }
+    wasStreamingRef.current = isStreaming;
+  }, [isStreaming]);
 
   return (
     /*
@@ -92,9 +102,10 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || isOrchestrating}
+            autoFocus
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={isOrchestrating ? "Coming soon" : "Message Bridge Cloud…"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
