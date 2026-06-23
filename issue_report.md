@@ -1,20 +1,33 @@
-# Bridge Cloud Issue Report
+# Bridge Cloud Bug Report
 
-Total issues found: 3
+Total issues found: 6
 
-1. **Bug: Agent Selector Dropdown UI Duplication/Import Issue**
-   - **Component:** `src/components/layout/Sidebar.tsx`, `src/components/topbar/TopBar.tsx`, `src/components/topbar/ProviderSelector.tsx`
-   - **What's broken:** The sidebar and topbar were importing a deprecated or misnamed `AgentSelector` component, rather than using the correctly implemented `ProviderSelector` which included the server health status and accessibility improvements.
-   - **Fix applied:** Updated the import paths in `Sidebar.tsx` and `TopBar.tsx` to correctly import and render `<ProviderSelector />` and removed the duplicated `AgentSelector.tsx` file.
+1. **Bug: Stop Button Silent Failure**
+   - **Component:** `src/store/chatStore.ts`
+   - **What's broken:** Stop button is visual-only and silently failed to stop generation due to usage of `DOMException`, which might not be supported across all JS environments, causing the catch block to bypass the abort handler.
+   - **Fix applied:** Replaced `DOMException` with a standard `Error` object containing `name = 'AbortError'`, correctly triggering the stream abort logic in `streaming.ts`.
 
-2. **Bug: Auto-scroll logic fails when user scrolls up and down**
+2. **Bug: Auto-scroll sticking when user scrolls up**
    - **Component:** `src/components/chat/MessageList.tsx`
-   - **What's broken:** The auto-scroll behavior relied on `isUserScrolledRef.current = distanceToBottom > 30`. It did not explicitly set the value to false when the user scrolls back to the bottom, causing auto-scroll to sometimes break on subsequent messages.
-   - **Fix applied:** Replaced the assignment with an explicit `if/else` block to explicitly toggle `isUserScrolledRef.current` to `true` when scrolled up and `false` when scrolled back to the bottom.
+   - **What's broken:** Programmatic scrolling flag was only cleared on `onWheel` and `onTouchMove`. Manual scrollbar clicks/drags (`onMouseDown`) and taps (`onTouchStart`) did not clear the flag, locking out manual scroll detection.
+   - **Fix applied:** Added `onMouseDown` and `onTouchStart` event handlers to the container to set `isProgrammaticScrollRef.current = false`, allowing immediate user scroll detection.
 
-3. **Bug: Orchestration Modes missing connection UI handling**
-   - **Component:** `src/components/orchestration/ModePill.tsx`, `src/components/chat/InputBar.tsx`
-   - **What's broken:** Orchestration modes (broadcast, parallel, pipeline, gather) have UI elements but do not currently connect to the proxy layer, causing potential empty states or errors if selected.
-   - **Fix applied:** Verified that non-single orchestration modes are gracefully disabled via `disabled={isDisabled}` and `onClick` handlers, preventing them from being clicked or breaking the UI. `InputBar.tsx` properly blocks input and shows "Coming soon".
+3. **Bug: Auto-scroll imprecise triggering due to subpixel scaling**
+   - **Component:** `src/components/chat/MessageList.tsx`
+   - **What's broken:** Browser sub-pixel rendering caused `scrollHeight - (scrollTop + clientHeight)` to return fractional differences slightly above 0, preventing the view from snapping fully to the bottom.
+   - **Fix applied:** Added `Math.ceil` to the distance calculation to properly round up fractional pixel values and ensure reliable auto-scrolling triggers.
 
-*(Note: The Stop button was tested and verified to be properly wired to the AbortController in `chatStore.ts` and correctly aborts the fetch streams.)*
+4. **Bug: Orchestration Modes Missing Input/UI Handling**
+   - **Component:** `src/components/chat/InputBar.tsx`
+   - **What's broken:** Selected orchestration modes (broadcast, pipeline, etc.) had UI mode selection but were not connected to the proxy layer, meaning they would execute as a standard single chat without gracefully failing.
+   - **Fix applied:** Disabled the submit button, text area, and placeholder text when `orchestrationMode !== 'single'`, showing a "Coming soon" placeholder instead of allowing a broken request.
+
+5. **Bug: Empty State Input lacks Auto-Focus**
+   - **Component:** `src/components/chat/EmptyState.tsx`
+   - **What's broken:** The primary chat input in the empty state did not auto-focus, forcing users to click manually before typing.
+   - **Fix applied:** Added the `autoFocus` prop to the `textarea` in `EmptyState.tsx`.
+
+6. **Bug: Input Bar lacks Auto-Focus and Re-focus after generation**
+   - **Component:** `src/components/chat/InputBar.tsx`
+   - **What's broken:** The main chat input did not auto-focus on load, and lost focus after the input was disabled during generation, forcing users to click back into the box to send another message.
+   - **Fix applied:** Added the `autoFocus` prop to the `textarea`, and introduced a `useEffect` hook that waits for `!isStreaming` and uses a short `setTimeout` to refocus `textareaRef.current` once the input becomes re-enabled.
