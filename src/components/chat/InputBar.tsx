@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -56,7 +56,7 @@ export default function InputBar() {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
@@ -65,6 +65,12 @@ export default function InputBar() {
       textareaRef.current.style.overflowY = 'hidden';
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
+
+  useEffect(() => {
+    if (!isStreaming) {
+      setTimeout(() => textareaRef.current?.focus(), 10);
+    }
+  }, [isStreaming]);
 
   const canSend = value.trim().length > 0 && !isStreaming;
 
@@ -92,9 +98,10 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            autoFocus
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -127,9 +134,9 @@ export default function InputBar() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
-              title="Send message"
+              title={orchestrationMode === 'single' ? "Send message" : "Orchestration modes coming soon!"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
