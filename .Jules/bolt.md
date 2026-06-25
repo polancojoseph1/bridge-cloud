@@ -1,0 +1,3 @@
+## 2026-06-25 - Optimize Zustand Array Rendering (O(N^2) to O(N))
+**Learning:** In React components rendering arrays from a Zustand store, allowing each child component to independently fetch its data using `useStore(s => s.items.find(...))` creates an O(N^2) render complexity. For `N` items, changing the active item causes all `N` items to re-render, and each re-render performs an O(N) `.find()` lookup.
+**Action:** Pass the full item object and computed properties (like `isActive`) from the parent mapping function, and wrap the child component in `React.memo()`. This ensures O(1) child rendering and reduces overall complexity to O(N).
