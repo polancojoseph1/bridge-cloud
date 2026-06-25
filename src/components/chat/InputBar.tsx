@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -67,6 +67,14 @@ export default function InputBar() {
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
   const canSend = value.trim().length > 0 && !isStreaming;
+
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 10);
+    }
+  }, [isStreaming]);
 
   return (
     /*
