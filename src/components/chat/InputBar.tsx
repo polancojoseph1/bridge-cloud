@@ -56,7 +56,7 @@ export default function InputBar() {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
@@ -66,7 +66,7 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 
   return (
     /*
@@ -81,7 +81,7 @@ export default function InputBar() {
             'flex items-end gap-2 px-4 py-3',
             'bg-[#111f15] border rounded-xl',
             'transition-colors duration-150',
-            isStreaming
+            isStreaming || orchestrationMode !== 'single'
               ? 'border-[#1e3025]'
               : 'border-[#1e3025] focus-within:border-[#2d4035] focus-within:bg-[#1f1f1f]',
             'focus-within:shadow-[0_0_0_1px_rgba(108,140,255,0.15)]',
@@ -92,9 +92,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
