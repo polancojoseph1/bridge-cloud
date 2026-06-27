@@ -1,0 +1,4 @@
+## 2024-06-27 - SSRF Bypass via Trailing Dots in Hostname
+**Vulnerability:** The SSRF protection mechanism `isForbiddenHostname` in `src/lib/ssrf.ts` fails to block domain names with trailing dots (e.g., `localhost.` or `%6c%6f%63%61%6c%68%6f%73%74%2e`). Node's `new URL()` preserves these trailing dots in the hostname, meaning `localhost.` is not blocked, but the underlying OS resolution and fetch logic strip or accept the trailing dot, successfully resolving it back to `127.0.0.1` and bypassing the blocklist.
+**Learning:** URL decoding and stripping trailing dots (`/\.+$/`) must happen before SSRF validation checking, because FQDNs (Fully Qualified Domain Names) bypass exact string checks but still point to internal IPs.
+**Prevention:** Always strip trailing dots (`/\.+$/`) from the parsed hostname and optionally attempt `decodeURIComponent` before passing it to any validation function (or do this inside the validation function `isForbiddenHostname`).
