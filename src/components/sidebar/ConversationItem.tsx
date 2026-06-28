@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -39,9 +39,22 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
     router.push(`/chat/${conversation.id}`);
   }
 
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    if (showConfirm) {
+      const timer = setTimeout(() => setShowConfirm(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfirm]);
+
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+    if (showConfirm) {
+      deleteConversation(conversation.id);
+    } else {
+      setShowConfirm(true);
+    }
   }
 
   return (
@@ -82,16 +95,17 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       {/* Delete button — hidden until group hover */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        onMouseLeave={() => setShowConfirm(false)}
+        aria-label={showConfirm ? "Confirm delete" : "Delete conversation"}
+        title={showConfirm ? "Confirm delete" : "Delete conversation"}
         className={cn(
           'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
+          showConfirm ? 'text-[#e05c5c] bg-[#2a1616]' : 'text-[#5c5c5c] hover:text-[#e05c5c]',
           'transition-all duration-150',
           'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {showConfirm ? <Check className="w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
       </button>
     </div>
   );
