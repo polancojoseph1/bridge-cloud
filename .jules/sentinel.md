@@ -1,0 +1,4 @@
+## 2024-06-28 - SSRF Filter Bypass with FQDNs and URL Encoding
+**Vulnerability:** The `isForbiddenHostname` function blocked SSRF on internal hostnames (like `localhost` and `127.0.0.1`), but could be easily bypassed by using Fully Qualified Domain Names (e.g., `localhost.`) and URL encoded characters (e.g., `%6Cocalhost`).
+**Learning:** String matching filters for security validation on URLs/hostnames must sanitize input for trailing dots and encoding before the string match execution. Hostname checks are vulnerable if they do not expect trailing dots or encoded characters because standard network requests like `fetch` resolve these successfully while basic string equality filters fail.
+**Prevention:** Ensure the hostname is URL-decoded (wrapped in a try/catch to handle malformed URIs) and trailing dots are stripped (e.g., `.replace(/\.+$/, '')`) *before* executing SSRF validation blocklist filters.
