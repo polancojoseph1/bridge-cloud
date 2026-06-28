@@ -1,0 +1,3 @@
+## 2024-05-24 - [Hoisting TextEncoder/TextDecoder out of functions]
+**Learning:** Instantiating `TextEncoder` and `TextDecoder` (when not used with `{stream: true}`) within a function call (especially hot paths like streaming chunk handlers or request proxies) introduces unnecessary object creation overhead and garbage collection pressure, negatively impacting performance.
+**Action:** When a `TextEncoder` or `TextDecoder` (without `{stream: true}`) is used inside a frequently called function, hoist its instantiation to the module scope (outside the function) so it is reused across all invocations. Note: *Stateful* `TextDecoder` instances (those used with `{stream: true}`) MUST NOT be hoisted because sharing them across concurrent streams will cause decoding bugs.
