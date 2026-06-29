@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -42,6 +42,16 @@ export default function InputBar() {
   }, []);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      const el = textareaRef.current;
+      const timeoutId = setTimeout(() => {
+        el.focus();
+      }, 10);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isStreaming]);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
     resizeTextarea();
@@ -94,6 +104,7 @@ export default function InputBar() {
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
             rows={1}
+            autoFocus
             placeholder="Message Bridge Cloud…"
             aria-label="Chat input"
             title="Chat input"
