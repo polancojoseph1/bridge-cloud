@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useRouter } from 'next/navigation';
@@ -19,6 +19,16 @@ export default function EmptyState() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    // Only focus if not streaming. The empty state doesn't usually stay mounted during streaming,
+    // but just in case it is mounted when streaming starts/stops, we focus.
+    if (!isStreaming && textareaRef.current) {
+      const el = textareaRef.current;
+      const timeoutId = setTimeout(() => el.focus(), 10);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isStreaming]);
 
   const startChat = useCallback((text: string) => {
     if (!text.trim()) return;
@@ -101,6 +111,7 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
+              autoFocus
               placeholder="Message Bridge Cloud…"
               aria-label="Chat input"
               title="Chat input"
