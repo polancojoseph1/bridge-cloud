@@ -139,7 +139,10 @@ describe('checkHealth', () => {
   it('should reject internal/localhost URLs with SSRF guard', async () => {
     const testUrls = [
       'http://localhost:3000',
+      'http://localhost.:3000',
+      'http://localhost%2e:3000',
       'http://127.0.0.1:8080',
+      'http://127.0.0.1.:8080',
       'http://169.254.169.254',
       'http://2130706433', // 127.0.0.1 dec
       'http://0x7f.0.0.1', // hex
