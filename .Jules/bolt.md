@@ -1,0 +1,3 @@
+## 2024-07-01 - O(N^2) Zustand Array Lookup Re-Renders
+**Learning:** When a parent component maps over a Zustand store array and renders child components, if each child independently calls `useStore(s => s.items.find(...))` to locate itself in the same array, it creates O(N^2) time complexity and O(N) re-renders when global state changes. The parent array reference change triggers re-renders, and then all children simultaneously trigger O(N) array lookups within their selectors on the store update.
+**Action:** Always pass the full item object and its computed state (like `isActive`) as props from the parent mapping function, and wrap the child components in `React.memo` to achieve O(1) rendering.
