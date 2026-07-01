@@ -94,13 +94,13 @@ export default function ServerSwitcherPopover({ onClose }: Props) {
         </Show>
         <Show when="signed-out">
           <SignInButton mode="modal">
-            <button className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+            <button aria-label="Log in" className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
               <LogIn size={13} />
               Log in
             </button>
           </SignInButton>
           <SignUpButton mode="modal">
-            <button className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
+            <button aria-label="Sign up" className="w-[calc(100%-8px)] mx-1 rounded-md flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#152219] focus-visible:bg-[#152219] focus-visible:text-[#ececec] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] transition-colors text-left text-[13px] text-[#8e8e8e] hover:text-[#ececec]">
               <UserPlus size={13} />
               Sign up
             </button>
