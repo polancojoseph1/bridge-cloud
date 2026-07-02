@@ -102,23 +102,30 @@ export default function NodeTray() {
     gather:    'Gather from:',
   };
 
+  // ⚡ Bolt Optimization: Added pre-computed node map to replace O(N*M) lookups with O(N)
+  // 💡 What: Replaced nested `.find()` array traversals inside `.reduce()` loops with an O(1) Map lookup.
+  // 🎯 Why: Using `.find()` inside `.reduce()` causes O(N^2) time complexity. By pre-computing a Map
+  //         once (O(N)), all subsequent lookups in the arrays become O(1), bringing total time down to O(N).
+  // 📊 Impact: Significantly reduces CPU usage and loop duration during renders when node arrays are large.
+  const nodeMap = useMemo(() => new Map(nodes.map(n => [n.nodeId, n])), [nodes]);
+
   // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
   // to prevent O(N) memory allocations and reduce React GC pauses
   const onlineCount = useMemo(() => nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0), [nodes]);
   const selectedCount = useMemo(() => selectedNodeIds.reduce((count, id) =>
-    count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
-  ), [selectedNodeIds, nodes]);
+    count + (nodeMap.get(id)?.online ? 1 : 0), 0
+  ), [selectedNodeIds, nodeMap]);
 
   // Optimize array mapping/filtering: replace O(2N) chained .map().filter() with single O(N) .reduce() pass
   // and memoize to prevent O(N) allocations on every render cycle.
   const orderedNodes = useMemo(() => {
     if (mode !== 'pipeline') return nodes;
     return pipelineOrder.reduce<BridgeNode[]>((acc, id) => {
-      const node = nodes.find(n => n.nodeId === id);
+      const node = nodeMap.get(id);
       if (node) acc.push(node);
       return acc;
     }, []);
-  }, [mode, pipelineOrder, nodes]);
+  }, [mode, pipelineOrder, nodeMap, nodes]);
 
   const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
 
