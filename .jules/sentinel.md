@@ -1,0 +1,4 @@
+## 2025-07-02 - SSRF Bypass via URL Decoding
+**Vulnerability:** The SSRF prevention function `isForbiddenHostname` failed to URL decode the hostname before validating it. This allowed attackers to bypass the blocklist using URL-encoded characters (like `%6coc%61lhost` or `%31%32%37.0.0.1`), which would evade the `isForbiddenHostname` check but would then be resolved normally by the underlying `fetch` implementation or DNS library.
+**Learning:** Hostnames in URLs can be passed encoded. If we only validate the raw string, we miss encoded attacks. Validation must occur on the normalized, decoded representation of the data.
+**Prevention:** Always decode and normalize inputs (like decoding URIs and stripping trailing dots for FQDNs) *before* performing security validations against blocklists or patterns.
