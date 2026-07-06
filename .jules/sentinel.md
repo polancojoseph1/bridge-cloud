@@ -1,0 +1,4 @@
+## 2025-07-06 - FQDN SSRF Blocklist Bypass
+**Vulnerability:** The SSRF protection in `isForbiddenHostname` relied on strict string matching against `localhost` and other restricted domains. However, `fetch` and DNS resolution correctly interpret Fully Qualified Domain Names (FQDNs) ending with a dot (e.g., `localhost.`), allowing attackers to bypass the blocklist while still reaching restricted local endpoints. It also missed URL-encoded bypasses (e.g., `%6c%6f...`).
+**Learning:** Network request libraries often normalize domain names (handling trailing dots and URL encoding natively) before issuing requests, but basic string comparison blocklists do not.
+**Prevention:** Always normalize hostnames by URL-decoding and explicitly stripping trailing dots (`.replace(/\.+$/, '')`) *before* executing blocklist checks.
