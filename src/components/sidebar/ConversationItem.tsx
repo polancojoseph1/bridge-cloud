@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -39,9 +39,22 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
     router.push(`/chat/${conversation.id}`);
   }
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
+  useEffect(() => {
+    if (isConfirmingDelete) {
+      const timer = setTimeout(() => setIsConfirmingDelete(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isConfirmingDelete]);
+
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+    if (isConfirmingDelete) {
+      deleteConversation(conversation.id);
+    } else {
+      setIsConfirmingDelete(true);
+    }
   }
 
   return (
@@ -82,16 +95,22 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       {/* Delete button — hidden until group hover */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        onMouseLeave={() => setIsConfirmingDelete(false)}
+        aria-label={isConfirmingDelete ? "Confirm delete conversation" : "Delete conversation"}
+        title={isConfirmingDelete ? "Confirm delete conversation" : "Delete conversation"}
         className={cn(
-          'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
-          'transition-all duration-150',
-          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
+          'flex-shrink-0 p-1 rounded transition-all duration-150',
+          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
+          isConfirmingDelete
+            ? 'opacity-100 text-[#e05c5c] bg-[#e05c5c]/10'
+            : 'opacity-0 group-hover:opacity-100 text-[#5c5c5c] hover:text-[#e05c5c]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {isConfirmingDelete ? (
+          <Check className="w-3.5 h-3.5" />
+        ) : (
+          <Trash2 className="w-3.5 h-3.5" />
+        )}
       </button>
     </div>
   );
