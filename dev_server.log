@@ -1,0 +1,25 @@
+
+> bridge-cloud@0.1.0 dev /app
+> next dev
+
+▲ Next.js 16.1.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 1427ms
+○ Compiling / ...
+ GET / 307 in 6.3s (compile: 5.3s, proxy.ts: 196ms, render: 830ms)
+○ Compiling /chat ...
+ GET /chat 200 in 4.4s (compile: 3.8s, proxy.ts: 22ms, render: 541ms)
+○ Compiling /chat/[id] ...
+ GET /chat/2948aabe-b1f6-4bac-8f2a-098cf12587b1 200 in 6.1s (compile: 6.0s, proxy.ts: 25ms, render: 96ms)
+ GET / 307 in 194ms (compile: 7ms, proxy.ts: 9ms, render: 177ms)
+ GET /chat 200 in 121ms (compile: 5ms, proxy.ts: 9ms, render: 107ms)
+ GET /chat/ba7213ae-e5b8-4f0a-8c5a-029a2b985380 200 in 163ms (compile: 55ms, proxy.ts: 8ms, render: 100ms)
+ GET / 307 in 159ms (compile: 6ms, proxy.ts: 6ms, render: 148ms)
+ GET /chat 200 in 91ms (compile: 6ms, proxy.ts: 5ms, render: 81ms)
+ GET /chat/0059d6a4-7889-4153-ab2e-b71a40a4fadc 200 in 156ms (compile: 48ms, proxy.ts: 10ms, render: 98ms)
+ ELIFECYCLE  Command failed.
+[?25h
