@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -56,7 +56,7 @@ export default function InputBar() {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
@@ -66,7 +66,17 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
+
+  // Auto-focus input when returning from streaming
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current && orchestrationMode === 'single') {
+      const timeoutId = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 10);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isStreaming, orchestrationMode]);
 
   return (
     /*
@@ -92,11 +102,11 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
-            title="Chat input"
+            title={orchestrationMode === 'single' ? "Chat input" : "Orchestration modes coming soon!"}
             aria-multiline="true"
             className={[
               'flex-1 bg-transparent resize-none outline-none',
@@ -129,7 +139,7 @@ export default function InputBar() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={orchestrationMode === 'single' ? "Send message" : "Orchestration modes coming soon!"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',

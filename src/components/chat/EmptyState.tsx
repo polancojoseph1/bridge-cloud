@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
@@ -15,6 +16,7 @@ export default function EmptyState() {
   const newConversation = useChatStore(s => s.newConversation);
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
+  const orchestrationMode = useOrchestrationStore((s) => s.mode);
   const router = useRouter();
 
   const [value, setValue] = useState('');
@@ -37,7 +39,7 @@ export default function EmptyState() {
 
   const handleSubmit = () => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     setValue('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     startChat(trimmed);
@@ -58,7 +60,7 @@ export default function EmptyState() {
     el.style.overflowY = el.scrollHeight > 120 ? 'auto' : 'hidden';
   };
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0">
@@ -78,7 +80,8 @@ export default function EmptyState() {
             <button
               key={s}
               onClick={() => startChat(s)}
-              className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
+              disabled={orchestrationMode !== 'single'}
+              className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {s}
             </button>
@@ -100,14 +103,16 @@ export default function EmptyState() {
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
+              disabled={isStreaming || orchestrationMode !== 'single'}
               rows={1}
-              placeholder="Message Bridge Cloud…"
+              placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
               aria-label="Chat input"
-              title="Chat input"
+              title={orchestrationMode === 'single' ? "Chat input" : "Orchestration modes coming soon!"}
               className={[
                 'flex-1 bg-transparent resize-none outline-none',
                 'text-sm text-[#ececec] placeholder:text-[#5c5c5c]',
                 'leading-[1.6] min-h-[24px] overflow-hidden',
+                'disabled:cursor-not-allowed disabled:opacity-50',
               ].join(' ')}
               style={{ maxHeight: '120px' }}
             />
@@ -116,7 +121,7 @@ export default function EmptyState() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={orchestrationMode === 'single' ? "Send message" : "Orchestration modes coming soon!"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]',
