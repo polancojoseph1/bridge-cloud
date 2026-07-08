@@ -1,0 +1,3 @@
+## 2024-07-08 - Optimize InstanceTabBar Re-renders
+**Learning:** When a child component in a mapped array subscribes to a Zustand store and runs an `.find()` on the entire array to get its own state (e.g. `s.instances.find(i => i.instanceId === instanceId)`), it causes O(N^2) complexity. If the global `instances` array changes, EVERY child component independently recalculates and potentially re-renders.
+**Action:** Pass the full `instance` object, the computed `isActive` state, and the array length as props from the parent's mapping function, and wrap the child component in `React.memo()`. This turns O(N) re-renders into O(1) re-renders.
