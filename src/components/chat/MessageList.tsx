@@ -58,8 +58,6 @@ export default function MessageList({ conversationId }: MessageListProps) {
     // If the user just sent a message, force auto-scroll to bottom
     // regardless of whether they were previously scrolled up
     if (messages.length > prevCountRef.current) {
-      // The store currently appends BOTH user and assistant messages at the same time,
-      // so `lastMsg` is the assistant message. We need to check if the user just sent a message.
       const justAddedUserMsg = messages[messages.length - 1]?.role === 'user' || messages[messages.length - 2]?.role === 'user';
       if (justAddedUserMsg) {
         isUserScrolledRef.current = false;
@@ -106,6 +104,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       onScroll={handleScroll}
       onWheel={() => { isProgrammaticScrollRef.current = false; }}
       onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
+      onMouseDown={() => { isProgrammaticScrollRef.current = false; }}
+      onTouchStart={() => { isProgrammaticScrollRef.current = false; }}
       className="flex-1 overflow-y-auto py-6"
     >
       <div className="flex flex-col">
