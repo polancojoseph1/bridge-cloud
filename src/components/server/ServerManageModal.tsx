@@ -108,6 +108,7 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       {/* Back */}
       <button
         onClick={onBack}
+        aria-label="Back to servers"
         className="flex items-center gap-1.5 text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-colors mb-5 self-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm"
       >
         <ArrowLeft size={13} />
@@ -385,12 +386,14 @@ function ProfileCard({
           <div className="flex gap-2">
             <button
               onClick={() => setConfirmDelete({ profileId: null })}
+              aria-label="Cancel deletion"
               className="px-3 py-1 rounded-md text-[12px] text-[#8e8e8e] bg-[#1e3025] hover:bg-[#2d4035] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]"
             >
               Cancel
             </button>
             <button
               onClick={handleDelete}
+              aria-label="Confirm deletion"
               className="px-3 py-1 rounded-md text-[12px] font-medium text-[#fca5a5] bg-[rgba(239,68,68,0.10)] hover:bg-[rgba(239,68,68,0.18)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ef4444]"
             >
               Delete
@@ -426,6 +429,7 @@ function ServerListView({ onAddServer }: ListViewProps) {
         </p>
         <button
           onClick={onAddServer}
+          aria-label="Connect your first server"
           className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111c15]"
         >
           <Plus size={15} />
@@ -581,6 +585,7 @@ export default function ServerManageModal() {
             {tab === 'list' && (
               <button
                 onClick={() => setTab('add')}
+                aria-label="Add Server"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111c15]"
               >
                 <Plus size={13} />

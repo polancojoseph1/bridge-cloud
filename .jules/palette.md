@@ -1,0 +1,3 @@
+## 2024-05-17 - Missing ARIA Labels on Internal Action Buttons
+**Learning:** Many internal generic action buttons (e.g. `Back`, `Cancel`, `Delete`, `Manage servers`) throughout the UI components are missing `aria-label` tags, which makes it challenging for screen readers to properly announce their function, especially since some only have icons or their text context is not clear enough.
+**Action:** When adding new internal action buttons or modifying existing ones, ensure they have descriptive `aria-label` properties, even if they have visible text, when the text alone might not be sufficiently descriptive out of context.
