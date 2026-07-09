@@ -261,6 +261,7 @@ function ProfileCard({
 
   return (
     <div
+      onMouseLeave={() => setConfirmDelete({ profileId: null })}
       className={cn(
         'relative bg-[#152219] border rounded-xl p-4 mb-3 transition-all duration-150',
         isActive
