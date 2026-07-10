@@ -140,6 +140,7 @@ export default function NodeTray() {
               <>
                 <button
                   type="button"
+                  aria-label="Select all nodes"
                   onClick={() => selectAllNodes(nodes)}
                   className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
                 >
@@ -147,6 +148,7 @@ export default function NodeTray() {
                 </button>
                 <button
                   type="button"
+                  aria-label="Select no nodes"
                   onClick={clearNodeSelection}
                   className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
                 >
