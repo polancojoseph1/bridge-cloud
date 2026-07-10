@@ -11,7 +11,13 @@ interface SendButtonProps {
 export default function SendButton({ disabled, isStreaming, onClick, title }: SendButtonProps) {
   return (
     <button
-      onClick={onClick}
+      onClick={(e) => {
+        if (isStreaming) e.preventDefault();
+        onClick();
+      }}
+      onMouseDown={(e) => {
+        if (isStreaming) e.preventDefault();
+      }}
       disabled={disabled && !isStreaming}
       title={title}
       aria-label={isStreaming ? 'Stop generating' : 'Send message'}
