@@ -7,7 +7,9 @@ import ServerSwitcherPopover from './ServerSwitcherPopover';
 
 export default function ServerStatusIndicator() {
   const [showPopover, setShowPopover] = useState(false);
-  const activeProfile = useServerStore(s => s.activeProfile)();
+  // ⚡ Bolt Optimization: Replace getter method subscription with targeted selector
+  // to fix reactivity and ensure the component re-renders when the active profile changes.
+  const activeProfile = useServerStore(s => s.profiles.find(p => p.id === s.activeProfileId) ?? null);
   const connectionStatus = useServerStore(s => s.connectionStatus);
 
   const dotColor = {
