@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,19 +10,26 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
-  const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
+/**
+ * ⚡ Bolt Optimization: Added React.memo() and boolean Zustand selectors
+ * 💡 What: Wrapped InstanceTab in React.memo() and changed Zustand selectors to return booleans instead of raw global values.
+ * 🎯 Why: When the active instance changed or a new instance was added, global values (`activeInstanceId` and `instances.length`) updated.
+ *         This caused EVERY tab to needlessly re-render simultaneously (O(N) renders).
+ *         By selecting booleans (e.g. `s.activeInstanceId === instanceId`), a tab only re-renders if its OWN active state changes.
+ * 📊 Impact: O(1) render cost on tab switches instead of O(N).
+ */
+const InstanceTab = memo(function InstanceTab({ instanceId }: { instanceId: string }) {
+  const isActive = useInstanceStore(s => s.activeInstanceId === instanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
 
   const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
-  const instancesLength = useInstanceStore(s => s.instances.length);
+  const hasMultiple = useInstanceStore(s => s.instances.length > 1);
 
   if (!instance) return null;
 
-  const isActive  = activeInstanceId === instanceId;
   const dotColor  = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
-  const canClose  = instancesLength > 1 && !instance.isPinned;
+  const canClose  = hasMultiple && !instance.isPinned;
 
   return (
     <button
@@ -79,23 +86,22 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
-  const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
+const MobileInstancePill = memo(function MobileInstancePill({ instanceId }: { instanceId: string }) {
+  const isActive = useInstanceStore(s => s.activeInstanceId === instanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
 
   const instance = useInstanceStore(useCallback(s => s.instances.find(i => i.instanceId === instanceId), [instanceId]));
-  const instancesLength = useInstanceStore(s => s.instances.length);
+  const hasMultiple = useInstanceStore(s => s.instances.length > 1);
 
   if (!instance) return null;
 
-  const isActive = activeInstanceId === instanceId;
   const dotColor = AGENT_DOT_COLORS[instance.agentId] ?? '#5c5c5c';
-  const canClose = instancesLength > 1;
+  const canClose = hasMultiple;
 
   return (
     <div
@@ -125,7 +131,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 

@@ -1,0 +1,3 @@
+## 2024-07-12 - Prevent O(N) List Re-renders with Zustand Boolean Selectors
+**Learning:** Wrapping a list item component in `React.memo()` is ineffective if the component selects raw global values from a Zustand store (like `activeId` or `array.length`), because those values change globally and force all items to re-render simultaneously.
+**Action:** When rendering lists of items connected to a store, combine `React.memo()` with boolean selectors (e.g., `useStore(s => s.activeId === myId)`) so components only re-render when their specific derived state flips, turning O(N) render costs into O(1).
