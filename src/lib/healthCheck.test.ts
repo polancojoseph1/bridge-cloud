@@ -3,7 +3,7 @@ import { checkHealth } from './healthCheck';
 
 describe('checkHealth', () => {
   // Use a public non-internal IP so SSRF guard doesn't block it
-  const mockUrl = 'http://203.0.113.1:3000';
+  const mockUrl = 'https://203.0.113.1:3000';
   const mockApiKey = 'test-api-key';
 
   beforeEach(() => {
@@ -138,16 +138,16 @@ describe('checkHealth', () => {
 
   it('should reject internal/localhost URLs with SSRF guard', async () => {
     const testUrls = [
-      'http://localhost:3000',
-      'http://127.0.0.1:8080',
-      'http://169.254.169.254',
-      'http://2130706433', // 127.0.0.1 dec
-      'http://0x7f.0.0.1', // hex
-      'http://0177.0.0.1', // octal
-      'http://[::1]',
-      'http://[::ffff:127.0.0.1]', // IPv4 mapped
-      'http://10.0.0.1',
-      'http://0.0.0.0'
+      'https://localhost:3000',
+      'https://127.0.0.1:8080',
+      'https://169.254.169.254',
+      'https://2130706433', // 127.0.0.1 dec
+      'https://0x7f.0.0.1', // hex
+      'https://0177.0.0.1', // octal
+      'https://[::1]',
+      'https://[::ffff:127.0.0.1]', // IPv4 mapped
+      'https://10.0.0.1',
+      'https://0.0.0.0'
     ];
 
     for (const url of testUrls) {
@@ -163,10 +163,10 @@ describe('checkHealth', () => {
 
   it('should allow valid external IPs with SSRF guard', async () => {
     const testUrls = [
-      'http://example.com',
-      'http://203.0.113.1', // test net
-      'http://127.com', // false positive evasion check
-      'http://8.8.8.8'
+      'https://example.com',
+      'https://203.0.113.1', // test net
+      'https://127.com', // false positive evasion check
+      'https://8.8.8.8'
     ];
 
     for (const url of testUrls) {

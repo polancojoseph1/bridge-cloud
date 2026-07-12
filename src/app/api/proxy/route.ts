@@ -113,10 +113,6 @@ export async function POST(req: NextRequest) {
   // Validate URL protocol to prevent SSRF
   try {
     const parsedUrl = new URL(targetUrl);
-    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-      throw new Error('Invalid protocol');
-    }
-
     const hn = parsedUrl.hostname.toLowerCase();
 
     // In test environment we need to bypass localhost restrictions for integration tests,
@@ -125,6 +121,9 @@ export async function POST(req: NextRequest) {
     const isIntegrationTestServer = process.env.NODE_ENV === 'test' && hn === 'localhost' && parsedUrl.port === '8585';
 
     if (!isIntegrationTestServer) {
+      if (parsedUrl.protocol !== 'https:') {
+        throw new Error('Invalid protocol: https is required');
+      }
       if (isForbiddenHostname(hn)) {
         throw new Error('Forbidden internal hostname or IP');
       }

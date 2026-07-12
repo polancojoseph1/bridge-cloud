@@ -36,7 +36,7 @@ describe('POST /api/proxy', () => {
   it('returns 503 when fetch throws an error', async () => {
     const req = createMockRequest({
       agentId: 'custom',
-      serverUrl: 'http://custom-server.com',
+      serverUrl: 'https://custom-server.com',
       serverKey: 'custom-key',
       message: 'hello',
       conversationId: 'conv-123'
@@ -50,7 +50,7 @@ describe('POST /api/proxy', () => {
     expect(data).toEqual({ error: 'Could not reach bot server' });
 
     // Verify fetch was called with correct arguments
-    expect(fetchMock).toHaveBeenCalledWith('http://custom-server.com/v1/chat', {
+    expect(fetchMock).toHaveBeenCalledWith('https://custom-server.com/v1/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ describe('POST /api/proxy', () => {
   });
 
   it('sanitizes the error response when upstream is not ok', async () => {
-    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key', message: 'hello' });
+    const req = createMockRequest({ agentId: 'custom', serverUrl: 'https://custom-server.com', serverKey: 'test-key', message: 'hello' });
 
     // Mock response with ok = false, simulating upstream leaking internal data
     const mockUpstreamResponse = new Response(JSON.stringify({ detail: 'Internal DB Error: stacktrace...' }), {
@@ -86,7 +86,7 @@ describe('POST /api/proxy', () => {
   });
 
   it('returns 400 when attempting to fetch an internal IP', async () => {
-    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://127.0.0.1:3000', serverKey: 'test-key', message: 'hello' });
+    const req = createMockRequest({ agentId: 'custom', serverUrl: 'https://127.0.0.1:3000', serverKey: 'test-key', message: 'hello' });
     const response = await POST(req);
 
     expect(response.status).toBe(400);
@@ -95,7 +95,7 @@ describe('POST /api/proxy', () => {
   });
 
   it('returns a streamed response with correct headers on success', async () => {
-    const req = createMockRequest({ agentId: 'custom', serverUrl: 'http://custom-server.com', serverKey: 'test-key', message: 'hello' });
+    const req = createMockRequest({ agentId: 'custom', serverUrl: 'https://custom-server.com', serverKey: 'test-key', message: 'hello' });
 
     // Mock successful stream response
     const mockStream = new ReadableStream({
