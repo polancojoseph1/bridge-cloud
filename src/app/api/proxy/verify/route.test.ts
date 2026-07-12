@@ -50,7 +50,7 @@ describe('POST /api/proxy/verify', () => {
       json: async () => ({ agent_id: 'test-agent', bot_name: 'Test Bot' })
     });
 
-    const req = createMockRequest({ url: 'http://test.com', apiKey: 'test-key' });
+    const req = createMockRequest({ url: 'https://test.com', apiKey: 'test-key' });
     const res = await POST(req);
 
     expect(res.status).toBe(200);
@@ -59,7 +59,7 @@ describe('POST /api/proxy/verify', () => {
     expect(data.agentId).toBe('test-agent');
     expect(data.botName).toBe('Test Bot');
 
-    expect(global.fetch).toHaveBeenCalledWith('http://test.com', expect.any(Object));
+    expect(global.fetch).toHaveBeenCalledWith('https://test.com', expect.any(Object));
   });
 
   it('returns 503 if health check fails or returns offline', async () => {
@@ -69,7 +69,7 @@ describe('POST /api/proxy/verify', () => {
       text: async () => 'Connection timed out'
     });
 
-    const req = createMockRequest({ url: 'http://test.com', apiKey: 'test-key' }); // apiKey provided
+    const req = createMockRequest({ url: 'https://test.com', apiKey: 'test-key' }); // apiKey provided
     const res = await POST(req);
 
     expect(res.status).toBe(503);
@@ -77,6 +77,6 @@ describe('POST /api/proxy/verify', () => {
     expect(data.status).toBe('offline');
     expect(data.error).toBe('Server returned 500');
 
-    expect(global.fetch).toHaveBeenCalledWith('http://test.com', expect.any(Object));
+    expect(global.fetch).toHaveBeenCalledWith('https://test.com', expect.any(Object));
   });
 });
