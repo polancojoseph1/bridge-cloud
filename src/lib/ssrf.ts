@@ -62,8 +62,8 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
+    // 🛡️ Sentinel: Fix SSRF bypass by blocking all equivalent IPv6 loopback/unspecified forms
+    if (/^([0:]+1|[0:]+)$/.test(cleanHn)) return true; // Loopback and Unspecified
     if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
