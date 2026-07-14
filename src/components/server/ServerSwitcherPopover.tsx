@@ -20,7 +20,16 @@ const dotColor = (s: HealthStatus) => ({
 
 export default function ServerSwitcherPopover({ onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const { profiles, activeProfileId, connectProfile, openManage } = useServerStore();
+
+  // ⚡ Bolt Optimization: Replace Zustand Store Destructuring with Targeted Selectors
+  // 💡 What: Replaced `const { profiles, ... } = useServerStore()` with individual `useServerStore(s => s.x)` calls.
+  // 🎯 Why: Destructuring the entire store causes the component to subscribe to EVERY property.
+  //         This forced ServerSwitcherPopover to re-render O(N) times when completely unrelated state
+  //         (like manageTab or connectionStatus) updated. Targeted selectors prevent unnecessary renders.
+  const profiles = useServerStore(s => s.profiles);
+  const activeProfileId = useServerStore(s => s.activeProfileId);
+  const connectProfile = useServerStore(s => s.connectProfile);
+  const openManage = useServerStore(s => s.openManage);
 
   useEffect(() => {
     function handler(e: MouseEvent) {

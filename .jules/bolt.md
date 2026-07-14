@@ -1,0 +1,3 @@
+## 2024-05-19 - Fix Zustand Destructuring & Getter Anti-patterns
+**Learning:** Using `useStore()` destructuring (e.g. `const { a, b } = useStore()`) subscribes components to the ENTIRE store, causing massive over-rendering on unrelated state changes. Additionally, using `useStore(s => s.getter)()` subscribes to the stable getter function reference rather than its return value, preventing components from re-rendering when the underlying data changes (stale UI).
+**Action:** Always use targeted selectors (e.g. `const a = useStore(s => s.a)`) instead of destructuring. Never subscribe to getter methods in React components; instead, compute the needed data directly inside the selector function to preserve reactivity.
