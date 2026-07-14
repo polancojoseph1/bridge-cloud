@@ -64,7 +64,9 @@ export const useChatStore = create<ChatStore>()(
           return { isStreaming: false, conversations: newConversations };
         });
         if (activeAbortController) {
-          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
+          const abortError = new Error('Aborted');
+          abortError.name = 'AbortError';
+          activeAbortController.abort(abortError);
         }
       },
 
@@ -160,7 +162,11 @@ export const useChatStore = create<ChatStore>()(
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
         } catch (error: unknown) {
-          if ((error as any)?.name === 'AbortError' || (error instanceof DOMException && error.name === 'AbortError') || (error as any)?.message === 'Aborted') {
+          const isAbortError = (error as any)?.name === 'AbortError' ||
+            (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError') ||
+            (error as any)?.message === 'Aborted';
+
+          if (isAbortError) {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => {
