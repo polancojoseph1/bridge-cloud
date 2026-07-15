@@ -105,6 +105,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       ref={scrollRef}
       onScroll={handleScroll}
       onWheel={() => { isProgrammaticScrollRef.current = false; }}
+      onMouseDown={() => { isProgrammaticScrollRef.current = false; }}
+      onTouchStart={() => { isProgrammaticScrollRef.current = false; }}
       onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
       className="flex-1 overflow-y-auto py-6"
     >

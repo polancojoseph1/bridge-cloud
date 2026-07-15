@@ -1,20 +1,18 @@
-# Bridge Cloud Issue Report
+# Bridge Cloud UI Test Report
 
-Total issues found: 3
+## Total issues found: 3
 
-1. **Bug: Agent Selector Dropdown UI Duplication/Import Issue**
-   - **Component:** `src/components/layout/Sidebar.tsx`, `src/components/topbar/TopBar.tsx`, `src/components/topbar/ProviderSelector.tsx`
-   - **What's broken:** The sidebar and topbar were importing a deprecated or misnamed `AgentSelector` component, rather than using the correctly implemented `ProviderSelector` which included the server health status and accessibility improvements.
-   - **Fix applied:** Updated the import paths in `Sidebar.tsx` and `TopBar.tsx` to correctly import and render `<ProviderSelector />` and removed the duplicated `AgentSelector.tsx` file.
+### Issue 1
+- **Component:** `InputBar` / `chatStore`
+- **Broken:** The "Stop generation" button appeared to be visual-only and stole focus, breaking the UI state.
+- **Fix Applied:** Verified that `AbortController` IS correctly wired to the `fetch` stream in `src/lib/streaming.ts` and `src/store/chatStore.ts` (via `activeAbortController.abort()`). The actual bug was focus-stealing on click. Added `e.preventDefault()` inside both `onClick` and `onMouseDown` handlers of the stop button to ensure the textarea retains browser focus and the stream correctly aborts without UI glitching.
 
-2. **Bug: Auto-scroll logic fails when user scrolls up and down**
-   - **Component:** `src/components/chat/MessageList.tsx`
-   - **What's broken:** The auto-scroll behavior relied on `isUserScrolledRef.current = distanceToBottom > 30`. It did not explicitly set the value to false when the user scrolls back to the bottom, causing auto-scroll to sometimes break on subsequent messages.
-   - **Fix applied:** Replaced the assignment with an explicit `if/else` block to explicitly toggle `isUserScrolledRef.current` to `true` when scrolled up and `false` when scrolled back to the bottom.
+### Issue 2
+- **Component:** `ModePill` / `InputBar`
+- **Broken:** Orchestration modes UI were disabled by a hardcoded `return null;` but leaving them fully enabled caused confusing UX since the feature is not wired to the proxy.
+- **Fix Applied:** Re-enabled the component visually but marked all non-"single" modes as disabled natively so users can see the modes but can't click them. Made sure `InputBar` also checks `orchestrationMode` to prevent sending interactions and update placeholder text to "Coming soon...".
 
-3. **Bug: Orchestration Modes missing connection UI handling**
-   - **Component:** `src/components/orchestration/ModePill.tsx`, `src/components/chat/InputBar.tsx`
-   - **What's broken:** Orchestration modes (broadcast, parallel, pipeline, gather) have UI elements but do not currently connect to the proxy layer, causing potential empty states or errors if selected.
-   - **Fix applied:** Verified that non-single orchestration modes are gracefully disabled via `disabled={isDisabled}` and `onClick` handlers, preventing them from being clicked or breaking the UI. `InputBar.tsx` properly blocks input and shows "Coming soon".
-
-*(Note: The Stop button was tested and verified to be properly wired to the AbortController in `chatStore.ts` and correctly aborts the fetch streams.)*
+### Issue 3
+- **Component:** `MessageList`
+- **Broken:** Auto-scroll was sticking too aggressively. Manual interactions (like clicking or starting a touch swipe) would often get ignored because the programmatic lock (`isProgrammaticScrollRef`) was active, preventing the `handleScroll` math (`if (distanceToBottom > 30) isUserScrolledRef = true;`) from properly detecting upward user scrolls.
+- **Fix Applied:** Cleared `isProgrammaticScrollRef.current` strictly on `onMouseDown` and `onTouchStart` container events so that any explicit user action immediately breaks the programmatic loop lock, allowing the existing precise math to register the user scroll.
