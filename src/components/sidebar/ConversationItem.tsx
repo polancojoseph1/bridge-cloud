@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -34,6 +34,8 @@ function formatRelativeTime(timestamp: number): string {
 export const ConversationItem = memo(function ConversationItem({ conversation, isActive }: ConversationItemProps) {
   const router = useRouter();
   const deleteConversation = useChatStore((s) => s.deleteConversation);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   function handleClick() {
     router.push(`/chat/${conversation.id}`);
@@ -41,14 +43,27 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+    if (isConfirming) {
+      deleteConversation(conversation.id);
+    } else {
+      setIsConfirming(true);
+      timeoutRef.current = setTimeout(() => setIsConfirming(false), 3000);
+    }
   }
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
 
   return (
     <div
       role="button"
       tabIndex={0}
       onClick={handleClick}
+      onMouseLeave={() => {
+        setIsConfirming(false);
+        clearTimeout(timeoutRef.current);
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -82,16 +97,21 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       {/* Delete button — hidden until group hover */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        aria-label={isConfirming ? "Confirm delete conversation" : "Delete conversation"}
+        title={isConfirming ? "Confirm delete conversation" : "Delete conversation"}
         className={cn(
-          'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
-          'transition-all duration-150',
-          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
+          'flex-shrink-0 p-1 rounded transition-all duration-150',
+          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
+          isConfirming
+            ? 'opacity-100 bg-[rgba(239,68,68,0.15)] text-[#f87171] hover:bg-[rgba(239,68,68,0.25)]'
+            : 'opacity-0 group-hover:opacity-100 text-[#5c5c5c] hover:text-[#e05c5c] hover:bg-[#1e3025]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {isConfirming ? (
+          <Check className="w-3.5 h-3.5" />
+        ) : (
+          <Trash2 className="w-3.5 h-3.5" />
+        )}
       </button>
     </div>
   );
