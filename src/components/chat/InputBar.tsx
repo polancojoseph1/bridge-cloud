@@ -92,9 +92,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -111,7 +111,8 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
-              onClick={stopGeneration}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => { e.preventDefault(); stopGeneration(); }}
               aria-label="Stop generation"
               title="Stop generation"
               className={[
@@ -127,7 +128,7 @@ export default function InputBar() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
               title="Send message"
               className={[
