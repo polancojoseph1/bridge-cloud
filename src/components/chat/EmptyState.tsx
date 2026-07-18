@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
@@ -15,6 +16,7 @@ export default function EmptyState() {
   const newConversation = useChatStore(s => s.newConversation);
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
+  const orchestrationMode = useOrchestrationStore(s => s.mode);
   const router = useRouter();
 
   const [value, setValue] = useState('');
@@ -37,7 +39,7 @@ export default function EmptyState() {
 
   const handleSubmit = () => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     setValue('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     startChat(trimmed);
@@ -100,8 +102,9 @@ export default function EmptyState() {
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
+              disabled={orchestrationMode !== 'single'}
               rows={1}
-              placeholder="Message Bridge Cloud…"
+              placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
               aria-label="Chat input"
               title="Chat input"
               className={[
@@ -114,7 +117,7 @@ export default function EmptyState() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
               title="Send message"
               className={[
