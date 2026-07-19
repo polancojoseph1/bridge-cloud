@@ -1,0 +1,6 @@
+## 2024-06-25 - Two-step Delete Confirmation Pattern
+**Learning:** For destructive actions in dense lists like conversation histories, inline two-step confirmation (clicking a trash icon changes it to a checkmark requiring a second click) works better than modal dialogs. Modals interrupt flow and are annoying for quick cleanup, while one-click deletes are prone to accidental clicks. It's important to reset the confirmation state when the user's mouse leaves the item to prevent accidental later clicks.
+**Action:** Use this inline two-step confirmation pattern (Trash -> Check) for destructive actions on list items where real estate is tight and modals would be too heavy.
+## 2024-06-25 - Two-step Delete Confirmation Pattern
+**Learning:** For destructive actions in dense lists like conversation histories, inline two-step confirmation (clicking a trash icon changes it to a checkmark requiring a second click) works better than modal dialogs. Modals interrupt flow and are annoying for quick cleanup, while one-click deletes are prone to accidental clicks. It's important to reset the confirmation state when the user's mouse leaves the item to prevent accidental later clicks.
+**Action:** Use this inline two-step confirmation pattern (Trash -> Check) for destructive actions on list items where real estate is tight and modals would be too heavy.
