@@ -111,7 +111,8 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
-              onClick={stopGeneration}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => { e.preventDefault(); stopGeneration(); }}
               aria-label="Stop generation"
               title="Stop generation"
               className={[
