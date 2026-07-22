@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,7 +10,15 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents InstanceTab and MobileInstancePill from re-rendering on scroll.
+ * 🎯 Why: When the user scrolls, `canScrollLeft` and `canScrollRight` update in the parent component.
+ *         Without memo, every single instance tab in the list re-renders during smooth scrolling,
+ *         causing layout thrashing and UI stuttering on low-end devices.
+ * 📊 Impact: O(1) render cost for tabs during parent scroll instead of O(N).
+ */
+const InstanceTab = memo(function InstanceTab({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
@@ -79,11 +87,11 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+const MobileInstancePill = memo(function MobileInstancePill({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
@@ -125,7 +133,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
