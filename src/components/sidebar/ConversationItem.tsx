@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -34,6 +34,17 @@ function formatRelativeTime(timestamp: number): string {
 export const ConversationItem = memo(function ConversationItem({ conversation, isActive }: ConversationItemProps) {
   const router = useRouter();
   const deleteConversation = useChatStore((s) => s.deleteConversation);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const deleteTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (deleteTimeoutRef.current) {
+        clearTimeout(deleteTimeoutRef.current);
+      }
+    };
+  }, []);
 
   function handleClick() {
     router.push(`/chat/${conversation.id}`);
@@ -41,12 +52,32 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+
+    if (isConfirmingDelete) {
+      if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+      deleteConversation(conversation.id);
+    } else {
+      setIsConfirmingDelete(true);
+
+      // Auto-reset confirmation state after 3 seconds
+      if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+      deleteTimeoutRef.current = setTimeout(() => {
+        setIsConfirmingDelete(false);
+      }, 3000);
+    }
+  }
+
+  function handleMouseLeave() {
+    if (isConfirmingDelete) {
+      setIsConfirmingDelete(false);
+      if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+    }
   }
 
   return (
     <div
       role="button"
+      onMouseLeave={handleMouseLeave}
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={(e) => {
@@ -82,16 +113,17 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       {/* Delete button — hidden until group hover */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        aria-label={isConfirmingDelete ? "Confirm delete" : "Delete conversation"}
+        title={isConfirmingDelete ? "Confirm delete" : "Delete conversation"}
         className={cn(
-          'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
-          'transition-all duration-150',
-          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
+          'flex-shrink-0 p-1 rounded transition-all duration-150',
+          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
+          isConfirmingDelete
+            ? 'opacity-100 text-[#e05c5c] bg-[#e05c5c]/10'
+            : 'opacity-0 group-hover:opacity-100 text-[#5c5c5c] hover:text-[#e05c5c]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {isConfirmingDelete ? <Check className="w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
       </button>
     </div>
   );
