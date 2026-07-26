@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -63,10 +63,25 @@ export default function InputBar() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+
+      // Delay focus slightly so the stream state update (which briefly disables the input) doesn't swallow it.
+      setTimeout(() => {
+        if (textareaRef.current) textareaRef.current.focus();
+      }, 0);
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
   const canSend = value.trim().length > 0 && !isStreaming;
+
+  // Added effect to refocus when streaming completes
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current && document.activeElement !== textareaRef.current) {
+        // Only refocus if the document has focus to avoid stealing focus if user switched windows
+        if (document.hasFocus()) {
+           textareaRef.current.focus();
+        }
+    }
+  }, [isStreaming]);
 
   return (
     /*
@@ -111,7 +126,11 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
-              onClick={stopGeneration}
+              onClick={(e) => {
+                e.preventDefault();
+                stopGeneration();
+              }}
+              onMouseDown={(e) => e.preventDefault()}
               aria-label="Stop generation"
               title="Stop generation"
               className={[
