@@ -32,6 +32,11 @@ export default function ChatInputBar() {
       textareaRef.current.style.height = 'auto';
     }
     await sendMessage(trimmed);
+
+    // Attempt to refocus after a slight delay so it doesn't get swallowed by UI streaming disables
+    setTimeout(() => {
+      if (textareaRef.current) textareaRef.current.focus();
+    }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
