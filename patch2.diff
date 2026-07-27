@@ -1,0 +1,12 @@
+--- src/components/input/SendButton.tsx
++++ src/components/input/SendButton.tsx
+@@ -14,8 +14,7 @@
+     <button
+       onClick={onClick}
+       disabled={disabled && !isStreaming}
+-      title={title}
+       aria-label={isStreaming ? 'Stop generating' : 'Send message'}
+-      title={isStreaming ? 'Stop generating' : 'Send message'}
++      title={title || (isStreaming ? 'Stop generating' : 'Send message')}
+       className={cn(
+         'w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 self-end mb-0.5',
