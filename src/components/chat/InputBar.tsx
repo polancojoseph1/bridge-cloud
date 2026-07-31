@@ -112,6 +112,7 @@ export default function InputBar() {
             <button
               type="button"
               onClick={stopGeneration}
+              onMouseDown={(e) => e.preventDefault()}
               aria-label="Stop generation"
               title="Stop generation"
               className={[
