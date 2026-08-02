@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -42,6 +42,15 @@ export default function InputBar() {
   }, []);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
+  // Refocus input after streaming finishes
+  useEffect(() => {
+    if (!isStreaming) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 0);
+    }
+  }, [isStreaming]);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
     resizeTextarea();
@@ -92,9 +101,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Coming soon..."}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -111,7 +120,11 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
-              onClick={stopGeneration}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                stopGeneration();
+              }}
               aria-label="Stop generation"
               title="Stop generation"
               className={[
