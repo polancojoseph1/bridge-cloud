@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,7 +10,13 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents InstanceTab from re-rendering on parent scroll events.
+ * 🎯 Why: InstanceTabBar maintains scroll state (canScrollLeft/Right) which causes all children to re-render.
+ * 📊 Impact: O(1) render cost instead of O(N) cascade when scrolling tabs.
+ */
+const InstanceTab = memo(function InstanceTab({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
@@ -79,11 +85,17 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents MobileInstancePill from re-rendering on parent scroll events.
+ * 🎯 Why: InstanceTabBar maintains scroll state (canScrollLeft/Right) which causes all children to re-render.
+ * 📊 Impact: O(1) render cost instead of O(N) cascade when scrolling tabs.
+ */
+const MobileInstancePill = memo(function MobileInstancePill({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
@@ -125,7 +137,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
