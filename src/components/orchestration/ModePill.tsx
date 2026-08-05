@@ -16,7 +16,6 @@ export default function ModePill() {
   const setMode = useOrchestrationStore(s => s.setMode);
 
   // Currently disabled gracefully as it's not wired to the proxy
-  return null;
 
   return (
     <div
@@ -26,7 +25,7 @@ export default function ModePill() {
     >
       {MODES.map(m => {
         const isActive = mode === m.id;
-        const isDisabled = false;
+        const isDisabled = true;
         return (
           <button
             key={m.id}
