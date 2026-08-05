@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -28,6 +28,15 @@ export default function InputBar() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!isStreaming && textareaRef.current) {
+      const el = textareaRef.current;
+      setTimeout(() => {
+        el.focus();
+      }, 0);
+    }
+  }, [isStreaming]);
 
   // ── Auto-resize ─────────────────────────────────────────────────────────────
   const resizeTextarea = useCallback(() => {
@@ -111,7 +120,11 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
-              onClick={stopGeneration}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={(e) => {
+              e.preventDefault();
+              stopGeneration();
+            }}
               aria-label="Stop generation"
               title="Stop generation"
               className={[

@@ -13,12 +13,16 @@ export async function streamMockResponse(
   const text = responses[Math.floor(Math.random() * responses.length)];
   for (let i = 0; i < text.length; ) {
     if (signal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
+      const error = new Error('Aborted');
+      error.name = 'AbortError';
+      throw error;
     }
     const chunkSize = Math.ceil(Math.random() * 3 + 1);
     await new Promise(r => setTimeout(r, 20 + Math.random() * 30));
     if (signal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
+      const error = new Error('Aborted');
+      error.name = 'AbortError';
+      throw error;
     }
     onChunk(text.slice(i, i + chunkSize));
     i += chunkSize;
