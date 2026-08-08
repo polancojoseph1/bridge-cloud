@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,7 +10,15 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: React.memo on mapped child items
+ * 💡 What: Wrapped InstanceTab in React.memo().
+ * 🎯 Why: The parent InstanceTabBar stores scroll state (`canScrollLeft`, `canScrollRight`).
+ *         Every scroll interaction updates parent state, which previously triggered a re-render
+ *         of all InstanceTab children.
+ * 📊 Impact: Changes O(N) render cascade to O(1) during tab bar scrolling.
+ */
+const InstanceTab = memo(function InstanceTab({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
@@ -79,11 +87,11 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+const MobileInstancePill = memo(function MobileInstancePill({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
@@ -125,7 +133,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 

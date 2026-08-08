@@ -1,0 +1,3 @@
+## 2024-12-05 - Optimize Scroll-dependent React Components
+**Learning:** In components where the parent stores scroll state (like `canScrollLeft` or `canScrollRight` in a tab bar), the entire parent component re-renders on every scroll interaction. If the parent maps over a list of child items (like tabs), this causes an O(N) re-render cascade for every single scroll tick, which can degrade scrolling performance severely.
+**Action:** Always wrap mapped child elements in `React.memo()` when their parent component tracks frequently updating state (like scroll or mouse position). This limits the render to just the parent, changing the scrolling rendering cost from O(N) to O(1).
