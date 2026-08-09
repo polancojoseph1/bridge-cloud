@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,7 +10,7 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+const InstanceTab = React.memo(function InstanceTab({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
@@ -79,11 +79,11 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+const MobileInstancePill = React.memo(function MobileInstancePill({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
@@ -125,7 +125,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
