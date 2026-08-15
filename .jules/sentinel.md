@@ -1,0 +1,4 @@
+## 2026-08-15 - SSRF Filter Bypass via IPv6 Unnormalized Addresses
+**Vulnerability:** The `isForbiddenHostname` SSRF prevention filter used strict equality checks (like `::1`) against unnormalized IPv6 addresses. This permitted attackers to bypass the filter using valid, functionally equivalent zero-compressed or zero-padded IPv6 representations (e.g., `0::1`, `0000:0000:0000:0000:0000:0000:0000:0001`).
+**Learning:** In Node.js, DNS resolution and standard parsing logic do not automatically normalize IPv6 representations in string-based checks. Using a naive string comparison on an unnormalized user-provided IP is insufficient for SSRF blocklisting.
+**Prevention:** Always normalize IPv6 inputs using robust methods—such as the `URL` constructor (e.g., `new URL('http://[' + ip + ']').hostname.slice(1, -1)`) or standard networking libraries—before comparing them against security blocklists.
