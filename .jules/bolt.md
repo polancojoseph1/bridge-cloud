@@ -1,0 +1,3 @@
+## 2024-05-30 - Prevent Cascade Re-renders with Zustand and Memo
+**Learning:** Destructuring entire Zustand stores (e.g., `const { a, b } = useStore()`) forces a component to subscribe to all state changes, leading to severe re-rendering issues (like UI elements reacting to hidden background polling). Additionally, state changes in list containers (like scroll bounds) can trigger O(N) child re-renders.
+**Action:** Always use individual, targeted selectors (e.g., `const a = useStore(s => s.a)`). For children mapped within stateful list containers, always wrap them in `React.memo()` to convert O(N) cascade re-renders into O(1).
