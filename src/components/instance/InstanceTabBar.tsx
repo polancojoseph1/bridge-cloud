@@ -108,7 +108,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
           : 'bg-[#0d1a11] text-[#5c5c5c] border border-[#1e3025]'
       )}
     >
-      <button type="button" onClick={() => setActive(instanceId)} className="flex items-center gap-1.5">
+      <button type="button" onClick={() => setActive(instanceId)} className="flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff] rounded-sm">
         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? dotColor : '#3c3c3c' }} />
         <span>{instance.label}</span>
       </button>
@@ -165,7 +165,7 @@ export default function InstanceTabBar() {
             onClick={() => nudge('left')}
             aria-label="Scroll left"
             title="Scroll left"
-            className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-r from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10"
+            className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-r from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff] focus-visible:ring-inset"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -186,7 +186,7 @@ export default function InstanceTabBar() {
             onClick={() => nudge('right')}
             aria-label="Scroll right"
             title="Scroll right"
-            className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-l from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10"
+            className="flex-shrink-0 w-6 h-full flex items-center justify-center bg-gradient-to-l from-[#0a1410] via-[#0a1410] to-transparent text-[#5c5c5c] hover:text-[#ececec] z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff] focus-visible:ring-inset"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
