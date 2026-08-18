@@ -1,0 +1,15 @@
+
+> bridge-cloud@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 1474ms
+○ Compiling / ...
+ HEAD / 307 in 4.8s (compile: 4.2s, proxy.ts: 168ms, render: 454ms)
+○ Compiling /chat ...
+ GET /chat 200 in 4.2s (compile: 3.7s, proxy.ts: 15ms, render: 475ms)
+ GET /chat/b1aac18c-5980-481e-8d6b-1df1cc2ea63d 200 in 2.4s (compile: 2.3s, proxy.ts: 7ms, render: 62ms)

@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -35,13 +35,35 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
   const router = useRouter();
   const deleteConversation = useChatStore((s) => s.deleteConversation);
 
+  const [isConfirming, setIsConfirming] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   function handleClick() {
     router.push(`/chat/${conversation.id}`);
   }
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+    if (isConfirming) {
+      deleteConversation(conversation.id);
+    } else {
+      setIsConfirming(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setIsConfirming(false), 3000);
+    }
+  }
+
+  function handleMouseLeave() {
+    if (isConfirming) {
+      setIsConfirming(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
   }
 
   return (
@@ -55,6 +77,7 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
           handleClick();
         }
       }}
+      onMouseLeave={handleMouseLeave}
       className={cn(
         'group relative flex items-center gap-2.5 px-3 py-2.5 rounded-md cursor-pointer',
         'transition-colors duration-150',
@@ -79,19 +102,24 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
         </p>
       </div>
 
-      {/* Delete button — hidden until group hover */}
+      {/* Delete button — inline confirmation state */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        aria-label={isConfirming ? "Confirm delete conversation" : "Delete conversation"}
+        title={isConfirming ? "Confirm delete conversation" : "Delete conversation"}
         className={cn(
-          'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
-          'transition-all duration-150',
-          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
+          'flex-shrink-0 p-1 rounded transition-all duration-150',
+          'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]',
+          isConfirming
+            ? 'opacity-100 text-[#e05c5c] hover:bg-[#e05c5c]/10'
+            : 'opacity-0 group-hover:opacity-100 text-[#5c5c5c] hover:text-[#e05c5c]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {isConfirming ? (
+          <Check className="w-3.5 h-3.5" />
+        ) : (
+          <Trash2 className="w-3.5 h-3.5" />
+        )}
       </button>
     </div>
   );
