@@ -65,7 +65,6 @@ export default function ChatInputBar() {
             disabled={isEmpty || orchestrationMode !== 'single'}
             isStreaming={isStreaming}
             onClick={isStreaming ? stopGeneration : handleSubmit}
-            title={orchestrationMode === 'single' ? undefined : "Orchestration modes coming soon!"}
           />
         </div>
         {/* Footer hint */}
