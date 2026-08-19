@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useInstanceStore } from '@/store/instanceStore';
@@ -10,7 +10,14 @@ import { NewInstanceButton } from './NewInstancePicker';
 
 // ─── Individual tab (web) ──────────────────────────────────────────────────
 
-function InstanceTab({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Wrapped InstanceTab component in `memo`.
+ * 🎯 Why: When scrolling through the list of instance tabs, the parent component updates its internal scroll state (`canScrollLeft`, `canScrollRight`).
+ *         Without memoization, this state change cascades down and forces every single list item to re-render, changing an O(N) render cascade to O(1).
+ * 📊 Impact: Prevents massive render cascades during list scroll.
+ */
+const InstanceTab = memo(function InstanceTab({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive       = useInstanceStore(s => s.setActiveInstance);
   const close           = useInstanceStore(s => s.closeInstance);
@@ -79,11 +86,18 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       )}
     </button>
   );
-}
+});
 
 // ─── Mobile pill ───────────────────────────────────────────────────────────
 
-function MobileInstancePill({ instanceId }: { instanceId: string }) {
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Wrapped MobileInstancePill component in `memo`.
+ * 🎯 Why: When scrolling through the list of mobile instance pills, the parent component updates its internal scroll state.
+ *         Without memoization, this state change cascades down and forces every single list item to re-render.
+ * 📊 Impact: Prevents massive render cascades during list scroll.
+ */
+const MobileInstancePill = memo(function MobileInstancePill({ instanceId }: { instanceId: string }) {
   const activeInstanceId = useInstanceStore(s => s.activeInstanceId);
   const setActive        = useInstanceStore(s => s.setActiveInstance);
   const close            = useInstanceStore(s => s.closeInstance);
@@ -125,7 +139,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Main component ────────────────────────────────────────────────────────
 
