@@ -62,12 +62,18 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
-    if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
-    if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
-    if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+    let normalizedIPv6 = cleanHn;
+    try {
+      normalizedIPv6 = new URL('http://[' + cleanHn + ']').hostname.slice(1, -1);
+    } catch (e) {
+      // Ignore
+    }
+    if (normalizedIPv6 === '::1') return true; // Loopback
+    if (normalizedIPv6 === '::') return true; // Unspecified
+    if (normalizedIPv6.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+    if (/^[fF][cCdDeEfF]/.test(normalizedIPv6)) return true; // Unique local address (fc00::/7)
+    if (/^[fF][eE][89aAbB]/.test(normalizedIPv6)) return true; // Link-local (fe80::/10)
+    if (normalizedIPv6.startsWith('100:')) return true; // RFC 6666 discard
   }
 
   return false;
