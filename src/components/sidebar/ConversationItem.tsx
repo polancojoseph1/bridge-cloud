@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -34,6 +34,15 @@ function formatRelativeTime(timestamp: number): string {
 export const ConversationItem = memo(function ConversationItem({ conversation, isActive }: ConversationItemProps) {
   const router = useRouter();
   const deleteConversation = useChatStore((s) => s.deleteConversation);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    if (confirmDelete) {
+      timeoutId = setTimeout(() => setConfirmDelete(false), 3000);
+    }
+    return () => clearTimeout(timeoutId);
+  }, [confirmDelete]);
 
   function handleClick() {
     router.push(`/chat/${conversation.id}`);
@@ -41,7 +50,11 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+    if (confirmDelete) {
+      deleteConversation(conversation.id);
+    } else {
+      setConfirmDelete(true);
+    }
   }
 
   return (
@@ -49,6 +62,7 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       role="button"
       tabIndex={0}
       onClick={handleClick}
+      onMouseLeave={() => setConfirmDelete(false)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -82,16 +96,16 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       {/* Delete button — hidden until group hover */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        aria-label={confirmDelete ? "Confirm delete" : "Delete conversation"}
+        title={confirmDelete ? "Confirm delete" : "Delete conversation"}
         className={cn(
           'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
+          confirmDelete ? 'text-[#e05c5c] bg-[#111f15]' : 'text-[#5c5c5c] hover:text-[#e05c5c]',
           'transition-all duration-150',
           'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {confirmDelete ? <Check className="w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
       </button>
     </div>
   );
