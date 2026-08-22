@@ -1,0 +1,3 @@
+## 2024-08-22 - Optimizing InstanceTabBar Renders
+**Learning:** The InstanceTabBar component in the multi-agent UI renders dynamic lists of instance tabs in a horizontally scrollable container. Without React.memo(), updating the parent component's local scroll state (`canScrollLeft` and `canScrollRight`) would cascade unneeded re-renders down to all existing, unchanged tabs in the array mapping. (Note: Zustand global state updates will still trigger re-renders for subscribed components, but memoizing prevents the scroll-induced re-renders).
+**Action:** Always wrap list items in scrollable array mappings with React.memo(), particularly when parent scroll states update frequently.
