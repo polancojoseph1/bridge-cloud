@@ -1,0 +1,4 @@
+## 2025-01-28 - SSRF Bypass via IPv6 Zero-Padding/Compression
+**Vulnerability:** The SSRF protection logic (`isForbiddenHostname`) used strict string matching against IPv6 addresses (e.g., `cleanHn === '::1'`). This allowed bypasses using valid alternative representations like zero-padding (`0000:0000:0000:0000:0000:0000:0000:0001`) or zero-compression (`0::1`), which the Node.js `dns.promises.lookup()` resolves without normalization.
+**Learning:** Node.js `dns.promises.lookup()` does not normalize resolved IPv6 addresses, so checking the raw address against a blocklist is insecure.
+**Prevention:** When validating resolved IPv6 addresses for SSRF protections, always normalize them explicitly (e.g., using `new URL('http://[' + ip + ']').hostname.slice(1, -1)`) before comparing them to a blocklist or using robust regex that handles all equivalent representations.
