@@ -173,6 +173,8 @@ export default function NodeTray() {
           <button
             type="button"
             onClick={() => openManage('add')}
+            title="Add server"
+            aria-label="Add server"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#2d4035] text-[12px] text-[#3c5c48] hover:text-[#6c8cff] hover:border-[#6c8cff] transition-colors duration-150"
           >
             <Plus className="w-3 h-3" />

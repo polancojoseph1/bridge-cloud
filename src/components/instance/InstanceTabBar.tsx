@@ -29,6 +29,8 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
       type="button"
       data-instance-id={instanceId}
       onClick={() => setActive(instanceId)}
+      title={instance.label}
+      aria-label={instance.label}
       className={cn(
         'group flex items-center gap-1.5 px-3 h-full flex-shrink-0 relative',
         'text-[12px] font-medium transition-all duration-150',
@@ -108,7 +110,7 @@ function MobileInstancePill({ instanceId }: { instanceId: string }) {
           : 'bg-[#0d1a11] text-[#5c5c5c] border border-[#1e3025]'
       )}
     >
-      <button type="button" onClick={() => setActive(instanceId)} className="flex items-center gap-1.5">
+      <button type="button" onClick={() => setActive(instanceId)} title={instance.label} aria-label={instance.label} className="flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? dotColor : '#3c3c3c' }} />
         <span>{instance.label}</span>
       </button>
