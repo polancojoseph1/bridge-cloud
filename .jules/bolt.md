@@ -1,0 +1,3 @@
+## 2023-10-27 - [Prevent Zustand store over-subscription with object destructuring]
+**Learning:** Using object destructuring on a Zustand store (e.g. `const { a, b } = useStore()`) implicitly subscribes the component to the ENTIRE store. In `ServerSwitcherPopover.tsx`, `useServerStore` destructuring was causing the component to re-render whenever ANY state changed in the store (e.g. `isManageOpen`, `connectionStatus`, etc.), wasting rendering cycles and CPU overhead on an unrelated popover UI element.
+**Action:** Replace `const { a, b } = useStore()` with multiple explicit selectors (`const a = useStore(s => s.a)`), guaranteeing that the component only updates when its explicitly requested state slice changes.
