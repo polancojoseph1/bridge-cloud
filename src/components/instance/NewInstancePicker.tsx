@@ -63,6 +63,8 @@ function NewInstancePicker({ open, onClose, anchorRef }: NewInstancePickerProps)
           key={agent.id}
           type="button"
           onClick={() => { createInstance(agent.id); onClose(); }}
+          title={agent.name}
+          aria-label={agent.name}
           className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] text-[#ececec] hover:bg-[#1e3025] transition-colors text-left"
         >
           <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: agent.dotColor }} />
