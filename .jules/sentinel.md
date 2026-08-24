@@ -1,0 +1,4 @@
+## 2024-05-18 - IPv6 SSRF Bypass via Zero-Compression
+**Vulnerability:** The `isForbiddenHostname` SSRF protection mechanism relied on raw string comparisons for IPv6 addresses (e.g., `ip === '::1'`). This allowed bypasses using valid alternative representations like zero-compression (`0::1`) or full expansion (`0000:0000:0000:0000:0000:0000:0000:0001`).
+**Learning:** Node.js `dns.promises.lookup()` and external inputs do not consistently normalize IPv6 addresses. Relying on strict string equality against blocklists is inherently insecure for IPv6.
+**Prevention:** Always normalize IPv6 addresses before validation. A reliable cross-platform method is using the built-in URL parser: `new URL('http://[' + ip + ']').hostname.slice(1, -1)`. If normalization fails, fail-closed by blocking the request.
