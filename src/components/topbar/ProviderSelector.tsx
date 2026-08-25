@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -29,7 +29,14 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
   );
 }
 
-function AgentRow({
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents AgentRow from re-rendering unless its specific `agent`, `isActive` or `disabled` props change.
+ * 🎯 Why: When health polling updates agent status, the ProviderSelector container re-renders.
+ *         Without memo, EVERY agent in the dropdown list re-renders simultaneously.
+ * 📊 Impact: Prevents unnecessary O(N) array element re-renders during frequent health updates.
+ */
+const AgentRow = memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
   agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
@@ -75,7 +82,7 @@ function AgentRow({
       </div>
     </div>
   );
-}
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
