@@ -20,7 +20,14 @@ const dotColor = (s: HealthStatus) => ({
 
 export default function ServerSwitcherPopover({ onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const { profiles, activeProfileId, connectProfile, openManage } = useServerStore();
+  // ⚡ Bolt Performance Optimization:
+  // Extracting store properties using individual targeted selectors prevents global
+  // subscriptions. This ensures the component only re-renders when these specific
+  // properties change, not when unrelated state updates in the useServerStore.
+  const profiles = useServerStore(s => s.profiles);
+  const activeProfileId = useServerStore(s => s.activeProfileId);
+  const connectProfile = useServerStore(s => s.connectProfile);
+  const openManage = useServerStore(s => s.openManage);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
