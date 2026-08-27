@@ -1,3 +1,4 @@
+import ipaddr from 'ipaddr.js';
 
 function parseIPv4(ip: string): number[] | null {
   let parts: string[];
@@ -62,12 +63,20 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
-    if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
-    if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
-    if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+    try {
+      const addr = ipaddr.parse(cleanHn);
+      const range = addr.range();
+      if (['loopback', 'unspecified', 'ipv4Mapped', 'uniqueLocal', 'linkLocal'].includes(range)) {
+        return true;
+      }
+
+      // RFC 6666 discard (100::/64)
+      const isDiscard = addr.match(ipaddr.parse('100::'), 64);
+      if (isDiscard) return true;
+    } catch {
+      // Fail securely for malformed IPv6 addresses
+      return true;
+    }
   }
 
   return false;
