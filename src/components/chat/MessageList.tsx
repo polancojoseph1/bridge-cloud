@@ -63,6 +63,11 @@ export default function MessageList({ conversationId }: MessageListProps) {
       const justAddedUserMsg = messages[messages.length - 1]?.role === 'user' || messages[messages.length - 2]?.role === 'user';
       if (justAddedUserMsg) {
         isUserScrolledRef.current = false;
+
+        if (scrollRef.current) {
+          isProgrammaticScrollRef.current = true;
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
       }
     }
     prevCountRef.current = messages.length;
