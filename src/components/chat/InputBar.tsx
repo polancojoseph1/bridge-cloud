@@ -66,7 +66,7 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 
   return (
     /*
@@ -87,6 +87,11 @@ export default function InputBar() {
             'focus-within:shadow-[0_0_0_1px_rgba(108,140,255,0.15)]',
           ].join(' ')}
         >
+          {orchestrationMode !== 'single' ? (
+            <div className="flex-1 flex items-center justify-center text-sm text-[#5c5c5c] font-medium min-h-[24px]">
+              Orchestration modes coming soon!
+            </div>
+          ) : (
           <textarea
             ref={textareaRef}
             value={value}
@@ -106,6 +111,7 @@ export default function InputBar() {
             ].join(' ')}
             style={{ maxHeight: `${MAX_HEIGHT}px` }}
           />
+          )}
 
           {/* Send / Stop button */}
           {isStreaming ? (
