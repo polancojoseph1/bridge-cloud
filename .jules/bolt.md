@@ -1,0 +1,3 @@
+## 2024-05-24 - Avoid global store subscriptions in components
+**Learning:** Using object destructuring on a Zustand store hook (e.g., `const { a, b } = useStore()`) creates a global subscription. This means the component will re-render ANY time ANY value in the store changes, even if it's unrelated to the destructured values. This is a common performance bottleneck in React applications using Zustand.
+**Action:** Always use individual, targeted selectors for each piece of state needed (e.g., `const a = useStore(s => s.a)`), or use `useShallow` if multiple values are needed from the same store and related to the same component update cycle.
