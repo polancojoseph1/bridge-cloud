@@ -145,6 +145,7 @@ describe('checkHealth', () => {
       'http://0x7f.0.0.1', // hex
       'http://0177.0.0.1', // octal
       'http://[::1]',
+      'http://[0000:0000:0000:0000:0000:0000:0000:0001]', // zero-padded IPv6
       'http://[::ffff:127.0.0.1]', // IPv4 mapped
       'http://10.0.0.1',
       'http://0.0.0.0'
