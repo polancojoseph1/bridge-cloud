@@ -47,8 +47,13 @@ export default function MessageList({ conversationId }: MessageListProps) {
     // ensuring precision within the threshold
     const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
+    if (isProgrammaticScrollRef.current && distanceToBottom <= 30) {
+      return;
+    }
+
     if (distanceToBottom > 30) {
       isUserScrolledRef.current = true;
+      isProgrammaticScrollRef.current = false;
     } else {
       isUserScrolledRef.current = false;
     }
