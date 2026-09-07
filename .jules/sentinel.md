@@ -1,0 +1,4 @@
+## 2025-03-01 - Fix IPv6 SSRF loopback bypass via zero-padding
+**Vulnerability:** The SSRF check for IPv6 loopback addresses used strict string equality (`cleanHn === '::1'`). This could be bypassed using alternative valid IPv6 representations like `0000:0000:0000:0000:0000:0000:0000:0001` or `::0001`.
+**Learning:** Naive string matching for IP validation is inherently flawed due to the numerous valid ways to format an IP address, especially IPv6 with its zero-compression and zero-padding rules.
+**Prevention:** Always normalize IP addresses and hostnames before validation. In Node.js/modern JavaScript, using the native `URL` class constructor (e.g., `new URL('http://[' + ip + ']')`) implicitly normalizes the host portion, making it a robust alternative to complex regexes or external dependencies.
