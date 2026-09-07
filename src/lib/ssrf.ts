@@ -40,7 +40,7 @@ function parseIPv4(ip: string): number[] | null {
 }
 
 export function isForbiddenHostname(hn: string): boolean {
-  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+  let cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
 
   // Block localhost and .local domains
   if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
@@ -62,6 +62,13 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
+    try {
+      const url = new URL(`http://[${cleanHn}]`);
+      cleanHn = url.hostname.slice(1, -1);
+    } catch {
+      // Ignore URL parsing errors, fallback to default checks
+    }
+
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
     if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
