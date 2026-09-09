@@ -20,7 +20,14 @@ const dotColor = (s: HealthStatus) => ({
 
 export default function ServerSwitcherPopover({ onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const { profiles, activeProfileId, connectProfile, openManage } = useServerStore();
+  // ⚡ Bolt Optimization: Replace global object destructuring with individual selectors
+  // 💡 What: Target specific properties instead of full store destructuring
+  // 🎯 Why: Prevents unnecessary re-renders when unrelated store state changes
+  // 📊 Impact: O(1) render stability for unrelated store updates
+  const profiles = useServerStore(s => s.profiles);
+  const activeProfileId = useServerStore(s => s.activeProfileId);
+  const connectProfile = useServerStore(s => s.connectProfile);
+  const openManage = useServerStore(s => s.openManage);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
