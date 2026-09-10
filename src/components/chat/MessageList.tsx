@@ -47,9 +47,12 @@ export default function MessageList({ conversationId }: MessageListProps) {
     // ensuring precision within the threshold
     const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
-    if (distanceToBottom > 30) {
+    // If the user manually scrolls up, they are no longer at the bottom
+    // We add a larger threshold to avoid stopping auto-scroll for minor layout shifts
+    if (distanceToBottom > 150) {
       isUserScrolledRef.current = true;
-    } else {
+    } else if (distanceToBottom <= 50) {
+      // User is back at the bottom
       isUserScrolledRef.current = false;
     }
   };
