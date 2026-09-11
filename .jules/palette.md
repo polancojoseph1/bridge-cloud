@@ -1,0 +1,3 @@
+## 2024-05-14 - Missing ARIA Labels on Navigation/Utility Buttons
+**Learning:** Icon-only navigation buttons or popover menu options in Next.js/React applications often omit the `aria-label` attribute, relying on adjacent text or context that screen readers may not read immediately. Specifically, popover menu items (e.g., inside `ServerSwitcherPopover`) missing aria-labels make it hard for visually impaired users to understand button actions.
+**Action:** Consistently review new `<button>` elements across the codebase and apply an `aria-label` for any button that contains only an icon, or where the visual text isn't a complete description of the button's action.
