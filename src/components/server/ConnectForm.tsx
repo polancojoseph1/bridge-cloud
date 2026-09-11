@@ -125,7 +125,7 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
               <button
                 type="button"
                 onClick={() => setShowKey(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565656] hover:text-[#8e8e8e]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565656] hover:text-[#8e8e8e] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm"
                 aria-label={showKey ? "Hide API key" : "Show API key"}
                 title={showKey ? "Hide API key" : "Show API key"}
               >
