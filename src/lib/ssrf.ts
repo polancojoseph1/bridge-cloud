@@ -39,8 +39,16 @@ function parseIPv4(ip: string): number[] | null {
   return result;
 }
 
+function normalizeIPv6(ip: string): string {
+  try {
+    return new URL('http://[' + ip + ']').hostname.slice(1, -1);
+  } catch {
+    return ip;
+  }
+}
+
 export function isForbiddenHostname(hn: string): boolean {
-  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+  let cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
 
   // Block localhost and .local domains
   if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
@@ -62,9 +70,22 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
+    cleanHn = normalizeIPv6(cleanHn);
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+    if (cleanHn.startsWith('::ffff:')) {
+      const parts = cleanHn.split(':');
+      if (parts.length >= 4) {
+        const p1 = parseInt(parts[parts.length - 2], 16);
+        const p2 = parseInt(parts[parts.length - 1], 16);
+
+        if (!isNaN(p1) && !isNaN(p2)) {
+           const ipStr = `${(p1 >> 8) & 0xff}.${p1 & 0xff}.${(p2 >> 8) & 0xff}.${p2 & 0xff}`;
+           return isForbiddenHostname(ipStr);
+        }
+      }
+      return true; // Fallback block if we can't parse it
+    }
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
