@@ -1,0 +1,3 @@
+## 2024-05-18 - Memoize mapped components polled by useAgentHealth
+**Learning:** Polling hooks like `useAgentHealth` trigger frequent re-renders in their host components. If child components within mapped lists (like `AgentRow` in `ProviderSelector`) use inline event handlers (e.g., `onSelect={() => ...}`), `React.memo()` is defeated, leading to O(N) re-render cascades.
+**Action:** Always wrap mapped child components in `React.memo()`, pass primitive identifiers (like `agent.id`) to their handlers, and provide stable function references via `useCallback` from the parent to ensure O(1) render cost during background state updates.
