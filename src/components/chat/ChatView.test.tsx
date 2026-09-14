@@ -7,6 +7,11 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 vi.mock('@/store/chatStore', () => ({
   useChatStore: vi.fn(),
 }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
 vi.mock('@/store/instanceStore', () => ({
   useInstanceStore: vi.fn(),
 }));
