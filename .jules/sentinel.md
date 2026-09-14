@@ -1,0 +1,4 @@
+## 2024-03-XX - Missing IPv6 URL normalization in SSRF filter
+**Vulnerability:** Server-Side Request Forgery (SSRF) via IPv6 parsing bypass. `isForbiddenHostname` relies on naive string matching for IPv6 addresses without proper URL normalization. An attacker can use URL-encoded formats or various uncompressed/alternative representations (e.g., `[::127.0.0.1]` instead of `[::ffff:127.0.0.1]`, or `[0:0:0:0:0:FFFF:127.0.0.1]`) which bypass the `if (cleanHn === '::1')` checks.
+**Learning:** Naive string matching for IPv6 is almost always flawed due to the numerous valid representations of IPv6 addresses.
+**Prevention:** Always use a standard library like `URL` to parse and normalize hostnames (which normalizes IPv6 properly), or `ipaddr.js` if more robust CIDR matching is required. Node's `new URL('http://['+ip+']').hostname` parses and normalizes IPv6 automatically into its compressed format (e.g. `[::ffff:7f00:1]`).
