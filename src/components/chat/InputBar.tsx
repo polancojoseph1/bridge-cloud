@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -21,6 +22,7 @@ const MAX_HEIGHT = LINE_HEIGHT_PX * MAX_LINES; // 120px
  * - Subtle gradient fade above the bar blends the message feed into the input.
  */
 export default function InputBar() {
+  const router = useRouter();
   const isStreaming = useChatStore((s) => s.isStreaming);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const stopGeneration = useChatStore((s) => s.stopGeneration);
@@ -56,7 +58,13 @@ export default function InputBar() {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
+
+    if (!useChatStore.getState().activeConversationId) {
+      const newId = useChatStore.getState().newConversation();
+      router.push(`/chat/${newId}`);
+    }
+
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
@@ -64,9 +72,9 @@ export default function InputBar() {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
     }
-  }, [value, isStreaming, sendMessage, orchestrationMode]);
+  }, [value, isStreaming, sendMessage, orchestrationMode, router]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 
   return (
     /*
@@ -81,7 +89,7 @@ export default function InputBar() {
             'flex items-end gap-2 px-4 py-3',
             'bg-[#111f15] border rounded-xl',
             'transition-colors duration-150',
-            isStreaming
+            isStreaming || orchestrationMode !== 'single'
               ? 'border-[#1e3025]'
               : 'border-[#1e3025] focus-within:border-[#2d4035] focus-within:bg-[#1f1f1f]',
             'focus-within:shadow-[0_0_0_1px_rgba(108,140,255,0.15)]',
@@ -92,9 +100,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -129,7 +137,7 @@ export default function InputBar() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={orchestrationMode === 'single' ? "Send message" : "Orchestration modes coming soon!"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
