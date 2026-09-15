@@ -1,0 +1,3 @@
+## 2024-09-15 - Unified chat input and auto-scroll fixes
+**Learning:** Using duplicated UI elements for the exact same function (like the chat input in EmptyState vs InputBar) leads to feature drift and un-handled edge cases (e.g. orchestration disabled states not being synced). Programmatic scroll logic must actively listen for user interaction events like `onPointerDown` to safely detach itself.
+**Action:** Always favor component re-use over inline duplication to maintain UI state parity. Always attach explicit interaction listeners (`onPointerDown`, `onWheel`, `onTouchMove`) when building auto-scroll containers to prevent locking users into programmatic scroll loops.
