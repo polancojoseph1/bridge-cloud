@@ -141,14 +141,14 @@ export default function NodeTray() {
                 <button
                   type="button"
                   onClick={() => selectAllNodes(nodes)}
-                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
+                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
                 >
                   All
                 </button>
                 <button
                   type="button"
                   onClick={clearNodeSelection}
-                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
+                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
                 >
                   None
                 </button>
