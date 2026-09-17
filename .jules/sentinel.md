@@ -1,0 +1,4 @@
+## 2024-05-15 - Node.js URL Normalization SSRF Bypass
+**Vulnerability:** The application's SSRF protection blocked literal IP strings (e.g., `::ffff:127.0.0.1`), but Node.js's built-in `URL` class normalizes IPv4-mapped and IPv4-compatible IPv6 addresses (e.g., `http://[::127.0.0.1]`) into hex-encoded formats (e.g., `[::7f00:1]`). The blocklist did not check these normalized hex formats, allowing attackers to reach internal network IPs by submitting the IP wrapped in brackets.
+**Learning:** Checking for string literals like `::ffff:` is insufficient when the underlying network stack or parser (like `URL`) actively mutates or normalizes the input format. IPv4 compatibility representations must always be parsed out of their hex-encoded normalization blocks and checked against standard IPv4 block rules.
+**Prevention:** Always extract and decode trailing hex blocks from any IPv6 address (`::xxxx:xxxx`) to verify if it hides a blocked IPv4 address.
