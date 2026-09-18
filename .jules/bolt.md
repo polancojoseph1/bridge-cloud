@@ -1,0 +1,3 @@
+## 2024-05-24 - Memoize mapped child items with primitive handlers
+**Learning:** In parent components that frequently re-render due to background updates (e.g., polling via useAgentHealth), mapped child list items must be wrapped in React.memo(), pass primitive identifiers to their handlers, and provide stable function references via useCallback from the parent to prevent large O(N) re-render cascades.
+**Action:** Always verify referential stability of inline functions passed to child components in frequently updating parent components, and use memo() and useCallback() to optimize list rendering.
