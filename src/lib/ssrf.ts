@@ -40,7 +40,16 @@ function parseIPv4(ip: string): number[] | null {
 }
 
 export function isForbiddenHostname(hn: string): boolean {
-  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+  let cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+
+  if (cleanHn.includes(':')) {
+    try {
+      const url = new URL(`http://[${cleanHn}]`);
+      cleanHn = url.hostname.slice(1, -1);
+    } catch {
+      return true;
+    }
+  }
 
   // Block localhost and .local domains
   if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
@@ -65,6 +74,7 @@ export function isForbiddenHostname(hn: string): boolean {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
     if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+    if (cleanHn.startsWith('::7f00:')) return true; // IPv4-compatible 127.0.0.0/8
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
