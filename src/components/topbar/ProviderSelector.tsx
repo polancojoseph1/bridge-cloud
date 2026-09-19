@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -29,7 +29,7 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
   );
 }
 
-function AgentRow({
+const AgentRow = memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
   agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
@@ -75,7 +75,12 @@ function AgentRow({
       </div>
     </div>
   );
-}
+}, (prev, next) => {
+  return prev.agent.id === next.agent.id &&
+         prev.agent.healthStatus === next.agent.healthStatus &&
+         prev.isActive === next.isActive &&
+         prev.disabled === next.disabled;
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
