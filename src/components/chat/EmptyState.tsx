@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
@@ -16,6 +17,7 @@ export default function EmptyState() {
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
   const router = useRouter();
+  const orchestrationMode = useOrchestrationStore(s => s.mode);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -78,7 +80,14 @@ export default function EmptyState() {
             <button
               key={s}
               onClick={() => startChat(s)}
-              className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
+              disabled={orchestrationMode !== 'single'}
+              className={[
+                "px-4 py-3 rounded-xl border text-[13px] text-left transition-all duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]",
+                orchestrationMode !== 'single'
+                  ? "bg-[#0d1a11] border-[#1e3025] text-[#3c5c48] opacity-50 cursor-not-allowed"
+                  : "bg-[#111f15] border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[#8e8e8e] hover:text-[#ececec]"
+              ].join(' ')}
             >
               {s}
             </button>
@@ -100,32 +109,34 @@ export default function EmptyState() {
               value={value}
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
+              disabled={orchestrationMode !== 'single'}
               rows={1}
-              placeholder="Message Bridge Cloud…"
-              aria-label="Chat input"
-              title="Chat input"
+              placeholder={orchestrationMode !== 'single' ? "Orchestration modes coming soon!" : "Message Bridge Cloud…"}
+              aria-label={orchestrationMode !== 'single' ? "Orchestration modes coming soon!" : "Chat input"}
+              title={orchestrationMode !== 'single' ? "Orchestration modes coming soon!" : "Chat input"}
               className={[
                 'flex-1 bg-transparent resize-none outline-none',
                 'text-sm text-[#ececec] placeholder:text-[#5c5c5c]',
                 'leading-[1.6] min-h-[24px] overflow-hidden',
+                'disabled:cursor-not-allowed disabled:opacity-50',
               ].join(' ')}
               style={{ maxHeight: '120px' }}
             />
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
               title="Send message"
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]',
-                canSend
+                (canSend && orchestrationMode === 'single')
                   ? 'bg-[#6c8cff] hover:bg-[#5a7aee] cursor-pointer'
                   : 'bg-[#1e3025] cursor-not-allowed',
               ].join(' ')}
             >
-              <ArrowUp className={`w-4 h-4 ${canSend ? 'text-[#0a1410]' : 'text-[#5c5c5c]'}`} strokeWidth={2.5} />
+              <ArrowUp className={`w-4 h-4 ${(canSend && orchestrationMode === 'single') ? 'text-[#0a1410]' : 'text-[#5c5c5c]'}`} strokeWidth={2.5} />
             </button>
           </div>
           <p className="text-center text-[11px] text-[#5c5c5c] mt-2 select-none">
