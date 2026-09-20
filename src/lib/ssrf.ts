@@ -47,16 +47,20 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
+  const checkIPv4Parts = (p1: number, p2: number) => {
+    if (p1 === 0) return true; // 0.0.0.0/8
+    if (p1 === 10) return true; // 10.0.0.0/8
+    if (p1 === 127) return true; // 127.0.0.0/8
+    if (p1 === 169 && p2 === 254) return true; // 169.254.0.0/16
+    if (p1 === 172 && p2 >= 16 && p2 <= 31) return true; // 172.16.0.0/12
+    if (p1 === 192 && p2 === 168) return true; // 192.168.0.0/16
+    return false;
+  };
+
   // IPv4 blocking (handles octal, hex, and dword formats)
   const parts = parseIPv4(cleanHn);
   if (parts) {
-    if (parts[0] === 0) return true; // 0.0.0.0/8
-    if (parts[0] === 10) return true; // 10.0.0.0/8
-    if (parts[0] === 127) return true; // 127.0.0.0/8
-    if (parts[0] === 169 && parts[1] === 254) return true; // 169.254.0.0/16
-    if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true; // 172.16.0.0/12
-    if (parts[0] === 192 && parts[1] === 168) return true; // 192.168.0.0/16
-
+    if (checkIPv4Parts(parts[0], parts[1])) return true;
     return false;
   }
 
@@ -65,6 +69,20 @@ export function isForbiddenHostname(hn: string): boolean {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
     if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    // IPv4-compatible IPv6 blocking
+    const isIPv4Compat = /^::([0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,1})$/i.test(cleanHn);
+    if (isIPv4Compat) {
+      const hexParts = cleanHn.slice(2).split(':');
+      let val = 0;
+      for (let i = 0; i < hexParts.length; i++) {
+        val = (val << 16) | parseInt(hexParts[i], 16);
+      }
+      const p1 = (val >>> 24) & 0xff;
+      const p2 = (val >>> 16) & 0xff;
+      if (checkIPv4Parts(p1, p2)) return true;
+    }
+
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
