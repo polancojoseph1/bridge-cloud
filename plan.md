@@ -1,0 +1,5 @@
+1. Add `onPointerDown` to `MessageList.tsx`
+   - In `MessageList.tsx`, we need to add an `onPointerDown` event handler to the scroll container (div) that sets `isProgrammaticScrollRef.current = false;`. This ensures that user interactions correctly pause auto-scroll behavior.
+2. Disable input when `orchestrationMode !== 'single'` in `InputBar.tsx`
+   - In `InputBar.tsx`, we need to disable the input when the orchestration mode is not `single`. This includes updating `canSend`, `textarea` disabled, and `handleSubmit`.
+3. Check memory memory: "When cancelling an active operation using an `AbortController` stored within a Zustand store (e.g., `chatStore.ts`), ensure `abort()` is invoked *before* applying any state updates that reset or clear the controller reference to avoid losing the ability to abort." -> Looks like this is already implemented correctly! Wait, in `stopGeneration`, `activeAbortController.abort()` is called *after* `set()`. The state is updated (isStreaming: false) but `activeAbortController` itself is *not* reset inside `set()`. Let's double check if we need to change it.
