@@ -1,0 +1,25 @@
+
+> bridge-cloud@0.1.0 dev /app
+> next dev
+
+▲ Next.js 16.1.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env.local
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 2.5s
+○ Compiling / ...
+ GET / 307 in 5.3s (compile: 4.5s, proxy.ts: 282ms, render: 514ms)
+○ Compiling /chat ...
+ GET /chat 200 in 3.9s (compile: 3.5s, proxy.ts: 7ms, render: 485ms)
+○ Compiling /chat/[id] ...
+ GET /chat/ad4c8a03-1bfc-43e2-b85a-53ba59bcb05d 200 in 4.5s (compile: 4.3s, proxy.ts: 10ms, render: 129ms)
+ GET / 307 in 179ms (compile: 6ms, proxy.ts: 7ms, render: 165ms)
+ GET /chat 200 in 109ms (compile: 6ms, proxy.ts: 6ms, render: 97ms)
+ GET /chat/c4c8775c-03b4-4d63-95d7-9b31e72ea27e 200 in 149ms (compile: 53ms, proxy.ts: 7ms, render: 89ms)
