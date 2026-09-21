@@ -1,0 +1,3 @@
+## 2024-05-24 - Avoid destructuring from Zustand stores
+**Learning:** Destructuring multiple values from a Zustand store hook (e.g. `const { profiles, activeProfileId } = useServerStore()`) creates a subscription to the entire store state object. If any other piece of state in the store updates (like `connectionStatus`), it will cause the component to re-render, even if the destructured values haven't changed.
+**Action:** Always use individual selectors when subscribing to Zustand stores to ensure the component only re-renders when the specific slice of state it needs changes (e.g. `const profiles = useServerStore(s => s.profiles);`).
