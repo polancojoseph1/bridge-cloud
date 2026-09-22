@@ -1,0 +1,3 @@
+## 2026-09-22 - Memoize List Items with Callback Props
+**Learning:** When using React.memo() on list items in frequently rendering components (like those using health polling), passing inline arrow functions for callback props defeats memoization. Instead, pass primitive identifiers (like an item's ID) to the callback and supply a stable function reference from the parent via useCallback.
+**Action:** Always verify that components wrapped in React.memo() receive stable function references and do not accept inline arrow functions, particularly when mapping over arrays in components with background state updates.
