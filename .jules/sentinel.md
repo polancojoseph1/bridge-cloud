@@ -1,0 +1,5 @@
+## 2024-10-25 - Fix IPv6 SSRF Bypass
+
+**Vulnerability:** The SSRF protection in `src/lib/ssrf.ts` failed to properly parse and block IPv4-mapped and IPv4-compatible IPv6 addresses. Node.js's `URL` class converts addresses like `::127.0.0.1` or `0:0:0:0:0:ffff:127.0.0.1` into their compact hex representation (e.g., `[::7f00:1]` and `[::ffff:7f00:1]`). The existing blocking logic relied on `startsWith('::ffff:')` which correctly caught `::ffff:127.0.0.1`, but not the hex-normalized versions produced by the `URL` parser, allowing an attacker to hit internal IPs.
+**Learning:** URL parsers (like Node's `URL` module) aggressively normalize IPv4-mapped and IPv4-compatible IPv6 addresses into hexadecimal representations. Standard string matching on the original IP or relying on simple prefix checks is insufficient. You must explicitly extract the hex segments and convert them back to an IPv4 format to properly reuse existing IPv4 blocking logic.
+**Prevention:** Always normalize and unpack mapped/compatible IPv6 addresses down to their core IPv4 values using hex parsing logic before validating them against internal blocklists.

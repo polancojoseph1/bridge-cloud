@@ -39,6 +39,22 @@ function parseIPv4(ip: string): number[] | null {
   return result;
 }
 
+function checkIPv6Hex(cleanHn: string): string | null {
+  const mappedMatch = cleanHn.match(/^::(?:ffff:)?([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+  if (mappedMatch) {
+    const high = parseInt(mappedMatch[1], 16);
+    const low = parseInt(mappedMatch[2], 16);
+    return `${high >> 8}.${high & 0xff}.${low >> 8}.${low & 0xff}`;
+  }
+
+  const mappedMatchSingle = cleanHn.match(/^::(?:ffff:)?([0-9a-f]{1,4})$/i);
+  if (mappedMatchSingle) {
+    const val = parseInt(mappedMatchSingle[1], 16);
+    return `0.0.${val >> 8}.${val & 0xff}`;
+  }
+  return null;
+}
+
 export function isForbiddenHostname(hn: string): boolean {
   const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
 
@@ -47,8 +63,14 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
+  let ipv4ToCheck = cleanHn;
+  const convertedIpv4 = checkIPv6Hex(cleanHn);
+  if (convertedIpv4) {
+    ipv4ToCheck = convertedIpv4;
+  }
+
   // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
+  const parts = parseIPv4(ipv4ToCheck);
   if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
