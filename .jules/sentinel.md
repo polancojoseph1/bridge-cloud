@@ -1,0 +1,4 @@
+## 2025-02-23 - SSRF Bypass via IPv6 Formatting
+**Vulnerability:** The SSRF filter incorrectly normalized and parsed IPv6 addresses, particularly IPv4-compatible (::127.0.0.1) and IPv4-mapped (::ffff:127.0.0.1) formats. A bug in URL protocol parsing within standard logic could be bypassed by using zero padding or dropping compression for Node's `new URL()`.
+**Learning:** Node.js's built-in `URL` class handles most IPv6 parsing out-of-the-box including zero-padding compression and hex conversion. This allows a bypass if a custom validation logic tries to reimplement string matching rather than relying on normalized behavior.
+**Prevention:** Always normalize the hostname with Node.js's `URL` class before evaluating it against a forbidden blocklist, and parse IPv4 embeddings from the `URL`-normalized hex format.

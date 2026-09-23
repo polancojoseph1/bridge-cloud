@@ -40,7 +40,16 @@ function parseIPv4(ip: string): number[] | null {
 }
 
 export function isForbiddenHostname(hn: string): boolean {
-  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+  let cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+
+  if (cleanHn.includes(':')) {
+    try {
+      const url = new URL(`http://[${cleanHn}]`);
+      cleanHn = url.hostname.slice(1, -1);
+    } catch {
+      return true;
+    }
+  }
 
   // Block localhost and .local domains
   if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
@@ -64,7 +73,23 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    // Support normalized IPv4-mapped (::ffff:127.0.0.1 -> ::ffff:7f00:1)
+    // and IPv4-compatible (::127.0.0.1 -> ::7f00:1)
+    const ipv4EmbeddedMatch = cleanHn.match(/^::(?:ffff:)?([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+    if (ipv4EmbeddedMatch) {
+      const p1 = parseInt(ipv4EmbeddedMatch[1], 16);
+      const p2 = parseInt(ipv4EmbeddedMatch[2], 16);
+      const ip4 = (p1 << 16) | p2;
+      const octet1 = (ip4 >>> 24) & 255;
+      const octet2 = (ip4 >>> 16) & 255;
+
+      if (octet1 === 127 || octet1 === 10 || octet1 === 0) return true;
+      if (octet1 === 169 && octet2 === 254) return true;
+      if (octet1 === 172 && octet2 >= 16 && octet2 <= 31) return true;
+      if (octet1 === 192 && octet2 === 168) return true;
+    }
+
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
