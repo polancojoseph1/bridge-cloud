@@ -66,7 +66,8 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const isSingleMode = orchestrationMode === 'single';
+  const canSend = value.trim().length > 0 && !isStreaming && isSingleMode;
 
   return (
     /*
@@ -92,11 +93,11 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || !isSingleMode}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={isSingleMode ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
-            title="Chat input"
+            title={isSingleMode ? "Chat input" : "Orchestration modes coming soon!"}
             aria-multiline="true"
             className={[
               'flex-1 bg-transparent resize-none outline-none',
