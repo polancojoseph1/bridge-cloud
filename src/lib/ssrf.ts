@@ -64,7 +64,39 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    // Extract underlying IPv4 if mapped (::ffff:x.x.x.x or ::ffff:x:y) or compatible (::x.x.x.x or ::x:y)
+    let underlyingIpv4: string | null = null;
+
+    // First check for direct dotted-decimal mapping e.g. ::127.0.0.1 or ::ffff:127.0.0.1
+    const ipv4CompatMatch = cleanHn.match(/^::(?:ffff:)?(\d+\.\d+\.\d+\.\d+)$/);
+    if (ipv4CompatMatch) {
+      underlyingIpv4 = ipv4CompatMatch[1];
+    } else {
+      let ipv4Hex = cleanHn;
+      if (cleanHn.startsWith('::ffff:')) ipv4Hex = cleanHn.substring(7);
+      else if (cleanHn.startsWith('::')) ipv4Hex = cleanHn.substring(2);
+
+      if (ipv4Hex && /^[0-9a-f]{1,4}:[0-9a-f]{1,4}$/i.test(ipv4Hex)) {
+        const parts = ipv4Hex.split(':');
+        const num = (parseInt(parts[0], 16) << 16) | parseInt(parts[1], 16);
+        underlyingIpv4 = `${(num >>> 24) & 255}.${(num >>> 16) & 255}.${(num >>> 8) & 255}.${num & 255}`;
+      }
+    }
+
+    if (underlyingIpv4) {
+      const ipv4Parts = parseIPv4(underlyingIpv4);
+      if (ipv4Parts) {
+        if (ipv4Parts[0] === 0 || ipv4Parts[0] === 10 || ipv4Parts[0] === 127 ||
+            (ipv4Parts[0] === 169 && ipv4Parts[1] === 254) ||
+            (ipv4Parts[0] === 172 && ipv4Parts[1] >= 16 && ipv4Parts[1] <= 31) ||
+            (ipv4Parts[0] === 192 && ipv4Parts[1] === 168)) {
+          return true;
+        }
+      }
+    }
+
+    if (cleanHn.startsWith('::ffff:')) return true; // Catch any other IPv4-mapped
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard

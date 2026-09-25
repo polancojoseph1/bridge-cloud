@@ -1,0 +1,4 @@
+## 2024-09-25 - SSRF Bypass via URL IPv6 Normalization
+**Vulnerability:** The SSRF filter blocked explicit private IPv4 addresses and the exact string `::1` but failed to block IPv4-compatible IPv6 addresses (e.g. `::127.0.0.1`). Node.js's `URL` class automatically normalizes these into their unbracketed hex formats (e.g. `::7f00:1`), bypassing the regex checks entirely.
+**Learning:** Checking for `::1` or `::ffff:` prefixes is insufficient when relying on `URL` parsing, as an attacker can encode any blocked IPv4 address into its compatible IPv6 form, which the system will normalize, resolve to the private subnet, and allow to bypass strict string blocklists.
+**Prevention:** When validating hostnames extracted from parsed `URL` objects, you must extract the trailing 32 bits from any `::ffff:x:y` or `::x:y` IPv6 string, convert them back to dotted decimal, and route them through the standard IPv4 blocking logic.
