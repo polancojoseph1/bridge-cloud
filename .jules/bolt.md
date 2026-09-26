@@ -1,0 +1,3 @@
+## 2025-01-24 - Memoize AgentRow in ProviderSelector
+**Learning:** Frequent polling of agent health statuses causes the entire `ProviderSelector` component to re-render. Since it contains lists of `AgentRow` components, mapping over these arrays without memoization triggers O(N) re-renders. When adding `memo` to a mapped child item, any callbacks passed down (like `onSelect`) must also be memoized with `useCallback` in the parent and passed down safely to prevent referential inequality from breaking the memoization.
+**Action:** When working on lists that are frequently updated (like polling data), wrap the mapped row component in `memo` and use `useCallback` for its handlers in the parent to turn O(N) re-renders into O(1).
