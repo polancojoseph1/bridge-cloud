@@ -68,6 +68,25 @@ export function isForbiddenHostname(hn: string): boolean {
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+
+    // Block normalized IPv4-compatible and IPv4-mapped addresses resolving to blocked IPv4 ranges
+    const ipv4MappedRegex = /^::(?:ffff:(?:0:)*)?([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i;
+    const match = cleanHn.match(ipv4MappedRegex);
+    if (match) {
+      const p1 = parseInt(match[1], 16);
+      const p2 = parseInt(match[2], 16);
+      const a = (p1 >> 8) & 0xff;
+      const b = p1 & 0xff;
+      const c = (p2 >> 8) & 0xff;
+      const d = p2 & 0xff;
+
+      if (a === 0) return true; // 0.0.0.0/8
+      if (a === 10) return true; // 10.0.0.0/8
+      if (a === 127) return true; // 127.0.0.0/8
+      if (a === 169 && b === 254) return true; // 169.254.0.0/16
+      if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
+      if (a === 192 && b === 168) return true; // 192.168.0.0/16
+    }
   }
 
   return false;

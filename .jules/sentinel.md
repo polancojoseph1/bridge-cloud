@@ -1,0 +1,4 @@
+## 2024-05-26 - IPv4-compatible IPv6 Address SSRF Bypass
+**Vulnerability:** The `isForbiddenHostname` function fails to correctly identify normalized IPv4-compatible IPv6 addresses (e.g., `::7f00:1` for `127.0.0.1`), allowing an attacker to bypass SSRF protections using formats like `http://[::127.0.0.1]`.
+**Learning:** Node.js's `URL` normalizer converts IPv4-mapped and IPv4-compatible IPv6 addresses directly to hex notation without standard mapped/compatible prefixes retaining decimal format, which standard string-matching SSRF checks easily miss.
+**Prevention:** Always normalize IP strings first (or use Node.js's built-in `URL` class) and implement robust regex checks or built-in IP validation libraries to verify that normalized IPv6 addresses are not representing forbidden IPv4 addresses in hex notation.
