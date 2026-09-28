@@ -62,12 +62,46 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
-    if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
-    if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
-    if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+    let normHn = cleanHn;
+    try {
+      // Normalize IPv6 address using URL parser (handles zero compression and embedded IPv4)
+      normHn = new URL(`http://[${cleanHn}]`).hostname.slice(1, -1);
+    } catch {
+      // If parsing fails, fall back to the original string
+    }
+
+    if (normHn === '::1') return true; // Loopback
+    if (normHn === '::') return true; // Unspecified
+    if (/^[fF][cCdDeEfF]/.test(normHn)) return true; // Unique local address (fc00::/7)
+    if (/^[fF][eE][89aAbB]/.test(normHn)) return true; // Link-local (fe80::/10)
+    if (normHn.startsWith('100:')) return true; // RFC 6666 discard
+
+    // Handle embedded IPv4 representations (IPv4-mapped and IPv4-compatible)
+    let v4Parts = null;
+    if (normHn.startsWith('::ffff:')) {
+      const hex = normHn.slice(7);
+      if (/^[0-9a-f]{1,4}:[0-9a-f]{1,4}$/i.test(hex)) {
+        const parts = hex.split(':');
+        const h1 = parseInt(parts[0] || '0', 16);
+        const h2 = parseInt(parts[1] || '0', 16);
+        v4Parts = [(h1 >> 8) & 255, h1 & 255, (h2 >> 8) & 255, h2 & 255];
+      }
+    } else if (/^::[0-9a-f]{1,4}:[0-9a-f]{1,4}$/i.test(normHn)) {
+      const hex = normHn.slice(2);
+      const parts = hex.split(':');
+      const h1 = parseInt(parts[0] || '0', 16);
+      const h2 = parseInt(parts[1] || '0', 16);
+      v4Parts = [(h1 >> 8) & 255, h1 & 255, (h2 >> 8) & 255, h2 & 255];
+    }
+
+    if (v4Parts) {
+      if (v4Parts[0] === 0) return true; // 0.0.0.0/8
+      if (v4Parts[0] === 10) return true; // 10.0.0.0/8
+      if (v4Parts[0] === 127) return true; // 127.0.0.0/8
+      if (v4Parts[0] === 169 && v4Parts[1] === 254) return true; // 169.254.0.0/16
+      if (v4Parts[0] === 172 && v4Parts[1] >= 16 && v4Parts[1] <= 31) return true; // 172.16.0.0/12
+      if (v4Parts[0] === 192 && v4Parts[1] === 168) return true; // 192.168.0.0/16
+    }
   }
 
   return false;
