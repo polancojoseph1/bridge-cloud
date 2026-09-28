@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix IPv6 SSRF bypass
+**Vulnerability:** The SSRF check for IPv4-mapped IPv6 addresses only used a strict string prefix match (`cleanHn.startsWith('::ffff:')`). It failed to account for zero-compressed, non-standard, or embedded IPv4-compatible representations of loopback IPs (e.g. `[::127.0.0.1]`), allowing an attacker to bypass the block.
+**Learning:** Checking IPv6 strings manually without a proper normalization engine is inherently flawed due to the numerous valid ways an IP can be represented (compressed, expanded, mixed-mapped). The environment's native `URL` parser reliably handles these nuances and transforms IPv4-mapped and compatible addresses into a standard hex-encoded tail.
+**Prevention:** Always use `new URL('http://['+ip+']').hostname` to fully normalize an IPv6 string before applying blacklist logic or parsing for internal network structures.
