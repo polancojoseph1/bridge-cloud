@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -29,7 +29,14 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
   );
 }
 
-function AgentRow({
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Wrapped AgentRow in React.memo() to prevent unnecessary re-renders.
+ * 🎯 Why: ProviderSelector polls agent health frequently. Without memo, all AgentRows re-render
+ *         even if their specific agent data hasn't changed.
+ * 📊 Impact: O(1) render cost for unchanged rows instead of O(N) during health polling.
+ */
+const AgentRow = memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
   agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
@@ -75,7 +82,7 @@ function AgentRow({
       </div>
     </div>
   );
-}
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
@@ -100,6 +107,19 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
       [[], []]
     );
   }, [agents]);
+
+  const handleSelect = (agentId: string) => {
+    onSelect(agentId);
+    setOpen(false);
+  };
+  const handleSelectAgent = useMemo(() => {
+    const handlers: Record<string, () => void> = {};
+    return (id: string) => {
+      if (!handlers[id]) handlers[id] = () => handleSelect(id);
+      return handlers[id];
+    };
+  }, [onSelect]);
+  const handleNoop = () => {};
 
   useEffect(() => {
     if (!open) return;
@@ -159,7 +179,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {onlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => { onSelect(agent.id); setOpen(false); }} />
+                  onSelect={handleSelectAgent(agent.id)} />
               ))}
             </>
           )}
@@ -175,7 +195,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {offlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => {}} disabled />
+                  onSelect={handleNoop} disabled />
               ))}
             </>
           )}
