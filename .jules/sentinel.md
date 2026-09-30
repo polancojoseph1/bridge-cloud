@@ -1,0 +1,4 @@
+## 2026-09-30 - SSRF Bypass via IPv4-Compatible IPv6 Addresses
+**Vulnerability:** The application's SSRF protection blocked common IPv6 loopback (`::1`) and IPv4-mapped (`::ffff:x.y.z.w`) addresses, but failed to block deprecated IPv4-compatible IPv6 addresses (`::x.y.z.w` which normalizes to `::hex:hex`).
+**Learning:** Node.js's `URL` parser automatically normalizes IPv4-compatible IPv6 addresses into their compressed hex format (`[::127.0.0.1]` becomes `::7f00:1`). Explicitly checking for `::ffff:` leaves the application vulnerable to internal network scanning and SSRF via `::` prefixed addresses.
+**Prevention:** Instead of explicitly listing `::1`, `::`, and `::ffff:`, simply block all IPv6 addresses that start with `::` (`cleanHn.startsWith('::')`). This broadly covers all unspecified, loopback, IPv4-mapped, and IPv4-compatible IPv6 addresses without inadvertently blocking legitimate public global unicast IPv6 addresses (which start with `2` or `3`).
