@@ -1,0 +1,4 @@
+## 2026-10-03 - Prevent trailing dot SSRF bypass in URL validation
+**Vulnerability:** The SSRF check `isForbiddenHostname` failed to account for Fully Qualified Domain Names (FQDN) using a trailing dot (e.g., `127.0.0.1.`). Node's `URL` class preserves this dot in the `hostname` property, allowing requests to internal networks to bypass exact IP and standard domain matching.
+**Learning:** Node's `URL` parser is strict to the WHATWG spec and does not canonicalize away trailing dots in the `hostname` field. Relying on `new URL(url).hostname` for SSRF blocklists without stripping the trailing dot leaves a trivial bypass vector.
+**Prevention:** Always strip trailing dots (`.replace(/\.$/, '')`) from hostnames after parsing them with `URL` but before passing them to any blocklist or whitelist logic.
