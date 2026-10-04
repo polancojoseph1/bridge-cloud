@@ -1,0 +1,3 @@
+## 2026-10-04 - Memoize AgentRow in ProviderSelector
+**Learning:** In parent components that frequently re-render due to background updates (e.g., polling via useAgentHealth), mapped child list items must be wrapped in React.memo() to prevent O(N) re-render cascades. However, for memoization to work, the parent must pass stable function references via useCallback, and child handlers must receive primitive identifiers instead of relying on inline arrow functions in the map block.
+**Action:** Always verify that mapped list items are memoized AND that their callback props are referentially stable when optimizing components with high-frequency local state updates.
