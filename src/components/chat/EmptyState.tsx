@@ -3,6 +3,7 @@ import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useRouter } from 'next/navigation';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 
 const SUGGESTIONS = [
   'Explain a concept',
@@ -15,6 +16,7 @@ export default function EmptyState() {
   const newConversation = useChatStore(s => s.newConversation);
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
+  const orchestrationMode = useOrchestrationStore(s => s.mode);
   const router = useRouter();
 
   const [value, setValue] = useState('');
@@ -58,7 +60,8 @@ export default function EmptyState() {
     el.style.overflowY = el.scrollHeight > 120 ? 'auto' : 'hidden';
   };
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
+  const isInputDisabled = isStreaming || orchestrationMode !== 'single';
 
   return (
     <div className="flex-1 flex flex-col bg-[#0a1410] min-h-0">
@@ -101,13 +104,15 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
-              placeholder="Message Bridge Cloud…"
+              disabled={isInputDisabled}
+              placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
               aria-label="Chat input"
-              title="Chat input"
+              title={orchestrationMode === 'single' ? "Chat input" : "Orchestration modes coming soon!"}
               className={[
                 'flex-1 bg-transparent resize-none outline-none',
                 'text-sm text-[#ececec] placeholder:text-[#5c5c5c]',
                 'leading-[1.6] min-h-[24px] overflow-hidden',
+                'disabled:cursor-not-allowed disabled:opacity-50',
               ].join(' ')}
               style={{ maxHeight: '120px' }}
             />
