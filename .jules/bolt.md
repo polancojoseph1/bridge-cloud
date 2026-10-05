@@ -1,0 +1,3 @@
+## 2026-10-05 - Memoize AgentRow list items in ProviderSelector
+**Learning:** Frequent array mappings inside components that re-render due to background polling (like ProviderSelector using useAgentHealth) create unnecessary O(N) re-renders for child items. Simply wrapping the child component in React.memo() is not enough; inline arrow functions in event handlers (e.g., onSelect) defeat memoization by passing a new function reference every render.
+**Action:** Always wrap mapped list item components in React.memo(), use stable identifiers (like id) in their handlers, and provide stable function references via useCallback from the parent to ensure O(1) referential stability and prevent re-render cascades.
