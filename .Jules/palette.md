@@ -1,3 +1,3 @@
-## 2024-04-20 - Icon Buttons Tooltip
-**Learning:** Icon-only buttons must include a `title` attribute (matching the `aria-label`) to provide a native browser tooltip on hover for sighted users who may not immediately recognize the icon's function.
-**Action:** When implementing icon-only buttons, always ensure that both `aria-label` and `title` are provided. Update `IconButton` component to use `label` for both `aria-label` and `title`.
+## 2024-10-06 - Avoid Redundant aria-label
+**Learning:** Adding `aria-label` to buttons that already have visible text content (e.g., `<button aria-label="Log in">Log in</button>`) is redundant. Browsers automatically compute the accessible name from a standard `<button>`'s text content. `aria-label` should ideally be reserved for icon-only buttons or situations where the visible text lacks necessary context.
+**Action:** Only use `aria-label` when a button is icon-only or lacks adequate text.
