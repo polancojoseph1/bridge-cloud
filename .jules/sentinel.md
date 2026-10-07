@@ -1,0 +1,4 @@
+## 2023-10-06 - Fix SSRF trailing dot bypass and IPv6 normalization bypass
+**Vulnerability:** Attackers could bypass SSRF checks using FQDNs with trailing dots (e.g., `127.0.0.1.`) or unnormalized IPv6 representations (e.g., `::127.0.0.1`) which bypass simplistic exact string matches but are resolved correctly by underlying HTTP clients.
+**Learning:** Node.js's `URL` class preserves trailing dots in hostnames and auto-normalizes certain IPv6 forms (like IPv4-mapped addresses) into standard hex representations, making string-matching blocklists ineffective without identical preprocessing.
+**Prevention:** Always strip trailing dots (`.replace(/\.$/, '')`) from hostnames before validating them against IP blocklists, and utilize the built-in `URL` class to standardize IPv6 formats before applying prefix checks.
