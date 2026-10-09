@@ -8,14 +8,13 @@ interface SendButtonProps {
   title?: string;
 }
 
-export default function SendButton({ disabled, isStreaming, onClick, title }: SendButtonProps) {
+export default function SendButton({ disabled, isStreaming, onClick }: SendButtonProps) {
   return (
     <button
       onClick={onClick}
       disabled={disabled && !isStreaming}
-      title={title}
-      aria-label={isStreaming ? 'Stop generating' : 'Send message'}
-      title={isStreaming ? 'Stop generating' : 'Send message'}
+      aria-label={isStreaming ? 'Stop generating' : disabled ? 'Enter a message to send' : 'Send message'}
+      title={isStreaming ? 'Stop generating' : disabled ? 'Enter a message to send' : 'Send message'}
       className={cn(
         'w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 self-end mb-0.5',
         'transition-colors duration-150 active:scale-[0.94] transition-transform',
