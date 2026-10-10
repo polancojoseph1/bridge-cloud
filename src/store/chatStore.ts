@@ -42,6 +42,9 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
+        if (activeAbortController) {
+          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
+        }
         set(s => {
           if (!s.activeConversationId) return { isStreaming: false };
           const convIndex = s.conversations.findIndex(c => c.id === s.activeConversationId);
