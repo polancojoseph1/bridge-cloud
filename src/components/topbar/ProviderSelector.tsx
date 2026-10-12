@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo, useCallback } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -29,21 +29,28 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
   );
 }
 
-function AgentRow({
+/**
+ * ⚡ Bolt Optimization: Memoize AgentRow and avoid inline functions
+ * 💡 What: Wrapped AgentRow in React.memo() and passed a stable useCallback handler with primitive IDs.
+ * 🎯 Why: ProviderSelector re-renders often (e.g. toggling the dropdown menu or polling updates).
+ *         Without memoization and with inline functions, every AgentRow would unnecessarily re-render.
+ * 📊 Impact: Prevents O(N) AgentRow re-renders when toggling the dropdown menu or receiving status updates.
+ */
+const AgentRow = memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
-  agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
+  agent: AgentWithHealth; isActive: boolean; onSelect: (id: string) => void; disabled?: boolean;
 }) {
   return (
     <div
       role="option"
       aria-selected={isActive}
       tabIndex={disabled ? -1 : 0}
-      onClick={disabled ? undefined : onSelect}
+      onClick={disabled ? undefined : () => onSelect(agent.id)}
       onKeyDown={(e) => {
         if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
-          onSelect();
+          onSelect(agent.id);
         }
       }}
       title={disabled ? `${agent.name} is offline` : undefined}
@@ -75,11 +82,16 @@ function AgentRow({
       </div>
     </div>
   );
-}
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleAgentSelect = useCallback((id: string) => {
+    onSelect(id);
+    setOpen(false);
+  }, [onSelect]);
   const agents = useAgentHealth();
   const orchMode = useOrchestrationStore(s => s.mode);
   const openManage = useServerStore(s => s.openManage);
@@ -159,7 +171,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {onlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => { onSelect(agent.id); setOpen(false); }} />
+                  onSelect={handleAgentSelect} />
               ))}
             </>
           )}
@@ -175,7 +187,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {offlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => {}} disabled />
+                  onSelect={handleAgentSelect} disabled />
               ))}
             </>
           )}
