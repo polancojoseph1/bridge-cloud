@@ -40,7 +40,7 @@ function parseIPv4(ip: string): number[] | null {
 }
 
 export function isForbiddenHostname(hn: string): boolean {
-  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase().replace(/\.+$/, '');
 
   // Block localhost and .local domains
   if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
@@ -76,7 +76,7 @@ export function isForbiddenHostname(hn: string): boolean {
 export function isOpenRouterUrl(url: string): boolean {
   try {
     const parsedUrl = new URL(url);
-    const hn = parsedUrl.hostname.toLowerCase();
+    const hn = parsedUrl.hostname.toLowerCase().replace(/\.+$/, '');
     return hn === 'openrouter.ai' || hn.endsWith('.openrouter.ai');
   } catch {
     return false;
