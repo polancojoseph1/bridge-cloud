@@ -29,7 +29,7 @@ export async function checkHealth(url: string, apiKey: string): Promise<HealthCh
       return { status: 'offline', error: 'Invalid URL protocol' };
     }
 
-    const hn = parsedUrl.hostname.toLowerCase();
+    const hn = parsedUrl.hostname.replace(/\.+$/, '').toLowerCase();
 
     // Check for loopback, current network, AWS metadata, etc.
     if (isForbiddenHostname(hn)) {
