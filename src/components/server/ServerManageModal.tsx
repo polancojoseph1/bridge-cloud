@@ -202,6 +202,7 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       <button
         onClick={handleTest}
         disabled={!canSubmit}
+        title={!canSubmit ? "Fill out URL and API key to test" : undefined}
         className={cn(
           'mt-5 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-[14px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]',
           canSubmit
