@@ -171,6 +171,7 @@ export default function ConnectForm({ tier, onBack, onConnected }: ConnectFormPr
         <button
           onClick={handleTest}
           disabled={isChecking || success || !url || (tier === 'local' && !apiKey.trim())}
+          title={isChecking || success || !url || (tier === 'local' && !apiKey.trim()) ? "Fill out URL and API key to test" : undefined}
           className={cn(
             'mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-lg text-[14px] font-medium transition-colors duration-150',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f]',
