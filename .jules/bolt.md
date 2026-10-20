@@ -1,0 +1,3 @@
+## 2026-10-20 - Memoize AgentRow in ProviderSelector
+**Learning:** In frequently polling components like ProviderSelector, mapping over agents without React.memo for the list items (AgentRow) causes O(N) redundant renders whenever the polling updates the status or reference. Furthermore, using inline callbacks like onSelect={() => onSelect(agent.id)} defeats memoization, requiring the child component to accept the primitive id directly and the parent to pass a stable useCallback handler.
+**Action:** Always wrap mapped child components in React.memo(), ensure they accept primitive identifiers instead of using inline arrow functions, and provide stable function references via useCallback from the parent to prevent large O(N) re-render cascades in polling hooks.
