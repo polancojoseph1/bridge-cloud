@@ -124,7 +124,8 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? "provider-listbox" : undefined}
-        title={isOrchestrating ? 'Agent selection disabled in orchestration mode' : undefined}
+        aria-label="Select AI provider"
+        title={isOrchestrating ? 'Agent selection disabled in orchestration mode' : 'Select AI provider'}
         className={cn(
           'flex items-center gap-2 px-3 py-1.5 rounded-md',
           'text-[13px] font-medium text-[#ececec]',
