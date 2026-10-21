@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
+import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useRouter } from 'next/navigation';
 
 const SUGGESTIONS = [
@@ -16,6 +17,7 @@ export default function EmptyState() {
   const sendMessage = useChatStore(s => s.sendMessage);
   const isStreaming = useChatStore(s => s.isStreaming);
   const router = useRouter();
+  const orchestrationMode = useOrchestrationStore(s => s.mode);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -38,6 +40,7 @@ export default function EmptyState() {
   const handleSubmit = () => {
     const trimmed = value.trim();
     if (!trimmed || isStreaming) return;
+    if (orchestrationMode !== 'single') return;
     setValue('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     startChat(trimmed);
@@ -101,7 +104,7 @@ export default function EmptyState() {
               onChange={e => { setValue(e.target.value); resizeTextarea(); }}
               onKeyDown={handleKeyDown}
               rows={1}
-              placeholder="Message Bridge Cloud…"
+              placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
               aria-label="Chat input"
               title="Chat input"
               className={[
@@ -114,13 +117,13 @@ export default function EmptyState() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
               title="Send message"
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]',
-                canSend
+                canSend && orchestrationMode === 'single'
                   ? 'bg-[#6c8cff] hover:bg-[#5a7aee] cursor-pointer'
                   : 'bg-[#1e3025] cursor-not-allowed',
               ].join(' ')}

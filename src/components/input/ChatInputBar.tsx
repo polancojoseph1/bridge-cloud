@@ -26,10 +26,15 @@ export default function ChatInputBar() {
 
   const handleSubmit = async () => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
+    if (!trimmed || isStreaming) return;
     setValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
+    }
+    if (orchestrationMode !== 'single') {
+      // Orchestration modes feature stub/graceful degradation if not fully wired
+      // Currently just disabled via UI conditionally
+      return;
     }
     await sendMessage(trimmed);
   };
