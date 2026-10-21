@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo, useCallback } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -29,23 +29,29 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
   );
 }
 
-function AgentRow({
+const AgentRow = memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
-  agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
+  agent: AgentWithHealth; isActive: boolean; onSelect: (id: string) => void; disabled?: boolean;
 }) {
+  const handleClick = useCallback(() => {
+    if (!disabled) onSelect(agent.id);
+  }, [disabled, onSelect, agent.id]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onSelect(agent.id);
+    }
+  }, [disabled, onSelect, agent.id]);
+
   return (
     <div
       role="option"
       aria-selected={isActive}
       tabIndex={disabled ? -1 : 0}
-      onClick={disabled ? undefined : onSelect}
-      onKeyDown={(e) => {
-        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onSelect();
-        }
-      }}
+      onClick={disabled ? undefined : handleClick}
+      onKeyDown={handleKeyDown}
       title={disabled ? `${agent.name} is offline` : undefined}
       className={cn(
         'flex items-center gap-3 px-3 py-2.5 mx-1 rounded-md',
@@ -75,7 +81,7 @@ function AgentRow({
       </div>
     </div>
   );
-}
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
@@ -114,6 +120,13 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
       document.removeEventListener('keydown', handleKey);
     };
   }, [open]);
+
+  const handleAgentSelect = useCallback((id: string) => {
+    onSelect(id);
+    setOpen(false);
+  }, [onSelect, setOpen]);
+
+  const handleOfflineSelect = useCallback(() => {}, []);
 
   return (
     <div ref={containerRef} className="relative">
@@ -159,7 +172,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {onlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => { onSelect(agent.id); setOpen(false); }} />
+                  onSelect={handleAgentSelect} />
               ))}
             </>
           )}
@@ -175,7 +188,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               </div>
               {offlineAgents.map(agent => (
                 <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => {}} disabled />
+                  onSelect={handleOfflineSelect} disabled />
               ))}
             </>
           )}
