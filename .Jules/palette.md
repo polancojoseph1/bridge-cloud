@@ -1,3 +1,3 @@
-## 2024-04-20 - Icon Buttons Tooltip
-**Learning:** Icon-only buttons must include a `title` attribute (matching the `aria-label`) to provide a native browser tooltip on hover for sighted users who may not immediately recognize the icon's function.
-**Action:** When implementing icon-only buttons, always ensure that both `aria-label` and `title` are provided. Update `IconButton` component to use `label` for both `aria-label` and `title`.
+## 2026-10-15 - Fix duplicate title attribute and build error
+**Learning:** React JSX does not allow duplicate attributes on an element. The `SendButton` component had two `title` attributes: one for the optional tooltip string, and one dynamically changing to "Stop generating" / "Send message".
+**Action:** Remove the hardcoded dynamic title string and just use the `title` prop which gets passed the "Stop generating" / "Send message" text, or fallback to the dynamic text if `title` is not provided.
