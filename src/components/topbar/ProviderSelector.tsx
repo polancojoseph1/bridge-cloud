@@ -83,7 +83,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
   const agents = useAgentHealth();
   const orchMode = useOrchestrationStore(s => s.mode);
   const openManage = useServerStore(s => s.openManage);
-  const isOrchestrating = orchMode !== 'single';
+  const isOrchestrating = false;
 
   const activeAgent = useMemo(() => {
     return agents.find(a => a.id === activeAgentId) ?? agents[0];

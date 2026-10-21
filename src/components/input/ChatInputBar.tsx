@@ -26,7 +26,7 @@ export default function ChatInputBar() {
 
   const handleSubmit = async () => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
+    if (!trimmed || isStreaming) return;
     setValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -53,8 +53,8 @@ export default function ChatInputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming || orchestrationMode !== 'single'}
-            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud..." : "Orchestration modes coming soon!"}
+            disabled={isStreaming}
+            placeholder="Message Bridge Cloud..."
             aria-label="Chat input"
             aria-multiline="true"
             rows={1}
@@ -62,10 +62,10 @@ export default function ChatInputBar() {
             style={{ height: 'auto' }}
           />
           <SendButton
-            disabled={isEmpty || orchestrationMode !== 'single'}
+            disabled={isEmpty}
             isStreaming={isStreaming}
             onClick={isStreaming ? stopGeneration : handleSubmit}
-            title={orchestrationMode === 'single' ? undefined : "Orchestration modes coming soon!"}
+            title={undefined}
           />
         </div>
         {/* Footer hint */}
