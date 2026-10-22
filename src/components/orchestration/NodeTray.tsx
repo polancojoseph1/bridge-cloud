@@ -35,6 +35,7 @@ function NodeChip({
     <div className="flex items-center gap-1">
       <button
         type="button"
+        title={node.online ? (selected ? "Deselect node" : "Select node") : "Node is offline"}
         onClick={onClick}
         disabled={!node.online}
         className={cn(
