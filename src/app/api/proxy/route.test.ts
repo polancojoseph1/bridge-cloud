@@ -6,6 +6,25 @@ vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
 }));
 
+vi.mock('dns', () => {
+  return {
+    default: {
+      lookup: (hostname: string, options: any, callback: any) => {
+        // For tests with options (like all: true), mimic the expected output
+        if (typeof options === 'function') {
+          callback = options;
+          options = {};
+        }
+        if (options && options.all) {
+           callback(null, [{ address: '8.8.8.8', family: 4 }]);
+        } else {
+           callback(null, '8.8.8.8', 4);
+        }
+      }
+    }
+  };
+});
+
 function createMockRequest(payload: Record<string, unknown>) {
   return { body: new ReadableStream({ start(controller) { controller.enqueue(new TextEncoder().encode(JSON.stringify(payload))); controller.close(); } }),
     json: async () => payload,
