@@ -1,0 +1,4 @@
+## 2024-05-18 - SSRF Bypass via Normalized IPv6 Addresses
+**Vulnerability:** Node.js's `URL` class normalizes IPv4-mapped (`::ffff:127.0.0.1`) and IPv4-compatible (`::127.0.0.1`) IPv6 addresses into standard hex notation (e.g., `::ffff:7f00:1` and `::7f00:1`). Naive string matching on the normalized hostname failed to block these, allowing an SSRF bypass to internal IPv4 addresses.
+**Learning:** External libraries and language built-ins like `new URL()` often normalize data formats. Security checks must account for this normalized state (e.g. by extracting the underlying IPv4 octets from the hex format).
+**Prevention:** When validating IP addresses to prevent SSRF, use robust IP parsing libraries or ensure that custom validation logic explicitly extracts and verifies the embedded octets from normalized IPv6 formats.
