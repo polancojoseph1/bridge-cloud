@@ -35,13 +35,6 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
-    // If we recently programmatically scrolled, ignore this scroll event
-    if (isProgrammaticScrollRef.current) {
-      // Don't clear it immediately because smooth scrolling fires multiple times.
-      // The timeout below will clear it.
-      return;
-    }
-
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
     // ensuring precision within the threshold
@@ -49,6 +42,7 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
     if (distanceToBottom > 30) {
       isUserScrolledRef.current = true;
+      isProgrammaticScrollRef.current = false; // Cancel programmatic scroll state if user scrolls manually
     } else {
       isUserScrolledRef.current = false;
     }
