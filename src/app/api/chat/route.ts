@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       await streamMockResponse(message, agentId, (chunk) => {
         controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
-      });
+      }, req.signal);
       controller.enqueue(encoder.encode('data: [DONE]\n\n'));
       controller.close();
     },
