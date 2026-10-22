@@ -108,6 +108,8 @@ function AddServerForm({ onBack, onConnected }: AddFormProps) {
       {/* Back */}
       <button
         onClick={onBack}
+        aria-label="Back to servers"
+        title="Back to servers"
         className="flex items-center gap-1.5 text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-colors mb-5 self-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] rounded-sm"
       >
         <ArrowLeft size={13} />
