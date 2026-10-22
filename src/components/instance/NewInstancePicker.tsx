@@ -63,7 +63,7 @@ function NewInstancePicker({ open, onClose, anchorRef }: NewInstancePickerProps)
           key={agent.id}
           type="button"
           onClick={() => { createInstance(agent.id); onClose(); }}
-          className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] text-[#ececec] hover:bg-[#1e3025] transition-colors text-left"
+          className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] text-[#ececec] hover:bg-[#1e3025] transition-colors text-left focus-visible:outline-none focus-visible:bg-[#1e3025] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6c8cff]"
         >
           <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: agent.dotColor }} />
           {agent.name}
@@ -110,7 +110,8 @@ export function NewInstanceButton() {
         'border border-[#1e3025] transition-colors duration-150',
         atMax
           ? 'opacity-30 cursor-not-allowed'
-          : 'hover:bg-[#1e3025] hover:border-[#2d4035] cursor-pointer text-[#5c5c5c] hover:text-[#9b9b9b]'
+          : 'hover:bg-[#1e3025] hover:border-[#2d4035] cursor-pointer text-[#5c5c5c] hover:text-[#9b9b9b]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]'
       )}
     >
       <Plus className="w-3.5 h-3.5" />
