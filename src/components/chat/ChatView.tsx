@@ -7,6 +7,7 @@ import { useEffect, useRef, use } from 'react';
 import EmptyState from './EmptyState';
 import InstanceTabBar from '@/components/instance/InstanceTabBar';
 import { useInstanceStore } from '@/store/instanceStore';
+import { useRouter } from 'next/navigation';
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 
@@ -36,13 +37,16 @@ export default function ChatView({ params }: { params?: Promise<{ id: string }> 
 
   // Keep track of previous active instance ID to know when a tab switch occurred
   const prevInstanceIdRef = useRef<string | null>(null);
+  const router = useRouter();
 
   // Sync URL conversation ID to store
   useEffect(() => {
     if (conversationIdFromUrl && conversationIdFromUrl !== activeConversationId) {
       setActiveConversation(conversationIdFromUrl);
+    } else if (!conversationIdFromUrl && activeConversationId) {
+      router.replace(`/chat/${activeConversationId}`);
     }
-  }, [conversationIdFromUrl, activeConversationId, setActiveConversation]);
+  }, [conversationIdFromUrl, activeConversationId, setActiveConversation, router]);
 
   useEffect(() => {
     if (!activeInstance || !activeInstanceId) return;

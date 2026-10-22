@@ -41,7 +41,13 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
+    const store = useChatStore.getState();
+    const wasActive = store.activeConversationId === conversation.id;
     deleteConversation(conversation.id);
+    if (wasActive) {
+      const next = useChatStore.getState().activeConversationId;
+      router.replace(next ? `/chat/${next}` : '/chat');
+    }
   }
 
   return (

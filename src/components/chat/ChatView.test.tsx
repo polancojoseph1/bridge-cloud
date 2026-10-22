@@ -10,6 +10,13 @@ vi.mock('@/store/chatStore', () => ({
 vi.mock('@/store/instanceStore', () => ({
   useInstanceStore: vi.fn(),
 }));
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  })),
+}));
 
 import { useInstanceStore } from '@/store/instanceStore';
 

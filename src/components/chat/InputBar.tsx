@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -28,6 +28,16 @@ export default function InputBar() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const wasStreaming = useRef(isStreaming);
+
+  useEffect(() => {
+    if (wasStreaming.current && !isStreaming) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 0);
+    }
+    wasStreaming.current = isStreaming;
+  }, [isStreaming]);
 
   // ── Auto-resize ─────────────────────────────────────────────────────────────
   const resizeTextarea = useCallback(() => {
@@ -66,7 +76,8 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const isSingle = orchestrationMode === 'single';
+  const canSend = value.trim().length > 0 && !isStreaming && isSingle;
 
   return (
     /*
@@ -92,9 +103,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || !isSingle}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={isSingle ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -129,7 +140,7 @@ export default function InputBar() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={isSingle ? "Send message" : "Orchestration modes coming soon!"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
