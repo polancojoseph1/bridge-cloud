@@ -37,5 +37,6 @@ export function generateId(): string {
   }
 
   // Final fallback (should rarely be hit in modern environments)
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  // 🛡️ Sentinel: Fail securely if no secure random generator is available
+  throw new Error('No secure random number generator available.');
 }
