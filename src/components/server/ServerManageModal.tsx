@@ -497,6 +497,7 @@ export default function ServerManageModal() {
     >
       {/* Backdrop */}
       <div
+        aria-hidden="true"
         className={cn(
           'absolute inset-0 bg-black/60 transition-opacity duration-300',
           visible ? 'opacity-100' : 'opacity-0'
