@@ -20,7 +20,11 @@ const MAX_HEIGHT = LINE_HEIGHT_PX * MAX_LINES; // 120px
  * - While streaming, send button is replaced by a Stop button.
  * - Subtle gradient fade above the bar blends the message feed into the input.
  */
-export default function InputBar() {
+interface InputBarProps {
+  onSend?: (text: string) => void;
+}
+
+export default function InputBar({ onSend }: InputBarProps = {}) {
   const isStreaming = useChatStore((s) => s.isStreaming);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const stopGeneration = useChatStore((s) => s.stopGeneration);
@@ -57,16 +61,21 @@ export default function InputBar() {
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
     if (!trimmed || isStreaming) return;
-    sendMessage(trimmed);
+    if (onSend) {
+      onSend(trimmed);
+    } else {
+      sendMessage(trimmed);
+    }
     setValue('');
     // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
     }
-  }, [value, isStreaming, sendMessage, orchestrationMode]);
+  }, [value, isStreaming, sendMessage, onSend, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const isOrchestrationNotSingle = orchestrationMode !== 'single';
+  const canSend = value.trim().length > 0 && !isStreaming && !isOrchestrationNotSingle;
 
   return (
     /*
@@ -92,9 +101,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || isOrchestrationNotSingle}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={isOrchestrationNotSingle ? "Orchestration modes coming soon!" : "Message Bridge Cloud…"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
