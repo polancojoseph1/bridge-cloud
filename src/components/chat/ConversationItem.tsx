@@ -29,9 +29,18 @@ export default function ConversationItem({ conversation, isActive }: Conversatio
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       className={cn(
-        'group flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors duration-100',
+        'group relative flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors duration-100',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-1 focus-visible:ring-offset-[#111111]',
         isActive ? 'bg-[#162a1c]' : 'hover:bg-[#111f15]'
       )}
     >
