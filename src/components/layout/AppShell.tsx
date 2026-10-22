@@ -79,6 +79,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar */}
       <aside
+        id="mobile-sidebar"
         className={cn(
           'fixed lg:relative inset-y-0 left-0 w-[260px] flex-shrink-0 flex flex-col',
           'bg-[#0e1c14] border-r border-[#1e3025] z-50 h-full',
