@@ -141,14 +141,14 @@ export default function NodeTray() {
                 <button
                   type="button"
                   onClick={() => selectAllNodes(nodes)}
-                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
+                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff] rounded-sm"
                 >
                   All
                 </button>
                 <button
                   type="button"
                   onClick={clearNodeSelection}
-                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
+                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff] rounded-sm"
                 >
                   None
                 </button>
@@ -173,7 +173,7 @@ export default function NodeTray() {
           <button
             type="button"
             onClick={() => openManage('add')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#2d4035] text-[12px] text-[#3c5c48] hover:text-[#6c8cff] hover:border-[#6c8cff] transition-colors duration-150"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#2d4035] text-[12px] text-[#3c5c48] hover:text-[#6c8cff] hover:border-[#6c8cff] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
           >
             <Plus className="w-3 h-3" />
             Add server
