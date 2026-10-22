@@ -1,0 +1,4 @@
+Total issues found: 3
+- EmptyState input lacked Stop button wiring; fixed by using InputBar component.
+- Orchestration modes lacked UI disabling in InputBar; fixed by updating disabled states.
+- Auto-scroll did not stick to bottom on new messages; fixed by removing user role condition.
