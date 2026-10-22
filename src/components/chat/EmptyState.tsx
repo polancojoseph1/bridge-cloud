@@ -78,6 +78,8 @@ export default function EmptyState() {
             <button
               key={s}
               onClick={() => startChat(s)}
+              title={`Ask: ${s}`}
+              aria-label={`Ask: ${s}`}
               className="px-4 py-3 rounded-xl bg-[#111f15] border border-[#1e3025] hover:border-[#2d4035] hover:bg-[#162a1c] text-[13px] text-[#8e8e8e] hover:text-[#ececec] transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
             >
               {s}
@@ -116,7 +118,7 @@ export default function EmptyState() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={!canSend ? "Enter a message to send" : "Send message"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]',
