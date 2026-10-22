@@ -58,6 +58,7 @@ function InstanceTab({ instanceId }: { instanceId: string }) {
           role="button"
           tabIndex={0}
           aria-label={`Close ${instance.label}`}
+          title={`Close ${instance.label}`}
           onClick={e => { e.stopPropagation(); close(instanceId); }}
           onKeyDown={e => {
             if (e.key === 'Enter' || e.key === ' ') {
