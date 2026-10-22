@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Bot, ArrowUp } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useRouter } from 'next/navigation';
@@ -19,6 +19,18 @@ export default function EmptyState() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // ── Auto-focus after send ───────────────────────────────────────────────────
+  const prevStreaming = useRef(isStreaming);
+  useEffect(() => {
+    if (prevStreaming.current && !isStreaming) {
+      // Transitioned from streaming to not streaming
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 0);
+    }
+    prevStreaming.current = isStreaming;
+  }, [isStreaming]);
 
   const startChat = useCallback((text: string) => {
     if (!text.trim()) return;

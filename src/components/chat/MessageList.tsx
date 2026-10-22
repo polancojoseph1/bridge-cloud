@@ -35,22 +35,19 @@ export default function MessageList({ conversationId }: MessageListProps) {
   const handleScroll = () => {
     if (!scrollRef.current) return;
 
-    // If we recently programmatically scrolled, ignore this scroll event
-    if (isProgrammaticScrollRef.current) {
-      // Don't clear it immediately because smooth scrolling fires multiple times.
-      // The timeout below will clear it.
-      return;
-    }
-
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    // Fix: Using Math.ceil(scrollTop + clientHeight) can sometimes be slightly off on different zoom levels,
-    // ensuring precision within the threshold
-    const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
+    const distanceToBottom = scrollHeight - Math.ceil(scrollTop + clientHeight);
 
     if (distanceToBottom > 30) {
+      // If we are far from the bottom, it MUST be a user scroll.
+      // Programmatic scroll always targets the very bottom.
       isUserScrolledRef.current = true;
+      isProgrammaticScrollRef.current = false;
     } else {
-      isUserScrolledRef.current = false;
+      // If we are at the bottom, and it was a programmatic scroll, ignore it.
+      if (!isProgrammaticScrollRef.current) {
+        isUserScrolledRef.current = false;
+      }
     }
   };
 
@@ -104,8 +101,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
     <div
       ref={scrollRef}
       onScroll={handleScroll}
-      onWheel={() => { isProgrammaticScrollRef.current = false; }}
-      onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
+      onWheel={() => { isProgrammaticScrollRef.current = false; isUserScrolledRef.current = true; }}
+      onTouchMove={() => { isProgrammaticScrollRef.current = false; isUserScrolledRef.current = true; }}
       className="flex-1 overflow-y-auto py-6"
     >
       <div className="flex flex-col">

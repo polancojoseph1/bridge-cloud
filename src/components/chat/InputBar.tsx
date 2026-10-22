@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, KeyboardEvent } from 'react';
+import { useRef, useState, useCallback, KeyboardEvent, useEffect } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { useOrchestrationStore } from '@/store/orchestrationStore';
@@ -28,6 +28,23 @@ export default function InputBar() {
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // ── Auto-focus after send ───────────────────────────────────────────────────
+  const prevStreaming = useRef(isStreaming);
+  useEffect(() => {
+    if (prevStreaming.current && !isStreaming) {
+      // Transitioned from streaming to not streaming
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 0);
+    }
+    prevStreaming.current = isStreaming;
+  }, [isStreaming]);
+
+  // Auto-focus on mount (especially useful when transitioning from EmptyState)
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
 
   // ── Auto-resize ─────────────────────────────────────────────────────────────
   const resizeTextarea = useCallback(() => {
@@ -66,7 +83,8 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const isUnsupportedMode = orchestrationMode !== 'single';
+  const canSend = value.trim().length > 0 && !isStreaming && !isUnsupportedMode;
 
   return (
     /*
@@ -92,9 +110,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || isUnsupportedMode}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={isUnsupportedMode ? "Orchestration modes coming soon!" : "Message Bridge Cloud…"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -129,12 +147,12 @@ export default function InputBar() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={isUnsupportedMode ? "Orchestration modes coming soon!" : "Send message"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1410]',
-                canSend
+                canSend && !isUnsupportedMode
                   ? 'bg-[#6c8cff] hover:bg-[#5a7aee] cursor-pointer'
                   : 'bg-[#1e3025] cursor-not-allowed',
               ].join(' ')}
