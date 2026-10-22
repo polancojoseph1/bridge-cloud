@@ -1,3 +1,6 @@
 ## 2024-04-20 - Icon Buttons Tooltip
 **Learning:** Icon-only buttons must include a `title` attribute (matching the `aria-label`) to provide a native browser tooltip on hover for sighted users who may not immediately recognize the icon's function.
 **Action:** When implementing icon-only buttons, always ensure that both `aria-label` and `title` are provided. Update `IconButton` component to use `label` for both `aria-label` and `title`.
+## $(date +%Y-%m-%d) - Fix chat UI and interaction flows
+**Learning:** Duplicate generic UI components (like chat inputs) lead to inconsistent behavior (missing disabled states, missing orchestration warnings) and make state management (like canceling streaming fetches) fragile. Furthermore, auto-scroll behaviors that unconditionally scroll users to the bottom of message lists are hostile to user interaction and cause UX frustration during generation.
+**Action:** When implementing or refactoring chat-like interfaces, always centralize the input logic into a single generic component (e.g. `<InputBar />`) to guarantee uniform accessibility, error states, and UX. When managing auto-scroll logic tied to dynamic lists, ensure the code strictly respects user scroll positions by tracking programmatic versus manual scroll events, gracefully pausing the auto-scroll when the user interacts.
