@@ -70,6 +70,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen overflow-hidden bg-[#0a1410]">
       {/* Mobile backdrop */}
       <div
+        aria-hidden="true"
         onClick={() => setSidebarOpen(false)}
         className={cn(
           'fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity duration-[240ms]',
