@@ -37,6 +37,8 @@ function NodeChip({
         type="button"
         onClick={onClick}
         disabled={!node.online}
+        aria-pressed={selected}
+        title={!node.online ? `${node.nodeName} is offline` : selected ? `Deselect ${node.nodeName}` : `Select ${node.nodeName}`}
         className={cn(
           'flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px] font-medium',
           'transition-all duration-150',
@@ -141,14 +143,18 @@ export default function NodeTray() {
                 <button
                   type="button"
                   onClick={() => selectAllNodes(nodes)}
-                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
+                  title="Select all online servers"
+                  aria-label="Select all online servers"
+                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
                 >
                   All
                 </button>
                 <button
                   type="button"
                   onClick={clearNodeSelection}
-                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors"
+                  title="Deselect all servers"
+                  aria-label="Deselect all servers"
+                  className="text-[11px] text-[#5c5c5c] hover:text-[#9b9b9b] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
                 >
                   None
                 </button>
@@ -173,7 +179,9 @@ export default function NodeTray() {
           <button
             type="button"
             onClick={() => openManage('add')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#2d4035] text-[12px] text-[#3c5c48] hover:text-[#6c8cff] hover:border-[#6c8cff] transition-colors duration-150"
+            title="Add new server"
+            aria-label="Add new server"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#2d4035] text-[12px] text-[#3c5c48] hover:text-[#6c8cff] hover:border-[#6c8cff] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#6c8cff]"
           >
             <Plus className="w-3 h-3" />
             Add server
