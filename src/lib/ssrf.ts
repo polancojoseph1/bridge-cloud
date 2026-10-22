@@ -62,9 +62,13 @@ export function isForbiddenHostname(hn: string): boolean {
 
   // IPv6 blocking
   if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+    // 🛡️ Sentinel: Prevent SSRF bypass via IPv6 zero-compression/padding
+    const hexOnly = cleanHn.replace(/:/g, '');
+    if (/^0*1?$/.test(hexOnly) && !cleanHn.includes('.')) return true; // Loopback & Unspecified
+
+    // Normalize IPv4-mapped IPv6 and similar
+    if (/^((0+:)*0*:)*(ffff|FFFF):/i.test(cleanHn)) return true;
+
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
