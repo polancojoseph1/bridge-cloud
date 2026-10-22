@@ -127,8 +127,9 @@ const markdownComponents: import('react-markdown').Components = {
 
   // ── Links ────────────────────────────────────────────────────────────
   a: ({ href, children }) => {
-    const isSafe = href && /^(https?|mailto):/i.test(href);
-    const safeHref = isSafe ? href : '#';
+    const trimmedHref = href ? href.trim() : '';
+    const isSafe = trimmedHref && /^(https?|mailto):/i.test(trimmedHref);
+    const safeHref = isSafe ? trimmedHref : '#';
     return (
       <a
         href={safeHref}
