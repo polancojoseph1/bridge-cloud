@@ -581,6 +581,8 @@ export default function ServerManageModal() {
             {tab === 'list' && (
               <button
                 onClick={() => setTab('add')}
+                aria-label="Add server"
+                title="Add server"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#10a37f] hover:bg-[#0d8f6f] text-[#0a1410] text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10a37f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111c15]"
               >
                 <Plus size={13} />
