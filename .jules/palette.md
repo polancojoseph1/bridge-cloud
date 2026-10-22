@@ -1,0 +1,3 @@
+## 2025-02-23 - Add focus visible styles for keyboard navigation
+**Learning:** The default focus ring (a solid border) can bleed into matching or similar colored backgrounds (like the dark #0a1410 theme), making keyboard navigation nearly invisible for interactable elements like suggestion chips and icon buttons.
+**Action:** When adding focus-visible styling over dark theme backgrounds, always include a focus ring offset (`focus-visible:ring-offset-2 focus-visible:ring-offset-[background-color]`) alongside the ring itself to create contrast spacing, significantly improving keyboard accessibility.

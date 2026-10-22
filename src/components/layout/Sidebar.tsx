@@ -27,7 +27,7 @@ export default function Sidebar() {
         <button
           onClick={handleNewChat}
           aria-label="New chat"
-          className="w-8 h-8 flex items-center justify-center rounded-md text-[#8e8e8e] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff]"
+          className="w-8 h-8 flex items-center justify-center rounded-md text-[#8e8e8e] hover:text-[#ececec] hover:bg-[#1e3025] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6c8cff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1410]"
           title="New chat"
         >
           <SquarePen size={16} />
