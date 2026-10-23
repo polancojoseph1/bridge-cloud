@@ -1,0 +1,4 @@
+## 2025-05-18 - SSRF Bypass via Node.js URL IPv6 Normalization
+**Vulnerability:** Node.js's built-in `URL` module normalizes IPv4-compatible IPv6 addresses (e.g., `[::127.0.0.1]`) into their pure hex representations (e.g., `[::7f00:1]`). If the string representation returned by `URL` is used for validation against blocklists, it circumvents standard regex filters expecting decimal dots or standard loopback checks.
+**Learning:** URL normalization logic can inadvertently hide malicious payloads from security scanners. Always validate the normalized output or ensure your blocklists account for these pure hex transformations of IPv4 mappings.
+**Prevention:** Explicitly block hex representations of internal network subnets (e.g., `::7f00:`, `::a00:`, `::c0a8:`, `::ac1[0-f]:`) when writing SSRF filters using string validation logic.

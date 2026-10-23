@@ -68,6 +68,12 @@ export function isForbiddenHostname(hn: string): boolean {
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+
+    // Normalize IPv4-compatible IPv6 addresses mapped to hex (e.g. ::127.0.0.1 -> ::7f00:1)
+    if (/^::ffff:7f[0-9a-f]{2}:/.test(cleanHn) || /^::7f[0-9a-f]{2}:/.test(cleanHn)) return true; // 127.0.0.0 - 127.255.255.255
+    if (/^::ffff:a[0-9a-f]{2}:/.test(cleanHn) || /^::a[0-9a-f]{2}:/.test(cleanHn)) return true; // 10.0.0.0 - 10.255.255.255
+    if (cleanHn.startsWith('::c0a8:') || cleanHn.startsWith('::ffff:c0a8:')) return true; // 192.168.x.x
+    if (/^::ffff:ac1[0-f]:/.test(cleanHn) || /^::ac1[0-f]:/.test(cleanHn)) return true; // 172.16.0.0 - 172.31.255.255
   }
 
   return false;
