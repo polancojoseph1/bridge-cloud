@@ -1,0 +1,4 @@
+## 2025-02-23 - Prevent SSRF bypass via IPv4-mapped IPv6 addresses
+**Vulnerability:** The Node.js `URL` parser normalizes IPv4-compatible and IPv4-mapped IPv6 addresses (e.g., `http://[::127.0.0.1]`) into pure hex representations (e.g., `[::7f00:1]`). The custom hostname validation logic in `isForbiddenHostname` did not check these normalized hex formats, allowing SSRF requests to loopback and internal subnets.
+**Learning:** Standard IP blocklists and regex-based checks for IPv4 ranges can be bypassed if the URL is supplied in IPv4-mapped IPv6 format and normalized to hex by the parser.
+**Prevention:** When validating hostnames for SSRF protection, explicitly parse and inspect normalized IPv6 representations for mapped IPv4 addresses, or use a robust IP matching library that handles these conversions natively.
