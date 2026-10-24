@@ -66,7 +66,8 @@ export default function InputBar() {
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const isDisabled = orchestrationMode !== 'single';
+  const canSend = value.trim().length > 0 && !isStreaming && !isDisabled;
 
   return (
     /*
@@ -92,9 +93,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || isDisabled}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={isDisabled ? "Coming soon" : "Message Bridge Cloud…"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -129,7 +130,7 @@ export default function InputBar() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={isDisabled ? "Coming soon" : "Send message"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
