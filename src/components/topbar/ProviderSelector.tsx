@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
@@ -29,7 +29,13 @@ function HealthDot({ agent, animate }: { agent: AgentWithHealth; animate?: boole
   );
 }
 
-function AgentRow({
+/**
+ * ⚡ Bolt Optimization: Added React.memo()
+ * 💡 What: Prevents AgentRow from re-rendering unnecessarily.
+ * 🎯 Why: ProviderSelector's open state changes frequently. Without memo, all AgentRow components re-render every time the menu opens/closes.
+ * 📊 Impact: O(1) render cost for AgentRow during menu toggle instead of O(N).
+ */
+const AgentRow = memo(function AgentRow({
   agent, isActive, onSelect, disabled,
 }: {
   agent: AgentWithHealth; isActive: boolean; onSelect: () => void; disabled?: boolean;
@@ -75,7 +81,7 @@ function AgentRow({
       </div>
     </div>
   );
-}
+});
 
 export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSelectorProps) {
   const [open, setOpen] = useState(false);
