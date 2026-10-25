@@ -1,0 +1,4 @@
+## 2024-10-25 - Fix SSRF bypass via IPv4-mapped IPv6
+**Vulnerability:** The SSRF protection in `isForbiddenHostname` fails to block Node.js's normalized hex format for IPv4-compatible (e.g. `::7f00:1` from `::127.0.0.1`) and IPv4-mapped (e.g. `::ffff:7f00:1` from `::ffff:127.0.0.1`) IPv6 addresses.
+**Learning:** Node.js's built-in `URL` module normalizes IPv4-compatible and IPv4-mapped IPv6 addresses (e.g., `::127.0.0.1`) into their pure hex representations (e.g., `::7f00:1`). Standard IP blocklists must explicitly parse or match these normalized hex forms to prevent loopback/internal subnets bypasses.
+**Prevention:** Implement explicit parsing and validation of IPv4 addresses embedded within IPv6 formats (both IPv4-compatible and IPv4-mapped) by extracting the hex components and validating against blocked IPv4 ranges.

@@ -64,7 +64,47 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    // Check for IPv4-compatible (::127.0.0.1 -> ::7f00:1) and IPv4-mapped (::ffff:127.0.0.1 -> ::ffff:7f00:1)
+    let ipv4Hex = '';
+    if (cleanHn.startsWith('::ffff:')) {
+      ipv4Hex = cleanHn.substring(7);
+    } else if (cleanHn.startsWith('::')) {
+      ipv4Hex = cleanHn.substring(2);
+    }
+
+    if (ipv4Hex) {
+      const hexParts = ipv4Hex.split(':');
+      if (hexParts.length === 1 || hexParts.length === 2) {
+        let valid = true;
+        for (const part of hexParts) {
+          if (!/^[0-9a-f]+$/i.test(part)) {
+            valid = false;
+            break;
+          }
+        }
+        if (valid) {
+          let ipValue = 0;
+          if (hexParts.length === 2) {
+            ipValue = (parseInt(hexParts[0], 16) << 16) | parseInt(hexParts[1], 16);
+          } else {
+            ipValue = parseInt(hexParts[0], 16);
+          }
+
+          const octet1 = (ipValue >>> 24) & 255;
+          const octet2 = (ipValue >>> 16) & 255;
+
+          if (octet1 === 0 || octet1 === 10 || octet1 === 127 ||
+             (octet1 === 169 && octet2 === 254) ||
+             (octet1 === 172 && octet2 >= 16 && octet2 <= 31) ||
+             (octet1 === 192 && octet2 === 168)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6 generic fallback
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
