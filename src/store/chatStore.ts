@@ -42,6 +42,9 @@ export const useChatStore = create<ChatStore>()(
       setActiveAgent: (agentId: string) => set({ activeAgentId: agentId }),
 
       stopGeneration: () => {
+        if (activeAbortController) {
+          activeAbortController.abort();
+        }
         set(s => {
           if (!s.activeConversationId) return { isStreaming: false };
           const convIndex = s.conversations.findIndex(c => c.id === s.activeConversationId);
@@ -63,9 +66,6 @@ export const useChatStore = create<ChatStore>()(
 
           return { isStreaming: false, conversations: newConversations };
         });
-        if (activeAbortController) {
-          activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
-        }
       },
 
       sendMessage: async (content: string) => {
@@ -160,7 +160,7 @@ export const useChatStore = create<ChatStore>()(
             await streamMockResponse(content, agentId, onChunk, activeAbortController.signal);
           }
         } catch (error: unknown) {
-          if ((error as any)?.name === 'AbortError' || (error instanceof DOMException && error.name === 'AbortError') || (error as any)?.message === 'Aborted') {
+          if ((error as any)?.name === 'AbortError' || (error instanceof DOMException && error.name === 'AbortError') || (error as any)?.message === 'This operation was aborted' || (error as any)?.message === 'Aborted') {
             // User stopped generation, we just end here gracefully
           } else {
             set(s => {
