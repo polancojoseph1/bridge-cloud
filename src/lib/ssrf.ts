@@ -64,7 +64,15 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    // IPv4-mapped and IPv4-compatible IPv6 addresses for internal IPv4 ranges
+    // Matches ::ffff:7f00:1, ::7f00:1, ::a00:1, ::c0a8:1, etc.
+    if (/^::(ffff:)?(7f[0-9a-f]{2}|a[0-9a-f]{2}|c0a8|ac1[0-f]|a9fe|0{1,4})(:|$)/i.test(cleanHn)) return true;
+
+    // Explicit string IPs like ::ffff:127.0.0.1 without normalization (if not parsed by URL block)
+    if (cleanHn.startsWith('::ffff:127.') || cleanHn.startsWith('::ffff:10.') || cleanHn.startsWith('::ffff:192.168.') || cleanHn.startsWith('::ffff:169.254.')) return true;
+    if (/^::ffff:172\.(1[6-9]|2[0-9]|3[0-1])\./.test(cleanHn)) return true;
+
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
