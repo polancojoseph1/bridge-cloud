@@ -1,0 +1,4 @@
+## 2025-02-23 - Prevent SSRF via normalized IPv4-compatible IPv6 Addresses
+**Vulnerability:** The SSRF protection failed to properly identify IPv4 loopback and internal addresses provided as IPv4-compatible IPv6 representations (e.g., `::127.0.0.1`), because Node.js's `URL` normalizes them into pure hex format like `[::7f00:1]`, bypassing explicit string checks and blocking all IPv4-mapped IPv6 ranges blindly didn't cover compatible formats.
+**Learning:** Node.js's built-in `URL` module normalizes IPv4-compatible IPv6 addresses into pure hex representation. Standard IP blocklists must explicitly match these normalized hex forms to prevent bypasses.
+**Prevention:** Always parse or match the hex representations (e.g. `::7f00:1`) for internal IPv4 subnets when validating normalized IPv6 addresses for SSRF.
