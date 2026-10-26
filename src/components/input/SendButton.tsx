@@ -12,8 +12,6 @@ export default function SendButton({ disabled, isStreaming, onClick, title }: Se
   return (
     <button
       onClick={onClick}
-      disabled={disabled && !isStreaming}
-      title={title}
       aria-label={isStreaming ? 'Stop generating' : 'Send message'}
       title={isStreaming ? 'Stop generating' : 'Send message'}
       className={cn(
