@@ -1,0 +1,4 @@
+## 2023-10-25 - Fix SSRF bypass via IPv4-mapped IPv6 address normalization
+**Vulnerability:** The `isForbiddenHostname` function failed to block IPv4-compatible IPv6 addresses like `[::192.168.1.1]`. Node.js's `URL` module normalizes these to hex representation (e.g., `::c0a8:101`). Because the string no longer contains dots or recognizable blocked patterns, the IP string bypassed the blocklist entirely, causing an SSRF.
+**Learning:** URL normalization (like IPv4-compatible IPv6 parsing) can defeat text-based blocklists. The validation function checked strings instead of fully parsing the normalized IPv6 output back to IPv4 for re-evaluation.
+**Prevention:** When building custom SSRF protections, always handle IP normalization rules (like Node.js's handling of `::` with IPv4 embedded). If an IPv6 string starts with `::` and ends in hex-encoded IPv4 space, it must be correctly parsed or blocked.
