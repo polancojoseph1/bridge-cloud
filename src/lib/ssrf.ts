@@ -40,7 +40,25 @@ function parseIPv4(ip: string): number[] | null {
 }
 
 export function isForbiddenHostname(hn: string): boolean {
-  const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+  let cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
+
+  if (cleanHn === '::1' || cleanHn === '::') {
+    // Keep exact string for standard IPv6 rules below
+  } else if (cleanHn.startsWith('::') && !cleanHn.startsWith('::ffff:')) {
+    const p = cleanHn.split(':').filter(Boolean);
+    if (p.length > 0 && p.length <= 2) {
+      let p0 = 0, p1 = 0;
+      if (p.length === 2) {
+        p0 = parseInt(p[0], 16);
+        p1 = parseInt(p[1], 16);
+      } else if (p.length === 1) {
+        p1 = parseInt(p[0], 16);
+      }
+      if (!isNaN(p0) && !isNaN(p1)) {
+        cleanHn = `${p0 >> 8}.${p0 & 0xff}.${p1 >> 8}.${p1 & 0xff}`;
+      }
+    }
+  }
 
   // Block localhost and .local domains
   if (cleanHn === 'localhost' || cleanHn.endsWith('.localhost') || cleanHn.endsWith('.local')) {
