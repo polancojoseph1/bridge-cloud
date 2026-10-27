@@ -1,8 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useChatStore } from '@/store/chatStore';
 import type { Conversation } from '@/types';
@@ -34,6 +34,14 @@ function formatRelativeTime(timestamp: number): string {
 export const ConversationItem = memo(function ConversationItem({ conversation, isActive }: ConversationItemProps) {
   const router = useRouter();
   const deleteConversation = useChatStore((s) => s.deleteConversation);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   function handleClick() {
     router.push(`/chat/${conversation.id}`);
@@ -41,7 +49,20 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    deleteConversation(conversation.id);
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      timeoutRef.current = setTimeout(() => setConfirmDelete(false), 3000);
+    } else {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      deleteConversation(conversation.id);
+    }
+  }
+
+  function handleMouseLeave() {
+    if (confirmDelete) {
+      setConfirmDelete(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
   }
 
   return (
@@ -55,6 +76,7 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
           handleClick();
         }
       }}
+      onMouseLeave={handleMouseLeave}
       className={cn(
         'group relative flex items-center gap-2.5 px-3 py-2.5 rounded-md cursor-pointer',
         'transition-colors duration-150',
@@ -82,16 +104,17 @@ export const ConversationItem = memo(function ConversationItem({ conversation, i
       {/* Delete button — hidden until group hover */}
       <button
         onClick={handleDelete}
-        aria-label="Delete conversation"
-        title="Delete conversation"
+        aria-label={confirmDelete ? "Confirm delete conversation" : "Delete conversation"}
+        title={confirmDelete ? "Confirm delete conversation" : "Delete conversation"}
         className={cn(
-          'flex-shrink-0 p-1 rounded opacity-0 group-hover:opacity-100',
-          'text-[#5c5c5c] hover:text-[#e05c5c]',
-          'transition-all duration-150',
+          'flex-shrink-0 p-1 rounded transition-all duration-150',
+          confirmDelete
+            ? 'opacity-100 text-[#e05c5c] bg-[#e05c5c]/10'
+            : 'opacity-0 group-hover:opacity-100 text-[#5c5c5c] hover:text-[#e05c5c]',
           'focus-visible:outline-none focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-[#6c8cff]'
         )}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        {confirmDelete ? <Check className="w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
       </button>
     </div>
   );
