@@ -47,16 +47,20 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
-  // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
-  if (parts) {
+  const checkIPv4Blocklist = (parts: number[]) => {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
     if (parts[0] === 127) return true; // 127.0.0.0/8
     if (parts[0] === 169 && parts[1] === 254) return true; // 169.254.0.0/16
     if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true; // 172.16.0.0/12
     if (parts[0] === 192 && parts[1] === 168) return true; // 192.168.0.0/16
+    return false;
+  };
 
+  // IPv4 blocking (handles octal, hex, and dword formats)
+  const parts = parseIPv4(cleanHn);
+  if (parts) {
+    if (checkIPv4Blocklist(parts)) return true;
     return false;
   }
 
@@ -64,7 +68,26 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    // Check for IPv4-compatible and IPv4-mapped IPv6 addresses that Node.js URL normalizes to hex
+    const ipv4CompatMatch = cleanHn.match(/^::(?:ffff:)?([0-9a-f]{1,4})(?::([0-9a-f]{1,4}))?$/i);
+    if (ipv4CompatMatch) {
+      const p1 = parseInt(ipv4CompatMatch[1], 16);
+      const p2 = ipv4CompatMatch[2] ? parseInt(ipv4CompatMatch[2], 16) : 0;
+
+      const ipv4Num = ipv4CompatMatch[2] ? (p1 << 16) | p2 : p1;
+
+      const p = [
+        (ipv4Num >>> 24) & 255,
+        (ipv4Num >>> 16) & 255,
+        (ipv4Num >>> 8) & 255,
+        ipv4Num & 255
+      ];
+
+      if (checkIPv4Blocklist(p)) return true;
+    }
+
+    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6 generic block
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
