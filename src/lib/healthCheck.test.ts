@@ -146,6 +146,9 @@ describe('checkHealth', () => {
       'http://0177.0.0.1', // octal
       'http://[::1]',
       'http://[::ffff:127.0.0.1]', // IPv4 mapped
+      'http://[::127.0.0.1]', // IPv4-compatible IPv6
+      'http://[::ffff:7f00:1]', // Hex IPv4 mapped
+      'http://[::7f00:1]', // Hex IPv4-compatible IPv6
       'http://10.0.0.1',
       'http://0.0.0.0'
     ];
