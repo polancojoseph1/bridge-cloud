@@ -65,6 +65,32 @@ export function isForbiddenHostname(hn: string): boolean {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
     if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+
+    if (cleanHn.startsWith('::') && !cleanHn.startsWith('::ffff:') && cleanHn !== '::1' && cleanHn !== '::') {
+      const hexPart = cleanHn.slice(2);
+      const hexChunks = hexPart.split(':');
+      if (hexChunks.length === 1 || hexChunks.length === 2) {
+        const isValidHex = hexChunks.every(chunk => /^[0-9a-fA-F]{1,4}$/.test(chunk));
+        if (isValidHex) {
+          let val = 0;
+          if (hexChunks.length === 1) {
+            val = parseInt(hexChunks[0], 16);
+          } else {
+            val = (parseInt(hexChunks[0], 16) << 16) | parseInt(hexChunks[1], 16);
+          }
+          const p0 = (val >>> 24) & 255;
+          const p1 = (val >>> 16) & 255;
+
+          if (p0 === 0) return true; // 0.0.0.0/8
+          if (p0 === 10) return true; // 10.0.0.0/8
+          if (p0 === 127) return true; // 127.0.0.0/8
+          if (p0 === 169 && p1 === 254) return true; // 169.254.0.0/16
+          if (p0 === 172 && p1 >= 16 && p1 <= 31) return true; // 172.16.0.0/12
+          if (p0 === 192 && p1 === 168) return true; // 192.168.0.0/16
+        }
+      }
+    }
+
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
