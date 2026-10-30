@@ -502,6 +502,7 @@ export default function ServerManageModal() {
           visible ? 'opacity-100' : 'opacity-0'
         )}
         onClick={closeManage}
+        aria-hidden="true"
       />
 
       {/* ── Mobile: bottom sheet ── */}
