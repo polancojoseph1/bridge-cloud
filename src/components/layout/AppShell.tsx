@@ -71,6 +71,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile backdrop */}
       <div
         onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
         className={cn(
           'fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity duration-[240ms]',
           isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
