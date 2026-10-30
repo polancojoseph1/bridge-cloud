@@ -1,4 +1,27 @@
 
+function parseIPv6ToIPv4(ip: string): number[] | null {
+  if (!ip.startsWith('::')) return null;
+  const hex = ip.slice(2);
+  if (hex === '1' || hex === '') return null;
+  const parts = hex.split(':');
+  if (parts.length > 2) return null;
+  let dword = 0;
+  if (parts.length === 1) {
+    dword = parseInt(parts[0], 16);
+  } else {
+    const high = parseInt(parts[0], 16);
+    const low = parseInt(parts[1], 16);
+    dword = (high << 16) | low;
+  }
+  if (isNaN(dword)) return null;
+  return [
+    (dword >>> 24) & 255,
+    (dword >>> 16) & 255,
+    (dword >>> 8) & 255,
+    dword & 255
+  ];
+}
+
 function parseIPv4(ip: string): number[] | null {
   let parts: string[];
   if (ip.includes('.')) {
@@ -48,7 +71,10 @@ export function isForbiddenHostname(hn: string): boolean {
   }
 
   // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
+  let parts = parseIPv4(cleanHn);
+  if (!parts) {
+    parts = parseIPv6ToIPv4(cleanHn);
+  }
   if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
