@@ -68,6 +68,23 @@ export function isForbiddenHostname(hn: string): boolean {
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+
+    // 🛡️ Sentinel: Block hex-encoded IPv4-compatible IPv6 addresses (e.g. ::c0a8:101)
+    if (cleanHn.startsWith('::') && cleanHn !== '::1' && cleanHn !== '::' && !cleanHn.startsWith('::ffff:')) {
+      const segments = cleanHn.slice(2).split(':');
+      let fullHex = segments.map(s => s.padStart(4, '0')).join('');
+      if (/^[0-9a-fA-F]+$/.test(fullHex) && fullHex.length <= 8) {
+        fullHex = fullHex.padStart(8, '0');
+        const p1 = parseInt(fullHex.slice(0, 2), 16);
+        const p2 = parseInt(fullHex.slice(2, 4), 16);
+        if (p1 === 0) return true;
+        if (p1 === 10) return true;
+        if (p1 === 127) return true;
+        if (p1 === 169 && p2 === 254) return true;
+        if (p1 === 172 && p2 >= 16 && p2 <= 31) return true;
+        if (p1 === 192 && p2 === 168) return true;
+      }
+    }
   }
 
   return false;

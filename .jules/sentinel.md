@@ -1,0 +1,4 @@
+## 2024-10-31 - [SSRF Bypass via Hex-Encoded IPv4-Compatible IPv6 Addresses]
+**Vulnerability:** The SSRF protection filter in src/lib/ssrf.ts blocked standard IPv4 mapped IPv6 addresses (e.g. ::ffff:127.0.0.1), but allowed hex-encoded IPv4-compatible IPv6 addresses (e.g. ::c0a8:101 for 192.168.1.1).
+**Learning:** Pure IPv6 addresses can encode IPv4 payloads in their lowest 32 bits without using the standard ::ffff: mapped prefix, successfully tricking naive IPv6 blocklists while still routing to internal IPv4 destinations on many network stacks.
+**Prevention:** When validating hostnames, always extract and check the lower 32 bits of any :: prefixed IPv6 address, ensuring you explicitly ignore valid edge cases like the ::1 loopback or unspecified :: address to avoid misinterpreting them as IPv4 0.0.0.1.
