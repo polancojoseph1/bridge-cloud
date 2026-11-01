@@ -1,0 +1,4 @@
+## 2024-11-01 - Fix SSRF bypass via IPv4-mapped/compatible IPv6 addresses
+**Vulnerability:** The application was vulnerable to SSRF bypass where IPv4 addresses (like 127.0.0.1) could be embedded within IPv6 addresses (e.g., `::ffff:192.168.1.1`, `::192.168.1.1`, or hex representations like `::ffff:c0a8:101`), which are normalized by URL parsers and resolve successfully via Node's fetch.
+**Learning:** `new URL` normalizes IPv4-mapped IPv6 addresses with dot-decimal notations to their hexadecimal equivalent (`::ffff:c0a8:101`), bypassing simple string prefix checks like `.startsWith('::ffff:')`. Standard Node.js networking accepts and connects to these representations.
+**Prevention:** Always extract and validate the underlying IPv4 payload embedded within mapped or compatible IPv6 addresses, particularly by parsing the trailing two 16-bit hex segments, rather than relying exclusively on string-matching heuristics.
