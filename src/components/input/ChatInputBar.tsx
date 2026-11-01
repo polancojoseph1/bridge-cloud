@@ -30,6 +30,9 @@ export default function ChatInputBar() {
     setValue('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 10);
     }
     await sendMessage(trimmed);
   };

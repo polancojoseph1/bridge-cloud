@@ -63,6 +63,9 @@ export default function InputBar() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 10);
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
