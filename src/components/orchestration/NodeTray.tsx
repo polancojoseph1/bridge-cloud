@@ -102,23 +102,35 @@ export default function NodeTray() {
     gather:    'Gather from:',
   };
 
+  // ⚡ Bolt Optimization: Pre-compute a Map for O(1) lookups to avoid O(N*M) nested loops
+  const nodeMap = useMemo(() => {
+    const map = new Map<string, BridgeNode>();
+    for (const node of nodes) {
+      map.set(node.nodeId, node);
+    }
+    return map;
+  }, [nodes]);
+
   // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
   // to prevent O(N) memory allocations and reduce React GC pauses
   const onlineCount = useMemo(() => nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0), [nodes]);
+
+  // ⚡ Bolt Optimization: Replace O(N*M) nested loop with O(N+M) Map lookup
   const selectedCount = useMemo(() => selectedNodeIds.reduce((count, id) =>
-    count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
-  ), [selectedNodeIds, nodes]);
+    count + (nodeMap.get(id)?.online ? 1 : 0), 0
+  ), [selectedNodeIds, nodeMap]);
 
   // Optimize array mapping/filtering: replace O(2N) chained .map().filter() with single O(N) .reduce() pass
   // and memoize to prevent O(N) allocations on every render cycle.
   const orderedNodes = useMemo(() => {
     if (mode !== 'pipeline') return nodes;
+    // ⚡ Bolt Optimization: Replace O(N*M) nested loop with O(N+M) Map lookup
     return pipelineOrder.reduce<BridgeNode[]>((acc, id) => {
-      const node = nodes.find(n => n.nodeId === id);
+      const node = nodeMap.get(id);
       if (node) acc.push(node);
       return acc;
     }, []);
-  }, [mode, pipelineOrder, nodes]);
+  }, [mode, pipelineOrder, nodes, nodeMap]);
 
   const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
 
