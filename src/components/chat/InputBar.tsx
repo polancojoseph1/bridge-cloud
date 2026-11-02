@@ -3,7 +3,6 @@
 import { useRef, useState, useCallback, KeyboardEvent } from 'react';
 import { ArrowUp, Square } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
-import { useOrchestrationStore } from '@/store/orchestrationStore';
 
 // One line-height in px — used to cap auto-resize at 5 lines
 const LINE_HEIGHT_PX = 24;
@@ -24,7 +23,6 @@ export default function InputBar() {
   const isStreaming = useChatStore((s) => s.isStreaming);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const stopGeneration = useChatStore((s) => s.stopGeneration);
-  const orchestrationMode = useOrchestrationStore((s) => s.mode);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -63,8 +61,9 @@ export default function InputBar() {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      textareaRef.current.focus();
     }
-  }, [value, isStreaming, sendMessage, orchestrationMode]);
+  }, [value, isStreaming, sendMessage]);
 
   const canSend = value.trim().length > 0 && !isStreaming;
 

@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Check, WifiOff, Settings } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAgentHealth } from '@/hooks/useAgentHealth';
-import { useOrchestrationStore } from '@/store/orchestrationStore';
 import { useServerStore } from '@/store/serverStore';
 import type { AgentWithHealth } from '@/types';
 
@@ -81,9 +80,8 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const agents = useAgentHealth();
-  const orchMode = useOrchestrationStore(s => s.mode);
   const openManage = useServerStore(s => s.openManage);
-  const isOrchestrating = orchMode !== 'single';
+  const isOrchestrating = false;
 
   const activeAgent = useMemo(() => {
     return agents.find(a => a.id === activeAgentId) ?? agents[0];
