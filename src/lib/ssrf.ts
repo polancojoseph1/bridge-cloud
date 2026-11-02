@@ -1,4 +1,3 @@
-
 function parseIPv4(ip: string): number[] | null {
   let parts: string[];
   if (ip.includes('.')) {
@@ -47,8 +46,55 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
+  // Exact matching for pure loopback and unspecified to avoid parsing as ipv4 0.0.0.1 and 0.0.0.0
+  if (cleanHn === '::1' || cleanHn === '::') {
+    return true;
+  }
+
+  // Extract embedded IPv4 from IPv4-mapped and IPv4-compatible IPv6 addresses.
+  // Node's `new URL` normalizes [::192.168.1.1] to [::c0a8:101], so we check for both formats.
+  let ipv4ToParse = cleanHn;
+  let isEmbeddedIPv4 = false;
+
+  if (cleanHn.includes(':')) {
+    // IPv4-mapped IPv6 address (::ffff:w.x.y.z or ::ffff:hex)
+    if (cleanHn.startsWith('::ffff:')) {
+      const ipv4Part = cleanHn.substring(7);
+      if (ipv4Part.includes('.')) {
+         ipv4ToParse = ipv4Part;
+         isEmbeddedIPv4 = true;
+      } else if (ipv4Part.includes(':')) {
+         const parts = ipv4Part.split(':');
+         if (parts.length === 2) {
+             ipv4ToParse = `0x${parts[0].padStart(4, '0')}${parts[1].padStart(4, '0')}`;
+             isEmbeddedIPv4 = true;
+         }
+      } else if (ipv4Part !== '') {
+         ipv4ToParse = `0x${ipv4Part}`;
+         isEmbeddedIPv4 = true;
+      }
+    }
+    // IPv4-compatible IPv6 address (::w.x.y.z or ::hex)
+    else if (cleanHn.startsWith('::')) {
+       const ipv4Part = cleanHn.substring(2);
+       if (ipv4Part.includes('.')) {
+          ipv4ToParse = ipv4Part;
+          isEmbeddedIPv4 = true;
+       } else if (ipv4Part.includes(':')) {
+          const parts = ipv4Part.split(':');
+          if (parts.length === 2 && !ipv4Part.includes('::')) {
+             ipv4ToParse = `0x${parts[0].padStart(4, '0')}${parts[1].padStart(4, '0')}`;
+             isEmbeddedIPv4 = true;
+          }
+       } else if (ipv4Part !== '') {
+          ipv4ToParse = `0x${ipv4Part}`;
+          isEmbeddedIPv4 = true;
+      }
+    }
+  }
+
   // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
+  const parts = parseIPv4(ipv4ToParse);
   if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
@@ -61,10 +107,7 @@ export function isForbiddenHostname(hn: string): boolean {
   }
 
   // IPv6 blocking
-  if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
+  if (cleanHn.includes(':') && !isEmbeddedIPv4) {
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
