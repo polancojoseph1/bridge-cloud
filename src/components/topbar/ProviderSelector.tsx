@@ -146,12 +146,10 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
 
       {open && (
         <div
-          id="provider-listbox"
-          role="listbox"
-          aria-label="Select AI provider"
           onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
           className="absolute top-full right-0 mt-1 z-50 w-[260px] bg-[#181818] border border-[#1e3025] rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-1"
         >
+          <div id="provider-listbox" role="listbox" aria-label="Select AI provider">
           {onlineAgents.length > 0 && (
             <>
               <div className="px-3 pt-2 pb-1">
@@ -179,6 +177,7 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
               ))}
             </>
           )}
+          </div>
 
           <div className="border-t border-[#1e3025] mt-1 pt-1">
             <button
