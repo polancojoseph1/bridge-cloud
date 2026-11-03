@@ -65,11 +65,21 @@ export const useChatStore = create<ChatStore>()(
         });
         if (activeAbortController) {
           activeAbortController.abort(new DOMException('Aborted', 'AbortError'));
+          activeAbortController = null;
         }
       },
 
       sendMessage: async (content: string) => {
         if (get().isStreaming) return;
+
+        const { useOrchestrationStore } = await import('@/store/orchestrationStore');
+        const orchestrationMode = useOrchestrationStore.getState().mode;
+
+        if (orchestrationMode !== 'single') {
+            console.warn(`Orchestration mode '${orchestrationMode}' is not fully implemented for chat proxy yet. Falling back or ignoring.`);
+            return;
+        }
+
         let convId = get().activeConversationId;
         if (!convId) {
           convId = get().newConversation();
