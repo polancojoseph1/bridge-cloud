@@ -41,6 +41,7 @@ export default function EmptyState() {
     setValue('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     startChat(trimmed);
+    setTimeout(() => textareaRef.current?.focus(), 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
