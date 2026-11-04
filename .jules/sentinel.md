@@ -1,0 +1,4 @@
+## 2025-02-27 - [Fix SSRF via fetch parsing bypass]
+**Vulnerability:** Node.js URL parses IPv4-mapped/compatible IPv6 addresses with dot-decimal notations (e.g. [::192.168.1.1]) into hexadecimal formats (e.g. [::c0a8:101]), which bypassed string prefix blocks and SSRF validations.
+**Learning:** `fetch` resolves these hexadecimal IPv6 addresses successfully, leading to an SSRF vulnerability where internal networks can be accessed via `[::c0a8:101]` equivalent format. Simple string prefix blocks like `.startsWith('::ffff:')` are bypassed by these normalized forms.
+**Prevention:** Implement custom parsing to detect and extract the embedded IPv4 payload from normalized hexadecimal IPv4-compatible/mapped IPv6 formats, and subject the extracted IPv4 to the existing blocklist logic. Ensure validations handle both string manipulation and URL objects correctly.
