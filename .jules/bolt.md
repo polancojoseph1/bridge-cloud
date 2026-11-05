@@ -1,0 +1,3 @@
+## 2024-05-15 - Fast Array Length Checking in NodeTray
+**Learning:** In the orchestration `NodeTray`, using nested loops by searching with `nodes.find()` inside `selectedNodeIds.reduce()` creates an `O(N*M)` complexity which can cause measurable React GC pauses and stuttering during rendering as node counts increase.
+**Action:** When performing dependent array lookups inside a `useMemo`, pre-compute an `O(1)` lookup `Map` or `Record` for the target array first. Then, lookups within `reduce` or `map` become `O(1)`, decreasing overall complexity to `O(N+M)` and eliminating performance bottlenecks.
