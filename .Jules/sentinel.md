@@ -1,0 +1,4 @@
+## 2025-02-27 - Server-Side Request Forgery (SSRF) bypass in proxy route
+**Vulnerability:** The SSRF check failed to catch hex-encoded IPv4-compatible IPv6 addresses (e.g., `::c0a8:101` for `192.168.1.1`). Node.js `URL` normalizes these IPv4-mapped and compatible IPv6 addresses into hexadecimal formats, which bypasses simple string prefix blocks.
+**Learning:** `fetch` and Node `URL` will successfully resolve `::c0a8:101` as localhost / private network addresses, but our blocklist in `isForbiddenHostname` only blocked typical `.startsWith('::ffff:')` mapped addresses but not when they are hex encoded by Node.
+**Prevention:** Manually parse the hex-encoded payload of IPv4-compatible IPv6 addresses, extract the equivalent IPv4 octets, and explicitly check them against the IPv4 blocklist. Ensure standard pure IPv6 addresses like `::1` or `::` are ignored from the IPv4 translation.
