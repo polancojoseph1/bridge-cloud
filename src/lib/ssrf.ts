@@ -64,6 +64,35 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
+
+    let ipv4Hex = '';
+    if (cleanHn.startsWith('::ffff:')) {
+      ipv4Hex = cleanHn.substring(7);
+    } else if (cleanHn.startsWith('::')) {
+      ipv4Hex = cleanHn.substring(2);
+    }
+
+    if (ipv4Hex) {
+      const hexParts = ipv4Hex.split(':');
+      if (hexParts.length <= 2 && hexParts.every(p => /^[0-9a-f]{1,4}$/.test(p))) {
+        let val = 0;
+        if (hexParts.length === 1) {
+          val = parseInt(hexParts[0], 16);
+        } else {
+          val = (parseInt(hexParts[0], 16) << 16) | parseInt(hexParts[1], 16);
+        }
+        const p0 = (val >>> 24) & 255;
+        const p1 = (val >>> 16) & 255;
+
+        if (p0 === 0) return true; // 0.0.0.0/8
+        if (p0 === 10) return true; // 10.0.0.0/8
+        if (p0 === 127) return true; // 127.0.0.0/8
+        if (p0 === 169 && p1 === 254) return true; // 169.254.0.0/16
+        if (p0 === 172 && p1 >= 16 && p1 <= 31) return true; // 172.16.0.0/12
+        if (p0 === 192 && p1 === 168) return true; // 192.168.0.0/16
+      }
+    }
+
     if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
