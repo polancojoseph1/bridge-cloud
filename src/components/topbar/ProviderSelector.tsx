@@ -146,39 +146,42 @@ export default function ProviderSelector({ activeAgentId, onSelect }: ProviderSe
 
       {open && (
         <div
-          id="provider-listbox"
-          role="listbox"
-          aria-label="Select AI provider"
-          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
           className="absolute top-full right-0 mt-1 z-50 w-[260px] bg-[#181818] border border-[#1e3025] rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-1"
+          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
         >
-          {onlineAgents.length > 0 && (
-            <>
-              <div className="px-3 pt-2 pb-1">
-                <span className="text-[10px] text-[#3c5c48] uppercase tracking-widest font-semibold">Available</span>
-              </div>
-              {onlineAgents.map(agent => (
-                <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => { onSelect(agent.id); setOpen(false); }} />
-              ))}
-            </>
-          )}
+          <div
+            id="provider-listbox"
+            role="listbox"
+            aria-label="Select AI provider"
+          >
+            {onlineAgents.length > 0 && (
+              <>
+                <div role="presentation" className="px-3 pt-2 pb-1">
+                  <span className="text-[10px] text-[#3c5c48] uppercase tracking-widest font-semibold">Available</span>
+                </div>
+                {onlineAgents.map(agent => (
+                  <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
+                    onSelect={() => { onSelect(agent.id); setOpen(false); }} />
+                ))}
+              </>
+            )}
 
-          {onlineAgents.length > 0 && offlineAgents.length > 0 && (
-            <div className="my-1 border-t border-[#1e3025]" />
-          )}
+            {onlineAgents.length > 0 && offlineAgents.length > 0 && (
+              <div role="presentation" className="my-1 border-t border-[#1e3025]" />
+            )}
 
-          {offlineAgents.length > 0 && (
-            <>
-              <div className="px-3 pt-1 pb-1">
-                <span className="text-[10px] text-[#3c3c3c] uppercase tracking-widest font-semibold">Offline</span>
-              </div>
-              {offlineAgents.map(agent => (
-                <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
-                  onSelect={() => {}} disabled />
-              ))}
-            </>
-          )}
+            {offlineAgents.length > 0 && (
+              <>
+                <div role="presentation" className="px-3 pt-1 pb-1">
+                  <span className="text-[10px] text-[#3c3c3c] uppercase tracking-widest font-semibold">Offline</span>
+                </div>
+                {offlineAgents.map(agent => (
+                  <AgentRow key={agent.id} agent={agent} isActive={agent.id === activeAgentId}
+                    onSelect={() => {}} disabled />
+                ))}
+              </>
+            )}
+          </div>
 
           <div className="border-t border-[#1e3025] mt-1 pt-1">
             <button

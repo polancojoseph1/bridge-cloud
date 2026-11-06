@@ -1,3 +1,6 @@
 ## 2024-04-20 - Icon Buttons Tooltip
 **Learning:** Icon-only buttons must include a `title` attribute (matching the `aria-label`) to provide a native browser tooltip on hover for sighted users who may not immediately recognize the icon's function.
 **Action:** When implementing icon-only buttons, always ensure that both `aria-label` and `title` are provided. Update `IconButton` component to use `label` for both `aria-label` and `title`.
+## 2024-05-18 - Fix Listbox accessibility
+**Learning:** Elements with `role="listbox"` must strictly contain only `role="option"` elements. Placing non-option interactive elements, like dividers, headers, or action buttons, inside the `listbox` container violates ARIA guidelines and can break screen reader arrow-key navigation.
+**Action:** When implementing custom select/dropdown menus using `role="listbox"`, wrap the entire dropdown in a generic container (`div`) and apply `role="listbox"` to an inner container that exclusively holds the `role="option"` elements. Place non-option elements (like "Manage servers" buttons or dividers) outside of this inner listbox wrapper. Use `role="presentation"` on any purely visual layout elements (like dividers or headers) if they are placed inside the listbox, but ideally move them outside the listbox role entirely.
