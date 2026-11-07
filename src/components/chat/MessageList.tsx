@@ -37,8 +37,6 @@ export default function MessageList({ conversationId }: MessageListProps) {
 
     // If we recently programmatically scrolled, ignore this scroll event
     if (isProgrammaticScrollRef.current) {
-      // Don't clear it immediately because smooth scrolling fires multiple times.
-      // The timeout below will clear it.
       return;
     }
 
@@ -106,6 +104,8 @@ export default function MessageList({ conversationId }: MessageListProps) {
       onScroll={handleScroll}
       onWheel={() => { isProgrammaticScrollRef.current = false; }}
       onTouchMove={() => { isProgrammaticScrollRef.current = false; }}
+      onPointerDown={() => { isProgrammaticScrollRef.current = false; }}
+      onKeyDown={() => { isProgrammaticScrollRef.current = false; }}
       className="flex-1 overflow-y-auto py-6"
     >
       <div className="flex flex-col">

@@ -24,6 +24,7 @@ export default function InputBar() {
   const isStreaming = useChatStore((s) => s.isStreaming);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const stopGeneration = useChatStore((s) => s.stopGeneration);
+  const activeConversationId = useChatStore(s => s.activeConversationId);
   const orchestrationMode = useOrchestrationStore((s) => s.mode);
 
   const [value, setValue] = useState('');
@@ -54,19 +55,25 @@ export default function InputBar() {
     }
   };
 
+  const handleStop = useCallback(() => {
+    stopGeneration();
+    setTimeout(() => textareaRef.current?.focus(), 0);
+  }, [stopGeneration]);
+
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      setTimeout(() => textareaRef.current?.focus(), 0);
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
-  const canSend = value.trim().length > 0 && !isStreaming;
+  const canSend = value.trim().length > 0 && !isStreaming && orchestrationMode === 'single';
 
   return (
     /*
@@ -92,9 +99,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -111,7 +118,7 @@ export default function InputBar() {
           {isStreaming ? (
             <button
               type="button"
-              onClick={stopGeneration}
+              onClick={handleStop}
               aria-label="Stop generation"
               title="Stop generation"
               className={[
