@@ -48,7 +48,31 @@ export function isForbiddenHostname(hn: string): boolean {
   }
 
   // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
+  let parts = parseIPv4(cleanHn);
+
+  if (!parts && cleanHn.includes(':')) {
+    const match = cleanHn.match(/^::(?:ffff:)?([0-9a-f:.]+)$/i);
+    if (match && cleanHn !== '::1' && cleanHn !== '::') {
+      const payload = match[1];
+      if (payload.includes('.')) {
+        parts = parseIPv4(payload);
+      } else {
+        const hexParts = payload.split(':');
+        if (hexParts.length <= 2) {
+          const numStr = hexParts.map(p => p.padStart(4, '0')).join('');
+          if (numStr.length === 8) {
+            parts = [
+              parseInt(numStr.substring(0, 2), 16),
+              parseInt(numStr.substring(2, 4), 16),
+              parseInt(numStr.substring(4, 6), 16),
+              parseInt(numStr.substring(6, 8), 16)
+            ];
+          }
+        }
+      }
+    }
+  }
+
   if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
