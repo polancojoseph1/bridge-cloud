@@ -105,20 +105,32 @@ export default function NodeTray() {
   // Optimize array length counting: replace intermediate .filter() arrays with .reduce()
   // to prevent O(N) memory allocations and reduce React GC pauses
   const onlineCount = useMemo(() => nodes.reduce((count, n) => count + (n.online ? 1 : 0), 0), [nodes]);
+
+  // ⚡ Bolt Optimization: Replace O(N*M) nested `.find()` loops with an O(1) map lookup
+  // 💡 What: Pre-computes a lookup map of `nodes` by `nodeId` before counting/mapping over arrays.
+  // 🎯 Why: Calculating `selectedCount` and `orderedNodes` required mapping over one array and finding items in another (`nodes.find()`), leading to O(N*M) time complexity on every render cycle.
+  // 📊 Impact: Reduces computational complexity to O(N+M), significantly reducing CPU overhead during render cycles.
+  const nodeMap = useMemo(() => {
+    return nodes.reduce<Record<string, BridgeNode>>((acc, n) => {
+      acc[n.nodeId] = n;
+      return acc;
+    }, {});
+  }, [nodes]);
+
   const selectedCount = useMemo(() => selectedNodeIds.reduce((count, id) =>
-    count + (nodes.find(n => n.nodeId === id)?.online ? 1 : 0), 0
-  ), [selectedNodeIds, nodes]);
+    count + (nodeMap[id]?.online ? 1 : 0), 0
+  ), [selectedNodeIds, nodeMap]);
 
   // Optimize array mapping/filtering: replace O(2N) chained .map().filter() with single O(N) .reduce() pass
   // and memoize to prevent O(N) allocations on every render cycle.
   const orderedNodes = useMemo(() => {
     if (mode !== 'pipeline') return nodes;
     return pipelineOrder.reduce<BridgeNode[]>((acc, id) => {
-      const node = nodes.find(n => n.nodeId === id);
+      const node = nodeMap[id];
       if (node) acc.push(node);
       return acc;
     }, []);
-  }, [mode, pipelineOrder, nodes]);
+  }, [mode, pipelineOrder, nodes, nodeMap]);
 
   const selectedNodeSet = useMemo(() => new Set(selectedNodeIds), [selectedNodeIds]);
 
