@@ -2,7 +2,7 @@
 
 import { useChatStore } from '@/store/chatStore';
 import MessageList from './MessageList';
-import InputBar from './InputBar';
+import InputBar from '../input/ChatInputBar';
 import { useEffect, useRef, use } from 'react';
 import EmptyState from './EmptyState';
 import InstanceTabBar from '@/components/instance/InstanceTabBar';

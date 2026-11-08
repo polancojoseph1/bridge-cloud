@@ -18,3 +18,8 @@ Total issues found: 3
    - **Fix applied:** Verified that non-single orchestration modes are gracefully disabled via `disabled={isDisabled}` and `onClick` handlers, preventing them from being clicked or breaking the UI. `InputBar.tsx` properly blocks input and shows "Coming soon".
 
 *(Note: The Stop button was tested and verified to be properly wired to the AbortController in `chatStore.ts` and correctly aborts the fetch streams.)*
+
+4. **Bug: Duplicate attribute `title` causing build failure**
+   - **Component:** `src/components/input/SendButton.tsx`
+   - **What's broken:** `title` was specified twice on `<button>`, causing Next.js to fail compilation.
+   - **Fix applied:** Removed duplicate attribute and merged `title` with fallback to `isStreaming ? 'Stop generating' : 'Send message'`.
