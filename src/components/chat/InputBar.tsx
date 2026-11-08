@@ -64,6 +64,7 @@ export default function InputBar() {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
     }
+    setTimeout(() => textareaRef.current?.focus(), 0);
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
   const canSend = value.trim().length > 0 && !isStreaming;
@@ -129,7 +130,7 @@ export default function InputBar() {
               onClick={handleSubmit}
               disabled={!canSend}
               aria-label="Send message"
-              title="Send message"
+              title={canSend ? 'Send message (Enter)' : 'Enter a message to send'}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
