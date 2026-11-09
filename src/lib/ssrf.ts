@@ -47,8 +47,46 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
+  // Handle mapped IPv4 in IPv6
+  let ipv4CheckStr = cleanHn;
+  if (cleanHn.includes(':')) {
+    if (cleanHn === '::1') return true; // Loopback
+    if (cleanHn === '::') return true; // Unspecified
+    if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
+    if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
+    if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+
+    // Check if it's an IPv4-mapped or IPv4-compatible address
+    const hnParts = cleanHn.split(':');
+    if (hnParts.length > 2) {
+      const lastPart = hnParts[hnParts.length - 1];
+      const secondLastPart = hnParts[hnParts.length - 2];
+
+      // Node URL normalizing produces ::c0a8:101 or ::ffff:c0a8:101
+      if (cleanHn.startsWith('::ffff:') && !cleanHn.includes('.')) {
+         if (hnParts.length === 5) {
+            const p1 = parseInt(secondLastPart, 16);
+            const p2 = parseInt(lastPart, 16);
+            if (!isNaN(p1) && !isNaN(p2)) {
+               ipv4CheckStr = `${(p1 >> 8) & 0xff}.${p1 & 0xff}.${(p2 >> 8) & 0xff}.${p2 & 0xff}`;
+            }
+         }
+      } else if (cleanHn.startsWith('::') && hnParts.length === 4 && !cleanHn.includes('.')) {
+         const p1 = parseInt(secondLastPart, 16);
+         const p2 = parseInt(lastPart, 16);
+         if (!isNaN(p1) && !isNaN(p2)) {
+               ipv4CheckStr = `${(p1 >> 8) & 0xff}.${p1 & 0xff}.${(p2 >> 8) & 0xff}.${p2 & 0xff}`;
+         }
+      } else if (cleanHn.startsWith('::ffff:')) {
+         ipv4CheckStr = lastPart;
+      } else if (cleanHn.startsWith('::') && hnParts.length === 3 && lastPart.includes('.')) {
+         ipv4CheckStr = lastPart;
+      }
+    }
+  }
+
   // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
+  const parts = parseIPv4(ipv4CheckStr);
   if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
@@ -58,16 +96,6 @@ export function isForbiddenHostname(hn: string): boolean {
     if (parts[0] === 192 && parts[1] === 168) return true; // 192.168.0.0/16
 
     return false;
-  }
-
-  // IPv6 blocking
-  if (cleanHn.includes(':')) {
-    if (cleanHn === '::1') return true; // Loopback
-    if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
-    if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
-    if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
-    if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
   }
 
   return false;
