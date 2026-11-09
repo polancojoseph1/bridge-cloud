@@ -1,0 +1,4 @@
+## 2024-11-09 - SSRF Bypass via Normalized IPv4-mapped IPv6
+**Vulnerability:** Node.js URL normalization converts IPv4-mapped and compatible IPv6 addresses with dot-decimal notations (e.g., `[::192.168.1.1]`) into hexadecimal forms (e.g., `[::c0a8:101]`). The existing string prefix checks like `.startsWith('::ffff:')` are bypassed by these normalized forms, allowing SSRF payload resolution.
+**Learning:** URL normalization behavior differs from simple string representation. Pure string manipulation is insufficient to block SSRF if the parser (like `fetch` or `URL`) interprets the host differently than the check logic.
+**Prevention:** Explicitly extract and decode hex-encoded IPv4 payloads from mapped/compatible IPv6 addresses *after* normalization, or ensure string-based checks cover all normalized variations.
