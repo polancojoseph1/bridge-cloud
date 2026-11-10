@@ -56,13 +56,14 @@ export default function InputBar() {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || orchestrationMode !== 'single') return;
     sendMessage(trimmed);
     setValue('');
     // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
+      setTimeout(() => textareaRef.current?.focus(), 0);
     }
   }, [value, isStreaming, sendMessage, orchestrationMode]);
 
@@ -92,9 +93,9 @@ export default function InputBar() {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
+            disabled={isStreaming || orchestrationMode !== 'single'}
             rows={1}
-            placeholder="Message Bridge Cloud…"
+            placeholder={orchestrationMode === 'single' ? "Message Bridge Cloud…" : "Orchestration modes coming soon!"}
             aria-label="Chat input"
             title="Chat input"
             aria-multiline="true"
@@ -127,9 +128,9 @@ export default function InputBar() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSend}
+              disabled={!canSend || orchestrationMode !== 'single'}
               aria-label="Send message"
-              title="Send message"
+              title={orchestrationMode !== 'single' ? "Orchestration modes coming soon!" : "Send message"}
               className={[
                 'w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 self-end mb-0.5',
                 'transition-colors duration-150',
