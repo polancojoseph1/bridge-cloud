@@ -47,16 +47,20 @@ export function isForbiddenHostname(hn: string): boolean {
     return true;
   }
 
-  // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
-  if (parts) {
+  const checkIPv4Parts = (parts: number[]): boolean => {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
     if (parts[0] === 127) return true; // 127.0.0.0/8
     if (parts[0] === 169 && parts[1] === 254) return true; // 169.254.0.0/16
     if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true; // 172.16.0.0/12
     if (parts[0] === 192 && parts[1] === 168) return true; // 192.168.0.0/16
+    return false;
+  };
 
+  // IPv4 blocking (handles octal, hex, and dword formats)
+  const parts = parseIPv4(cleanHn);
+  if (parts) {
+    if (checkIPv4Parts(parts)) return true;
     return false;
   }
 
@@ -64,10 +68,46 @@ export function isForbiddenHostname(hn: string): boolean {
   if (cleanHn.includes(':')) {
     if (cleanHn === '::1') return true; // Loopback
     if (cleanHn === '::') return true; // Unspecified
-    if (cleanHn.startsWith('::ffff:')) return true; // IPv4-mapped IPv6
     if (/^[fF][cCdDeEfF]/.test(cleanHn)) return true; // Unique local address (fc00::/7)
     if (/^[fF][eE][89aAbB]/.test(cleanHn)) return true; // Link-local (fe80::/10)
     if (cleanHn.startsWith('100:')) return true; // RFC 6666 discard
+
+    // Handle IPv4-mapped (::ffff:) and IPv4-compatible (::) addresses
+    let ipv4Payload = '';
+    if (cleanHn.startsWith('::ffff:')) {
+      ipv4Payload = cleanHn.slice(7);
+    } else if (cleanHn.startsWith('::')) {
+      ipv4Payload = cleanHn.slice(2);
+    }
+
+    if (ipv4Payload) {
+      let v4Parts: number[] | null = null;
+      if (ipv4Payload.includes('.')) {
+        v4Parts = parseIPv4(ipv4Payload);
+      } else if (/^[0-9a-f]+:[0-9a-f]+$/i.test(ipv4Payload)) {
+        const [highStr, lowStr] = ipv4Payload.split(':');
+        const highInt = parseInt(highStr, 16);
+        const lowInt = parseInt(lowStr, 16);
+        v4Parts = [
+          (highInt >> 8) & 0xff,
+          highInt & 0xff,
+          (lowInt >> 8) & 0xff,
+          lowInt & 0xff
+        ];
+      } else if (/^[0-9a-f]+$/i.test(ipv4Payload)) {
+        const val = parseInt(ipv4Payload, 16);
+        v4Parts = [
+          (val >> 24) & 0xff,
+          (val >> 16) & 0xff,
+          (val >> 8) & 0xff,
+          val & 0xff
+        ];
+      }
+
+      if (v4Parts && checkIPv4Parts(v4Parts)) {
+        return true;
+      }
+    }
   }
 
   return false;
