@@ -1,0 +1,4 @@
+## 2025-05-16 - SSRF Bypass via Normalized IPv4-Mapped Hexadecimal IPv6 Addresses
+**Vulnerability:** The SSRF guard blocked internal IPs and standard IPv4-mapped addresses (like `::ffff:127.0.0.1`), but node.js `URL` normalizes IPv4 payloads embedded in IPv6 formats into pure hexadecimal forms (e.g. `[::ffff:c0a8:101]`). The application's `fetch()` successfully connected to these normalized formats, completely bypassing the string prefix validation `cleanHn.startsWith('::ffff:')`.
+**Learning:** URL parsers in node.js and fetch will implicitly format IPv4-compatible dot-decimal notations in IPv6 brackets to their hexadecimal equivalents, evading simple string matching and allowing unauthenticated internal routing.
+**Prevention:** Rather than string matching, manually extract and decode trailing hexadecimal segments (the lowest 32 bits) of an IPv6 sequence, converting them back into an IPv4 octet array, to safely re-apply existing IP blocklist rules.

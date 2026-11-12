@@ -39,6 +39,34 @@ function parseIPv4(ip: string): number[] | null {
   return result;
 }
 
+function parseIPv4MappedIPv6(cleanHn: string): number[] | null {
+  if (cleanHn.startsWith('::')) {
+    if (cleanHn === '::1' || cleanHn === '::') {
+      return null;
+    }
+
+    const parts = cleanHn.split(':');
+
+    if (parts.length >= 3) {
+      const last = parts[parts.length - 1];
+      const secondLast = parts[parts.length - 2];
+
+      if (last && secondLast && /^[0-9a-f]{1,4}$/i.test(last) && /^[0-9a-f]{1,4}$/i.test(secondLast)) {
+        const val1 = parseInt(secondLast, 16);
+        const val2 = parseInt(last, 16);
+
+        const ip1 = (val1 >> 8) & 255;
+        const ip2 = val1 & 255;
+        const ip3 = (val2 >> 8) & 255;
+        const ip4 = val2 & 255;
+
+        return [ip1, ip2, ip3, ip4];
+      }
+    }
+  }
+  return null;
+}
+
 export function isForbiddenHostname(hn: string): boolean {
   const cleanHn = hn.replace(/^\[|\]$/g, '').toLowerCase();
 
@@ -48,7 +76,12 @@ export function isForbiddenHostname(hn: string): boolean {
   }
 
   // IPv4 blocking (handles octal, hex, and dword formats)
-  const parts = parseIPv4(cleanHn);
+  let parts = parseIPv4(cleanHn);
+
+  if (!parts) {
+    parts = parseIPv4MappedIPv6(cleanHn);
+  }
+
   if (parts) {
     if (parts[0] === 0) return true; // 0.0.0.0/8
     if (parts[0] === 10) return true; // 10.0.0.0/8
